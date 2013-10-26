@@ -155,6 +155,7 @@ CONFIG += cgal
 CONFIG += opencsg
 CONFIG += boost
 CONFIG += eigen
+CONFIG += freetype
 
 #Uncomment the following line to enable QCodeEdit
 #CONFIG += qcodeedit
@@ -247,6 +248,8 @@ HEADERS += src/typedefs.h \
            src/PolySetEvaluator.h \
            src/CSGTermEvaluator.h \
            src/Tree.h \
+	   src/DrawingCallback.h \
+	   src/FreetypeRenderer.h \
            src/mathc99.h \
            src/memory.h \
            src/linalg.h \
@@ -311,6 +314,8 @@ SOURCES += src/version_check.cc \
            src/ModuleCache.cc \
            src/PolySetCache.cc \
            src/Tree.cc \
+	   src/DrawingCallback.cc \
+	   src/FreetypeRenderer.cc \
            \
            src/rendersettings.cc \
            src/highlighter.cc \
