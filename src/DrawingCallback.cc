@@ -49,19 +49,24 @@ void DrawingCallback::add_xoffset(double x_offset)
 	this->x_offset += x_offset;
 }
 
-void DrawingCallback::move_to(Vector2d to) const
+void DrawingCallback::add_vertex(Vector2d v)
+{
+	data->paths.back().indices.push_back(data->addPoint(x_offset + v[0], v[1]));
+}
+
+void DrawingCallback::move_to(Vector2d to)
 {
 	data->paths.push_back(DxfData::Path());
 	data->paths.back().is_closed = true;
-	data->paths.back().indices.push_back(data->addPoint(x_offset + to[0], to[1]));
+	add_vertex(to);
 }
 
-void DrawingCallback::line_to(Vector2d to) const
+void DrawingCallback::line_to(Vector2d to)
 {
-	data->paths.back().indices.push_back(data->addPoint(x_offset + to[0], to[1]));
+	add_vertex(to);
 }
 
-void DrawingCallback::curve_to(Vector2d c1, Vector2d to) const
+void DrawingCallback::curve_to(Vector2d c1, Vector2d to)
 {
 	const Vector2d pen = data->points.back();
 	
@@ -70,11 +75,11 @@ void DrawingCallback::curve_to(Vector2d c1, Vector2d to) const
 		const double a = idx * (1.0 / segments);
 		const double x = (pen[0] - x_offset) * t(a, 2) + c1[0] * 2 * t(a, 1) * a + to[0] * a * a;
 		const double y = pen[1] * t(a, 2) + c1[1] * 2 * t(a, 1) * a + to[1] * a * a;
-		line_to(Vector2d(x, y));
+		add_vertex(Vector2d(x, y));
 	}
 }
 
-void DrawingCallback::curve_to(Vector2d c1, Vector2d c2, Vector2d to) const
+void DrawingCallback::curve_to(Vector2d c1, Vector2d c2, Vector2d to)
 {
 	const Vector2d pen = data->points.back();
 	
@@ -83,6 +88,6 @@ void DrawingCallback::curve_to(Vector2d c1, Vector2d c2, Vector2d to) const
 		const double a = idx * (1.0 / segments);
 		const double x = (pen[0] - x_offset) * t(a, 3) + c1[0] * 3 * t(a, 2) * a + c2[0] * 3 * t(a, 1) * a * a + to[0] * a * a * a;
 		const double y = pen[1] * t(a, 3) + c1[1] * 3 * t(a, 2) * a + c2[1] * 3 * t(a, 1) * a * a + to[1] * a * a * a;
-		line_to(Vector2d(x, y));
+		add_vertex(Vector2d(x, y));
 	}
 }

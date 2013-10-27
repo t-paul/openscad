@@ -38,14 +38,16 @@ public:
     
     void set_xoffset(double x_offset);
     void add_xoffset(double x_offset);
-    void move_to(Vector2d to) const;
-    void line_to(Vector2d to) const;
-    void curve_to(Vector2d c1, Vector2d to) const;
-    void curve_to(Vector2d c1, Vector2d c2, Vector2d to) const;
+    void move_to(Vector2d to);
+    void line_to(Vector2d to);
+    void curve_to(Vector2d c1, Vector2d to);
+    void curve_to(Vector2d c1, Vector2d c2, Vector2d to);
 private:
     DxfData *data;
     double fn;
     double x_offset;
+    
+    void add_vertex(Vector2d v);
     
     inline double t(double t, int exp) const {
 	return pow(1.0 - t, exp);

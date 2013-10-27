@@ -246,7 +246,7 @@ AbstractNode *PrimitiveModule::instantiate(const Context *ctx, const ModuleInsta
 		Value size = c.lookup_variable("size");
 		node->size = (size.type() == Value::NUMBER) ? size.toDouble() : 10.0;
 		Value font = c.lookup_variable("font");
-		node->font = (font.type() == Value::STRING) ? font.toString() : "DejaVuSansMono.ttf";
+		node->font = (font.type() == Value::STRING) ? font.toString() : "";
 	}
 
 	node->convexity = c.lookup_variable("convexity", true).toDouble();
@@ -577,7 +577,6 @@ sphere_next_r2:
 	{
 		p->is2d = true;
 
-		PRINTB("TEXT: %s", text);
 		DxfData dd;
 		const FreetypeRenderer *renderer = new FreetypeRenderer();
 		DrawingCallback *callback = new DrawingCallback(&dd, fn);
