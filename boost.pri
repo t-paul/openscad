@@ -61,7 +61,7 @@ boost {
 
   isEmpty(BOOST_LINK_FLAGS) {
     unix|macx {
-      BOOST_LINK_FLAGS = -lboost_thread -lboost_program_options -lboost_filesystem -lboost_system -lboost_regex
+      BOOST_LINK_FLAGS = -lboost_thread -lboost_program_options -lboost_filesystem -lboost_locale -lboost_system -lboost_regex
     }
   }
 

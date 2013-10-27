@@ -36,6 +36,7 @@
 #include FT_OUTLINE_H
 
 namespace fs = boost::filesystem;
+namespace loc = boost::locale;
 
 FreetypeRenderer::FreetypeRenderer()
 {
@@ -151,8 +152,9 @@ FreetypeRenderer::render(DrawingCallback *callback, std::string text, std::strin
 	callback->set_xoffset(x_offset);
 	FT_UInt prev_glyph_index = 0;
 	
-	for (unsigned int idx = 0;idx < text.length();idx++) {
-		int c = text.at(idx);
+	std::wstring wtext = loc::conv::to_utf<wchar_t>(text, "utf-8"); 
+	for (unsigned int idx = 0;idx < wtext.length();idx++) {
+		int c = wtext.at(idx);
 		FT_UInt glyph_index = FT_Get_Char_Index(face, c);
 
 		if (use_kerning && (idx > 0)) {
