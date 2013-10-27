@@ -47,10 +47,14 @@ private:
     FT_Face find_face(std::string font) const;
     FT_Face find_face_in_path(std::string path, std::string font) const;
     
-    static int Outline_MoveToFunc(const FT_Vector *to, void *user);
-    static int Outline_LineToFunc(const FT_Vector *to, void *user);
-    static int Outline_ConicToFunc(const FT_Vector *c1, const FT_Vector *to, void *user);
-    static int Outline_CubicToFunc(const FT_Vector *c1, const FT_Vector *c2, const FT_Vector *to, void *user);
+    static int outline_move_to_func(const FT_Vector *to, void *user);
+    static int outline_line_to_func(const FT_Vector *to, void *user);
+    static int outline_conic_to_func(const FT_Vector *c1, const FT_Vector *to, void *user);
+    static int outline_cubic_to_func(const FT_Vector *c1, const FT_Vector *c2, const FT_Vector *to, void *user);
+    
+    static inline Vector2d get_scaled_vector(const FT_Vector *ft_vector, double scale) {
+        return Vector2d(ft_vector->x / scale, ft_vector->y / scale);
+    }
 };
 
 #endif	/* FREETYPERENDERER_H */

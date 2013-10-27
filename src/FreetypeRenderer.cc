@@ -53,44 +53,39 @@ FreetypeRenderer::~FreetypeRenderer()
 {
 }
 
-int
-FreetypeRenderer::Outline_MoveToFunc(const FT_Vector *to, void *user)
+int FreetypeRenderer::outline_move_to_func(const FT_Vector *to, void *user)
 {
-	const DrawingCallback *cb = reinterpret_cast<const DrawingCallback *>(user);
+	DrawingCallback *cb = reinterpret_cast<DrawingCallback *>(user);
 	
-	cb->move_to(point_t(to->x, to->y, scale));
+	cb->move_to(get_scaled_vector(to, scale));
 	return 0;
 }
 
-int
-FreetypeRenderer::Outline_LineToFunc(const FT_Vector *to, void *user)
+int FreetypeRenderer::outline_line_to_func(const FT_Vector *to, void *user)
 {
-	const DrawingCallback *cb = reinterpret_cast<const DrawingCallback *>(user);
+	DrawingCallback *cb = reinterpret_cast<DrawingCallback *>(user);
 	
-	cb->line_to(point_t(to->x, to->y, scale));
+	cb->line_to(get_scaled_vector(to, scale));
 	return 0;
 }
 
-int
-FreetypeRenderer::Outline_ConicToFunc(const FT_Vector *c1, const FT_Vector *to, void *user)
+int FreetypeRenderer::outline_conic_to_func(const FT_Vector *c1, const FT_Vector *to, void *user)
 {
-	const DrawingCallback *cb = reinterpret_cast<const DrawingCallback *>(user);
-	
-	cb->curve_to(point_t(c1->x, c1->y, scale), point_t(to->x, to->y, scale));
+	DrawingCallback *cb = reinterpret_cast<DrawingCallback *>(user);
+
+	cb->curve_to(get_scaled_vector(c1, scale), get_scaled_vector(to, scale));
 	return 0;
 }
 
-int
-FreetypeRenderer::Outline_CubicToFunc(const FT_Vector *c1, const FT_Vector *c2, const FT_Vector *to, void *user)
+int FreetypeRenderer::outline_cubic_to_func(const FT_Vector *c1, const FT_Vector *c2, const FT_Vector *to, void *user)
 {
-	const DrawingCallback *cb = reinterpret_cast<const DrawingCallback *>(user);
+	DrawingCallback *cb = reinterpret_cast<DrawingCallback *>(user);
 	
-	cb->curve_to(point_t(c1->x, c1->y, scale), point_t(c2->x, c2->y, scale), point_t(to->x, to->y, scale));
+	cb->curve_to(get_scaled_vector(c1, scale), get_scaled_vector(c2, scale), get_scaled_vector(to, scale));
 	return 0; 
 }
 
-FT_Face
-FreetypeRenderer::find_face(std::string font) const
+FT_Face FreetypeRenderer::find_face(std::string font) const
 {
 	const char *env_font_path = getenv("OPENSCAD_FONT_PATH");
 	const std::string path = (env_font_path == NULL) ? "/usr/share/fonts/truetype" : env_font_path;
@@ -98,8 +93,7 @@ FreetypeRenderer::find_face(std::string font) const
 	return find_face_in_path(path, font);
 }
 
-FT_Face
-FreetypeRenderer::find_face_in_path(std::string path, std::string font) const
+FT_Face FreetypeRenderer::find_face_in_path(std::string path, std::string font) const
 {
 	FT_Error error;
 	
@@ -125,8 +119,7 @@ FreetypeRenderer::find_face_in_path(std::string path, std::string font) const
 	return NULL;
 }
 
-void
-FreetypeRenderer::render(DrawingCallback *callback, std::string text, std::string font, double size) const
+void FreetypeRenderer::render(DrawingCallback *callback, std::string text, std::string font, double size) const
 {
 	FT_Face face;
 	FT_Error error;
@@ -177,10 +170,10 @@ FreetypeRenderer::render(DrawingCallback *callback, std::string text, std::strin
 		}
 
 		FT_Outline_Funcs funcs;
-		funcs.move_to = Outline_MoveToFunc;
-		funcs.line_to = Outline_LineToFunc;
-		funcs.conic_to = Outline_ConicToFunc;
-		funcs.cubic_to = Outline_CubicToFunc;
+		funcs.move_to = outline_move_to_func;
+		funcs.line_to = outline_line_to_func;
+		funcs.conic_to = outline_conic_to_func;
+		funcs.cubic_to = outline_cubic_to_func;
 		funcs.delta = 0;
 		funcs.shift = 0;
 
