@@ -51,6 +51,10 @@ private:
     static int Outline_LineToFunc(const FT_Vector *to, void *user);
     static int Outline_ConicToFunc(const FT_Vector *c1, const FT_Vector *to, void *user);
     static int Outline_CubicToFunc(const FT_Vector *c1, const FT_Vector *c2, const FT_Vector *to, void *user);
+    
+    static inline Vector2d get_scaled_vector(const FT_Vector *ft_vector, double scale) {
+        return Vector2d(ft_vector->x / scale, ft_vector->y / scale);
+    }
 };
 
 #endif	/* FREETYPERENDERER_H */

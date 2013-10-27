@@ -58,7 +58,7 @@ FreetypeRenderer::Outline_MoveToFunc(const FT_Vector *to, void *user)
 {
 	const DrawingCallback *cb = reinterpret_cast<const DrawingCallback *>(user);
 	
-	cb->move_to(point_t(to->x, to->y, scale));
+	cb->move_to(get_scaled_vector(to, scale));
 	return 0;
 }
 
@@ -67,7 +67,7 @@ FreetypeRenderer::Outline_LineToFunc(const FT_Vector *to, void *user)
 {
 	const DrawingCallback *cb = reinterpret_cast<const DrawingCallback *>(user);
 	
-	cb->line_to(point_t(to->x, to->y, scale));
+	cb->line_to(get_scaled_vector(to, scale));
 	return 0;
 }
 
@@ -75,8 +75,8 @@ int
 FreetypeRenderer::Outline_ConicToFunc(const FT_Vector *c1, const FT_Vector *to, void *user)
 {
 	const DrawingCallback *cb = reinterpret_cast<const DrawingCallback *>(user);
-	
-	cb->curve_to(point_t(c1->x, c1->y, scale), point_t(to->x, to->y, scale));
+
+	cb->curve_to(get_scaled_vector(c1, scale), get_scaled_vector(to, scale));
 	return 0;
 }
 
@@ -85,7 +85,7 @@ FreetypeRenderer::Outline_CubicToFunc(const FT_Vector *c1, const FT_Vector *c2, 
 {
 	const DrawingCallback *cb = reinterpret_cast<const DrawingCallback *>(user);
 	
-	cb->curve_to(point_t(c1->x, c1->y, scale), point_t(c2->x, c2->y, scale), point_t(to->x, to->y, scale));
+	cb->curve_to(get_scaled_vector(c1, scale), get_scaled_vector(c2, scale), get_scaled_vector(to, scale));
 	return 0; 
 }
 
