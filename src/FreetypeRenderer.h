@@ -37,7 +37,7 @@ public:
     FreetypeRenderer();
     virtual ~FreetypeRenderer();
 
-    void render(DrawingCallback *cb, std::string text, std::string font, double size) const;
+    void render(DrawingCallback *cb, std::string text, std::string font, double size, std::string direction, std::string language, std::string script) const;
 private:
     const static double scale = 1000;
     

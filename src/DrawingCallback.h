@@ -30,22 +30,31 @@
 #include <Eigen/Core>
 
 #include "dxfdata.h"
+#include "CGAL_Nef_polyhedron.h"
 
 class DrawingCallback {
 public:
-    DrawingCallback(DxfData *data, double fn);
+    DrawingCallback(double fn);
     virtual ~DrawingCallback();
     
-    void set_xoffset(double x_offset);
-    void add_xoffset(double x_offset);
+    void start_glyph();
+    void finish_glyph();
+    void set_glyph_offset(double offset_x, double offset_y);
+    void add_glyph_advance(double advance_x, double advance_y);
+    PolySet *get_result();
+
     void move_to(Vector2d to);
     void line_to(Vector2d to);
     void curve_to(Vector2d c1, Vector2d to);
     void curve_to(Vector2d c1, Vector2d c2, Vector2d to);
 private:
-    DxfData *data;
     double fn;
-    double x_offset;
+    Vector2d pen;
+    Vector2d offset;
+    Vector2d advance;
+
+    DxfData *data;
+    CGAL_Nef_polyhedron result;
     
     void add_vertex(Vector2d v);
     
