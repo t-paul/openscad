@@ -62,6 +62,8 @@ public:
 	virtual AbstractNode *instantiate(const Context *ctx, const ModuleInstantiation *inst, const EvalContext *evalctx) const;
 private:
 	Value lookup_radius(const Context &ctx, const std::string &radius_var, const std::string &diameter_var) const;
+	double lookup_double_variable_with_default(Context &c, std::string variable, double def) const;
+	std::string lookup_string_variable_with_default(Context &c, std::string variable, std::string def) const;
 };
 
 class PrimitiveNode : public AbstractPolyNode
@@ -111,7 +113,7 @@ public:
 	int convexity;
 	Value points, paths, triangles;
 	std::string text;
-	std::string font;
+	std::string font, direction, language, script;
 	virtual PolySet *evaluate_polyset(class PolySetEvaluator *) const;
 };
 
@@ -273,12 +275,12 @@ AbstractNode *PrimitiveModule::instantiate(const Context *ctx, const ModuleInsta
 	}
 	
 	if (type == TEXT) {
-		Value t = c.lookup_variable("t");
-		node->text = (t.type() == Value::STRING) ? t.toString() : "";
-		Value size = c.lookup_variable("size");
-		node->size = (size.type() == Value::NUMBER) ? size.toDouble() : 10.0;
-		Value font = c.lookup_variable("font");
-		node->font = (font.type() == Value::STRING) ? font.toString() : "";
+		node->text = lookup_string_variable_with_default(c, "t", "");
+		node->size = lookup_double_variable_with_default(c, "size", 10.0);
+		node->font = lookup_string_variable_with_default(c, "font", "");
+		node->direction = lookup_string_variable_with_default(c, "direction", "ltr");
+		node->language = lookup_string_variable_with_default(c, "language", "en");
+		node->script = lookup_string_variable_with_default(c, "script", "latin");
 	}
 
 	node->convexity = c.lookup_variable("convexity", true).toDouble();
@@ -286,6 +288,18 @@ AbstractNode *PrimitiveModule::instantiate(const Context *ctx, const ModuleInsta
 		node->convexity = 1;
 
 	return node;
+}
+
+double PrimitiveModule::lookup_double_variable_with_default(Context &c, std::string variable, double def) const
+{
+	const Value v = c.lookup_variable(variable, false);
+	return (v.type() == Value::NUMBER) ? v.toDouble() : def;
+}
+
+std::string PrimitiveModule::lookup_string_variable_with_default(Context &c, std::string variable, std::string def) const
+{
+	const Value v = c.lookup_variable(variable, false);
+	return (v.type() == Value::STRING) ? v.toString() : def;
 }
 
 /*!
@@ -607,14 +621,11 @@ sphere_next_r2:
 	
 	if (this->type == TEXT)
 	{
-		p->is2d = true;
-
-		DxfData dd;
 		const FreetypeRenderer *renderer = new FreetypeRenderer();
-		DrawingCallback *callback = new DrawingCallback(&dd, fn);
-		renderer->render(callback, text, font, size);
-		dxf_tesselate(p, dd, 0, Vector2d(1,1), true, false, 0);
-		dxf_border_to_ps(p, dd);
+		DrawingCallback *callback = new DrawingCallback(fn);
+		renderer->render(callback, text, font, size, direction, language, script);
+		delete p;
+		p = callback->get_result();
 	}
 
 
@@ -658,7 +669,14 @@ std::string PrimitiveNode::toString() const
 		stream << "(points = " << this->points << ", paths = " << this->paths << ", convexity = " << this->convexity << ")";
 			break;
 	case TEXT:
-		stream << "($fn = " << this->fn << ", text = '" << this->text << ", size = " << this->size << ", font = " << this->font << "')";
+		stream << "($fn = " << this->fn
+			<< ", text = '" << this->text
+			<< ", size = " << this->size
+			<< ", font = " << this->font
+			<< ", direction = " << this->direction
+			<< ", language = " << this->language
+			<< ", script = " << this->script
+			<< "')";
 		break;
 	default:
 		assert(false);

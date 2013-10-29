@@ -28,10 +28,16 @@
 #include <iostream>
 #include <algorithm>
 
-#include "DrawingCallback.h"
 #include "dxfdata.h"
+#include "dxftess.h"
+#include "polyset.h"
+#include "Tree.h"
+#include "CGALEvaluator.h"
 
-DrawingCallback::DrawingCallback(DxfData *data, double fn) : data(data), fn(fn), x_offset(0)
+#include "DrawingCallback.h"
+
+DrawingCallback::DrawingCallback(double fn) : fn(fn),
+	pen(Vector2d(0, 0)), offset(Vector2d(0, 0)), advance(Vector2d(0, 0))
 {
 }
 
@@ -39,19 +45,56 @@ DrawingCallback::~DrawingCallback()
 {
 }
 
-void DrawingCallback::set_xoffset(double x_offset)
+void DrawingCallback::start_glyph()
 {
-	this->x_offset = x_offset;
+	data = new DxfData();
 }
 
-void DrawingCallback::add_xoffset(double x_offset)
+void DrawingCallback::finish_glyph()
 {
-	this->x_offset += x_offset;
+	PolySet *p = new PolySet();
+	p->is2d = true;
+	dxf_tesselate(p, *data, 0, Vector2d(1,1), true, false, 0);
+	dxf_border_to_ps(p, *data);
+
+	Tree nulltree;
+	CGALEvaluator tmpeval(nulltree);
+	CGAL_Nef_polyhedron N = tmpeval.evaluateCGALMesh(*p);
+	delete p;
+	
+	if (!N.isNull()) {
+		if (result.isNull()) {
+			result = N.copy();
+		} else {
+			result += N;
+		}
+	}
+	
+	delete data;
+	data = NULL;
+}
+
+PolySet * DrawingCallback::get_result()
+{
+	return result.convertToPolyset();
+}
+
+void DrawingCallback::set_glyph_offset(double offset_x, double offset_y)
+{
+	offset = Vector2d(offset_x, offset_y);
+}
+
+void DrawingCallback::add_glyph_advance(double advance_x, double advance_y)
+{
+	advance += Vector2d(advance_x, advance_y);
 }
 
 void DrawingCallback::add_vertex(Vector2d v)
 {
-	data->paths.back().indices.push_back(data->addPoint(x_offset + v[0], v[1]));
+	double x = offset[0] + advance[0];
+	double y = offset[1] + advance[1];
+	data->paths.back().indices.push_back(data->addPoint(x + v[0], y + v[1]));
+	pen = v;
 }
 
 void DrawingCallback::move_to(Vector2d to)
@@ -68,12 +111,10 @@ void DrawingCallback::line_to(Vector2d to)
 
 void DrawingCallback::curve_to(Vector2d c1, Vector2d to)
 {
-	const Vector2d pen = data->points.back();
-	
 	int segments = std::max(((int)floor(fn / 6)) + 2, 2);
 	for (int idx = 1;idx <= segments;idx++) {
 		const double a = idx * (1.0 / segments);
-		const double x = (pen[0] - x_offset) * t(a, 2) + c1[0] * 2 * t(a, 1) * a + to[0] * a * a;
+		const double x = pen[0] * t(a, 2) + c1[0] * 2 * t(a, 1) * a + to[0] * a * a;
 		const double y = pen[1] * t(a, 2) + c1[1] * 2 * t(a, 1) * a + to[1] * a * a;
 		add_vertex(Vector2d(x, y));
 	}
@@ -86,7 +127,7 @@ void DrawingCallback::curve_to(Vector2d c1, Vector2d c2, Vector2d to)
 	int segments = std::max(((int)floor(fn / 6)) + 2, 2);
 	for (int idx = 1;idx <= segments;idx++) {
 		const double a = idx * (1.0 / segments);
-		const double x = (pen[0] - x_offset) * t(a, 3) + c1[0] * 3 * t(a, 2) * a + c2[0] * 3 * t(a, 1) * a * a + to[0] * a * a * a;
+		const double x = pen[0] * t(a, 3) + c1[0] * 3 * t(a, 2) * a + c2[0] * 3 * t(a, 1) * a * a + to[0] * a * a * a;
 		const double y = pen[1] * t(a, 3) + c1[1] * 3 * t(a, 2) * a + c2[1] * 3 * t(a, 1) * a * a + to[1] * a * a * a;
 		add_vertex(Vector2d(x, y));
 	}

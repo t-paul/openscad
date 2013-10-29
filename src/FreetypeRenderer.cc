@@ -26,17 +26,20 @@
 #include <stdio.h>
 
 #include <iostream>
-#include <boost/locale.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/algorithm/string.hpp>
 
+#include "boosty.h"
 #include "printutils.h"
 #include "FreetypeRenderer.h"
 
 #include FT_GLYPH_H
 #include FT_OUTLINE_H
 
+#include <hb.h>
+#include <hb-ft.h>
+
 namespace fs = boost::filesystem;
-namespace loc = boost::locale;
 
 FreetypeRenderer::FreetypeRenderer()
 {
@@ -88,9 +91,17 @@ int FreetypeRenderer::outline_cubic_to_func(const FT_Vector *c1, const FT_Vector
 FT_Face FreetypeRenderer::find_face(std::string font) const
 {
 	const char *env_font_path = getenv("OPENSCAD_FONT_PATH");
-	const std::string path = (env_font_path == NULL) ? "/usr/share/fonts/truetype" : env_font_path;
 	
-	return find_face_in_path(path, font);
+	std::string paths = (env_font_path == NULL) ? "/usr/share/fonts/truetype" : env_font_path;
+	typedef boost::split_iterator<std::string::iterator> string_split_iterator;
+	for (string_split_iterator it = make_split_iterator(paths, first_finder(":", boost::is_iequal()));it != string_split_iterator();it++) {
+		std::string path = boosty::absolute(fs::path(boost::copy_range<std::string>(*it))).string();
+		FT_Face face = find_face_in_path(path, font);
+		if (face) {
+			return face;
+		}
+	}
+	return NULL;
 }
 
 FT_Face FreetypeRenderer::find_face_in_path(std::string path, std::string font) const
@@ -119,7 +130,7 @@ FT_Face FreetypeRenderer::find_face_in_path(std::string path, std::string font) 
 	return NULL;
 }
 
-void FreetypeRenderer::render(DrawingCallback *callback, std::string text, std::string font, double size) const
+void FreetypeRenderer::render(DrawingCallback *callback, std::string text, std::string font, double size, std::string direction, std::string language, std::string script) const
 {
 	FT_Face face;
 	FT_Error error;
@@ -139,33 +150,31 @@ void FreetypeRenderer::render(DrawingCallback *callback, std::string text, std::
 		return;
 	}
 	
-	bool use_kerning = FT_HAS_KERNING(face);
+	hb_font_t *hb_ft_font = hb_ft_font_create(face, NULL);
 	
-	double x_offset = 0;
-	callback->set_xoffset(x_offset);
-	FT_UInt prev_glyph_index = 0;
+	hb_buffer_t *buf = hb_buffer_create();
+	hb_buffer_set_direction(buf, hb_direction_from_string(direction.c_str(), -1));
+	hb_buffer_set_script(buf, hb_script_from_string(script.c_str(), -1));
+	hb_buffer_set_language(buf, hb_language_from_string(language.c_str(), -1));
+	hb_buffer_add_utf8(buf, text.c_str(), strlen(text.c_str()), 0, strlen(text.c_str()));
+	hb_shape(hb_ft_font, buf, NULL, 0);
 	
-	std::wstring wtext = loc::conv::to_utf<wchar_t>(text, "utf-8"); 
-	for (unsigned int idx = 0;idx < wtext.length();idx++) {
-		int c = wtext.at(idx);
-		FT_UInt glyph_index = FT_Get_Char_Index(face, c);
+	unsigned int glyph_count;
+        hb_glyph_info_t *glyph_info = hb_buffer_get_glyph_infos(buf, &glyph_count);
+        hb_glyph_position_t *glyph_pos = hb_buffer_get_glyph_positions(buf, &glyph_count);	
 
-		if (use_kerning && (idx > 0)) {
-			FT_Vector delta;
-			FT_Get_Kerning(face, prev_glyph_index, glyph_index, FT_KERNING_DEFAULT, &delta );
-		}
-		prev_glyph_index = glyph_index;
-
+	for (unsigned int idx = 0;idx < glyph_count;idx++) {
+		FT_UInt glyph_index = glyph_info[idx].codepoint;
 		error = FT_Load_Glyph(face, glyph_index, FT_LOAD_DEFAULT);
 		if (error) {
-			PRINTB("Could not load glyph %u for char '%c'", glyph_index % c);
+			PRINTB("Could not load glyph %u for char at index %u in text '%s'", glyph_index % idx % text);
 			continue;
 		}
 
 		FT_Glyph glyph;
 		error = FT_Get_Glyph(face->glyph, &glyph);
 		if (error) {
-			PRINTB("Could not load glyph %u for char '%c'", glyph_index % c);
+			PRINTB("Could not get glyph %u for char at index %u in text '%s'", glyph_index % idx % text);
 			continue;
 		}
 
@@ -177,12 +186,20 @@ void FreetypeRenderer::render(DrawingCallback *callback, std::string text, std::
 		funcs.delta = 0;
 		funcs.shift = 0;
 
+		callback->start_glyph();
+		callback->set_glyph_offset(glyph_pos[idx].x_offset / 64.0 / 16.0, glyph_pos[idx].y_offset / 64.0 / 16.0);
 		FT_Outline outline = reinterpret_cast<FT_OutlineGlyph>(glyph)->outline;
 		FT_Outline_Decompose(&outline, &funcs, callback);
 
-		double adv  = glyph->advance.x / scale / 64.0 / 16.0;
-		callback->add_xoffset(adv);
+		double adv_x  = glyph_pos[idx].x_advance / 64.0 / 16.0;
+		double adv_y  = glyph_pos[idx].y_advance / 64.0 / 16.0;
+		callback->add_glyph_advance(adv_x, adv_y);
+		callback->finish_glyph();
 		
 		FT_Done_Glyph(glyph);
 	}
+	
+	hb_buffer_clear_contents(buf);
+	hb_buffer_destroy(buf);
+        hb_font_destroy(hb_ft_font);
 }
