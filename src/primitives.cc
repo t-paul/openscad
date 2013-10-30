@@ -106,7 +106,7 @@ public:
 	}
 
 	bool center;
-	double x, y, z, h, r1, r2, size;
+	double x, y, z, h, r1, r2, size, spacing;
 	double fn, fs, fa;
 	primitive_type_e type;
 	int convexity;
@@ -246,6 +246,7 @@ AbstractNode *PrimitiveModule::instantiate(const Context *ctx, const ModuleInsta
 	if (type == TEXT) {
 		node->text = lookup_string_variable_with_default(c, "t", "");
 		node->size = lookup_double_variable_with_default(c, "size", 10.0);
+		node->spacing = lookup_double_variable_with_default(c, "spacing", 1.0);
 		node->font = lookup_string_variable_with_default(c, "font", "");
 		node->direction = lookup_string_variable_with_default(c, "direction", "ltr");
 		node->language = lookup_string_variable_with_default(c, "language", "en");
@@ -592,7 +593,7 @@ sphere_next_r2:
 	{
 		const FreetypeRenderer *renderer = new FreetypeRenderer();
 		DrawingCallback *callback = new DrawingCallback(fn);
-		renderer->render(callback, text, font, size, direction, language, script);
+		renderer->render(callback, text, font, size, spacing, direction, language, script);
 		delete p;
 		p = callback->get_result();
 	}
@@ -641,6 +642,7 @@ std::string PrimitiveNode::toString() const
 		stream << "($fn = " << this->fn
 			<< ", text = '" << this->text
 			<< ", size = " << this->size
+			<< ", spacing = " << this->spacing
 			<< ", font = " << this->font
 			<< ", direction = " << this->direction
 			<< ", language = " << this->language
