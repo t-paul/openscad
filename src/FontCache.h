@@ -23,36 +23,50 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-#ifndef FREETYPERENDERER_H
-#define	FREETYPERENDERER_H
+#ifndef FONTCACHE_H
+#define	FONTCACHE_H
 
+#include <map>
 #include <string>
+
+#include <time.h>
+
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
-#include "FontCache.h"
-#include "DrawingCallback.h"
+#include <hb.h>
+#include <hb-ft.h>
 
-class FreetypeRenderer {
+class FontCache {
 public:
-    FreetypeRenderer();
-    virtual ~FreetypeRenderer();
+    const static int MAX_NR_OF_CACHE_ENTRIES = 3;
+    
+    FontCache();
+    virtual ~FontCache();
 
-    void render(DrawingCallback *cb, std::string text, std::string font, double size, double spacing, std::string direction, std::string language, std::string script) const;
+    bool is_init_ok();
+    FT_Face get_font(std::string font);
+    void clear();
+    
+    static FontCache * instance();
 private:
-    const static double scale = 1000;
+    typedef std::pair<FT_Face, time_t> cache_entry_t;
+    typedef std::map<std::string, cache_entry_t> cache_t;
+
+    static FontCache *self;
     
-    FontCache *cache;
+    bool init_ok;
+    cache_t cache;
+    FT_Library library;
+
+    void check_cleanup();
+    void dump_cache(std::string info);
     
-    static int outline_move_to_func(const FT_Vector *to, void *user);
-    static int outline_line_to_func(const FT_Vector *to, void *user);
-    static int outline_conic_to_func(const FT_Vector *c1, const FT_Vector *to, void *user);
-    static int outline_cubic_to_func(const FT_Vector *c1, const FT_Vector *c2, const FT_Vector *to, void *user);
-    
-    static inline Vector2d get_scaled_vector(const FT_Vector *ft_vector, double scale) {
-        return Vector2d(ft_vector->x / scale, ft_vector->y / scale);
-    }
+    FT_Face find_face(std::string font);
+    FT_Face find_face_fontconfig(std::string font);
+    FT_Face find_face_in_path_list(std::string font);
+    FT_Face find_face_in_path(std::string path, std::string font);
 };
 
-#endif	/* FREETYPERENDERER_H */
+#endif	/* FONTCACHE_H */
 
