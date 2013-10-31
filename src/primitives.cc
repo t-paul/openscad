@@ -262,13 +262,13 @@ AbstractNode *PrimitiveModule::instantiate(const Context *ctx, const ModuleInsta
 
 double PrimitiveModule::lookup_double_variable_with_default(Context &c, std::string variable, double def) const
 {
-	const Value v = c.lookup_variable(variable, false);
+	const Value v = c.lookup_variable(variable, true);
 	return (v.type() == Value::NUMBER) ? v.toDouble() : def;
 }
 
 std::string PrimitiveModule::lookup_string_variable_with_default(Context &c, std::string variable, std::string def) const
 {
-	const Value v = c.lookup_variable(variable, false);
+	const Value v = c.lookup_variable(variable, true);
 	return (v.type() == Value::STRING) ? v.toString() : def;
 }
 
