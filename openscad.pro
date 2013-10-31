@@ -155,7 +155,9 @@ CONFIG += cgal
 CONFIG += opencsg
 CONFIG += boost
 CONFIG += eigen
+CONFIG += harfbuzz
 CONFIG += freetype
+CONFIG += fontconfig
 
 #Uncomment the following line to enable QCodeEdit
 #CONFIG += qcodeedit
