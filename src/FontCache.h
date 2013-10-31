@@ -34,6 +34,8 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
+#include <fontconfig/fontconfig.h>
+
 #include <hb.h>
 #include <hb-ft.h>
 
@@ -57,6 +59,7 @@ private:
     
     bool init_ok;
     cache_t cache;
+    FcConfig *config;
     FT_Library library;
 
     void check_cleanup();
