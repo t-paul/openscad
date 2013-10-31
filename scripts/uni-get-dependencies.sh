@@ -59,7 +59,8 @@ get_debian_deps()
   libxmu-dev cmake bison flex git-core libboost-all-dev \
   libXi-dev libmpfr-dev libboost-dev libglew-dev libeigen2-dev \
   libeigen3-dev libcgal-dev libopencsg-dev libgmp3-dev libgmp-dev \
-  python-paramiko curl imagemagick; do
+  python-paramiko curl imagemagick libfontconfig-dev libfreetype6-dev \
+  libharfbuzz-dev ; do
    sudo apt-get -y install $pkg;
  done
 }
