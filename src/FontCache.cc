@@ -29,8 +29,6 @@
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
 
-#include <fontconfig/fontconfig.h>
-
 #include "boosty.h"
 #include "FontCache.h"
 
@@ -42,20 +40,13 @@ FontCache::FontCache()
 {
 	init_ok = false;
 
-	if (!FcInit()) {
+	config = FcInitLoadConfigAndFonts();
+	if(!config) {
 		PRINT("Can't initialize fontconfig library, text() objects will not be rendered");
 		return;
 	}
 	
-	/*
-	FcConfig *config = FcInitLoadConfigAndFonts ();
-	if(!config) {
-		return false;
-	}
-	
-	FcConfig *config = FcConfigCreate();
-	FcConfigAppFontAddDir(config, (const FcChar8 *)"C:\\Windows\\Fonts");
-	*/
+	FcConfigAppFontAddDir(config, reinterpret_cast<const FcChar8 *>("/data/openscad/fonts"));
 	
 	const FT_Error error = FT_Init_FreeType(&library);
 	if (error) {
@@ -170,8 +161,8 @@ FT_Face FontCache::find_face_fontconfig(std::string font)
 	FcPatternAdd(pattern, FC_OUTLINE, true_value, true);
 	FcPatternAdd(pattern, FC_SCALABLE, true_value, true);
 	FcDefaultSubstitute(pattern);
-	FcConfigSubstitute(NULL, pattern, FcMatchFont);
-	FcPattern *match = FcFontMatch(NULL, pattern, &result);
+	FcConfigSubstitute(config, pattern, FcMatchFont);
+	FcPattern *match = FcFontMatch(config, pattern, &result);
 	
 	FcValue file_value;
 	FcPatternGet(match, FC_FILE, 0, &file_value);
