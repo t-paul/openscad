@@ -552,8 +552,7 @@ build_harfbuzz()
   fi
   tar xzf "harfbuzz-$version.tar.gz"
   cd "harfbuzz-$version"
-  ./autogen.sh
-  ./configure --prefix="$DEPLOYDIR" --with-glib=no --with-gobject=no --with-cairo=no --with-icu=no --with-freetype=yes
+  ./autogen.sh --prefix="$DEPLOYDIR" --with-glib=yes --with-freetype=yes --with-gobject=no --with-cairo=no --with-icu=no
   make -j$NUMCPU
   make install
 }
