@@ -46,6 +46,12 @@ printUsage()
 build_qt()
 {
   version=$1
+
+  if [ -d $DEPLOYDIR/lib/QtCore.framework ]; then
+    echo "qt already installed. not building"
+    return
+  fi
+
   echo "Building Qt" $version "..."
   cd $BASEDIR/src
   rm -rf qt-everywhere-opensource-src-$version
@@ -72,6 +78,12 @@ build_qt()
 build_gmp()
 {
   version=$1
+
+  if [ -f $DEPLOYDIR/lib/libgmp.dylib ]; then
+    echo "gmp already installed. not building"
+    return
+  fi
+
   echo "Building gmp" $version "..."
   cd $BASEDIR/src
   rm -rf gmp-$version
@@ -159,6 +171,12 @@ EOF
 build_mpfr()
 {
   version=$1
+
+  if [ -f $DEPLOYDIR/include/mpfr.h ]; then
+    echo "mpfr already installed. not building"
+    return
+  fi
+
   echo "Building mpfr" $version "..."
   cd $BASEDIR/src
   rm -rf mpfr-$version
@@ -199,6 +217,12 @@ build_mpfr()
 build_boost()
 {
   version=$1
+
+  if [ -f $DEPLOYDIR/lib/libboost_system.dylib ]; then
+    echo "boost already installed. not building"
+    return
+  fi
+
   bversion=`echo $version | tr "." "_"`
   echo "Building boost" $version "..."
   cd $BASEDIR/src
@@ -236,6 +260,12 @@ build_boost()
 build_cgal()
 {
   version=$1
+
+  if [ -f $DEPLOYDIR/lib/libCGAL.dylib ]; then
+    echo "cgal already installed. not building"
+    return
+  fi
+
   echo "Building CGAL" $version "..."
   cd $BASEDIR/src
   rm -rf CGAL-$version
@@ -267,6 +297,12 @@ build_cgal()
 build_glew()
 {
   version=$1
+
+  if [ -f $DEPLOYDIR/lib/libGLEW.dylib ]; then
+    echo "glew already installed. not building"
+    return
+  fi
+
   echo "Building GLEW" $version "..."
   cd $BASEDIR/src
   rm -rf glew-$version
@@ -285,6 +321,12 @@ build_glew()
 build_opencsg()
 {
   version=$1
+
+  if [ -f $DEPLOYDIR/lib/libopencsg.dylib ]; then
+    echo "opencsg already installed. not building"
+    return
+  fi
+
   echo "Building OpenCSG" $version "..."
   cd $BASEDIR/src
   rm -rf OpenCSG-$version
@@ -304,6 +346,16 @@ build_opencsg()
 build_eigen()
 {
   version=$1
+
+  if [ -d $DEPLOYDIR/include/eigen2 ]; then
+    echo "eigen2 already installed. not building"
+    return
+  fi
+  if [ -d $DEPLOYDIR/include/eigen3 ]; then
+    echo "eigen3 already installed. not building"
+    return
+  fi
+
   echo "Building eigen" $version "..."
   cd $BASEDIR/src
   rm -rf eigen-$version
