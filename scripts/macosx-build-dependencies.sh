@@ -43,6 +43,15 @@ printUsage()
   echo "  -d   Build for deployment"
 }
 
+create_dummy_cmd()
+{
+  cmd="$1"
+  file="$2"
+
+  echo "$cmd" > "$file"
+  chmod 755 "$file"
+}
+
 patch_qt_disable_core_wlan()
 {
   version="$1"
@@ -448,6 +457,9 @@ if [ ! -f $OPENSCADDIR/openscad.pro ]; then
   echo "Must be run from the OpenSCAD source root directory"
   exit 0
 fi
+OPENSCAD_SCRIPTDIR=$PWD/scripts
+
+. $OPENSCAD_SCRIPTDIR/common-build-dependencies.sh
 
 while getopts '6lcd' c
 do
@@ -503,6 +515,11 @@ fi
 
 echo "Building for $MAC_OSX_VERSION_MIN or later"
 
+if [ ! $NUMCPU ]; then
+  echo "Note: The NUMCPU environment variable can be set for parallel builds"
+  NUMCPU=1
+fi
+
 if $OPTION_DEPLOY; then
   echo "Building deployment version of libraries"
   OPTION_32BIT=true
@@ -528,6 +545,15 @@ build_boost 1.53.0
 build_cgal 4.2
 build_glew 1.9.0
 build_opencsg 1.3.2
+build_freetype 2.5.0.1 --without-png
+export FREETYPE_CFLAGS="-I$DEPLOYDIR/include -I$DEPLOYDIR/include/freetype2"
+export FREETYPE_LIBS="-L$DEPLOYDIR/lib -lfreetype"
+build_fontconfig 2.11.0
+build_ragel 6.8
+export PATH="$PATH:$DEPLOYDIR/bin"
+create_dummy_cmd "touch gtk-doc.make" "$DEPLOYDIR/bin/gtkdocize"
+create_dummy_cmd "exit 0" "$DEPLOYDIR/bin/pkg-config"
+build_harfbuzz 0.9.23 --with-coretext=auto
 if $OPTION_DEPLOY; then
   build_sparkle 0ed83cf9f2eeb425d4fdd141c01a29d843970c20
 fi
