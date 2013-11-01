@@ -117,7 +117,12 @@ To pull the MCAD library (http://reprap.org/wiki/MCAD), do the following:
 
 Prerequisites:
 * XCode, including XCode command-line tools (install from XCode Preferences).
-* [CMake](http://cmake.org), which can be installed manually or through MacPorts/homebrew.
+
+Prerequisites that can be installed through MacPorts/homebrew:
+* [CMake](http://cmake.org)
+* automake
+* pkg-config
+* libtool
 
 Then after you've cloned this git repository, run the script that sets up the
 environment variables.
