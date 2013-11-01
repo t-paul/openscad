@@ -47,6 +47,13 @@ FontCache::FontCache()
 	}
 	
 	FcConfigAppFontAddDir(config, reinterpret_cast<const FcChar8 *>("/data/openscad/fonts"));
+	FcConfigAppFontAddDir(config, reinterpret_cast<const FcChar8 *>("/System/Library/Fonts"));
+	const char *home = getenv("HOME");
+	if (home) {
+		std::string fontdir = std::string(home) + "/Library/Fonts";
+		std::cout << "home font dir = " << fontdir << std::endl;
+		FcConfigAppFontAddDir(config, reinterpret_cast<const FcChar8 *>(fontdir.c_str()));
+	}
 	
 	const FT_Error error = FT_Init_FreeType(&library);
 	if (error) {
