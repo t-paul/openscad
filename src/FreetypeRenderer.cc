@@ -32,11 +32,16 @@
 #include "printutils.h"
 #include "FreetypeRenderer.h"
 
-#include FT_GLYPH_H
 #include FT_OUTLINE_H
 
 FreetypeRenderer::FreetypeRenderer()
 {
+	funcs.move_to = outline_move_to_func;
+	funcs.line_to = outline_line_to_func;
+	funcs.conic_to = outline_conic_to_func;
+	funcs.cubic_to = outline_cubic_to_func;
+	funcs.delta = 0;
+	funcs.shift = 0;
 }
 
 FreetypeRenderer::~FreetypeRenderer()
@@ -108,7 +113,8 @@ void FreetypeRenderer::render(DrawingCallback *callback, std::string text, std::
 	unsigned int glyph_count;
         hb_glyph_info_t *glyph_info = hb_buffer_get_glyph_infos(hb_buf, &glyph_count);
         hb_glyph_position_t *glyph_pos = hb_buffer_get_glyph_positions(hb_buf, &glyph_count);	
-
+	
+	GlyphArray glyph_array;
 	for (unsigned int idx = 0;idx < glyph_count;idx++) {
 		FT_UInt glyph_index = glyph_info[idx].codepoint;
 		error = FT_Load_Glyph(face, glyph_index, FT_LOAD_DEFAULT);
@@ -123,26 +129,22 @@ void FreetypeRenderer::render(DrawingCallback *callback, std::string text, std::
 			PRINTB("Could not get glyph %u for char at index %u in text '%s'", glyph_index % idx % text);
 			continue;
 		}
+		const GlyphData *glyph_data = new GlyphData(glyph, &glyph_info[idx], &glyph_pos[idx]);
+		glyph_array.push_back(glyph_data);
+	}
 
-		FT_Outline_Funcs funcs;
-		funcs.move_to = outline_move_to_func;
-		funcs.line_to = outline_line_to_func;
-		funcs.conic_to = outline_conic_to_func;
-		funcs.cubic_to = outline_cubic_to_func;
-		funcs.delta = 0;
-		funcs.shift = 0;
-
+	for (GlyphArray::iterator it = glyph_array.begin();it != glyph_array.end();it++) {
+		const GlyphData *glyph = (*it);
+		
 		callback->start_glyph();
-		callback->set_glyph_offset(glyph_pos[idx].x_offset / 64.0 / 16.0, glyph_pos[idx].y_offset / 64.0 / 16.0);
-		FT_Outline outline = reinterpret_cast<FT_OutlineGlyph>(glyph)->outline;
+		callback->set_glyph_offset(glyph->get_x_offset(), glyph->get_y_offset());
+		FT_Outline outline = reinterpret_cast<FT_OutlineGlyph>(glyph->get_glyph())->outline;
 		FT_Outline_Decompose(&outline, &funcs, callback);
 
-		double adv_x  = glyph_pos[idx].x_advance * spacing / 64.0 / 16.0;
-		double adv_y  = glyph_pos[idx].y_advance * spacing / 64.0 / 16.0;
+		double adv_x  = glyph->get_x_advance() * spacing;
+		double adv_y  = glyph->get_y_advance() * spacing;
 		callback->add_glyph_advance(adv_x, adv_y);
 		callback->finish_glyph();
-		
-		FT_Done_Glyph(glyph);
 	}
 
 	hb_buffer_destroy(hb_buf);
