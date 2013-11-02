@@ -65,6 +65,8 @@ private:
     void check_cleanup();
     void dump_cache(std::string info);
     
+    void add_font_dir(std::string path);
+    
     FT_Face find_face(std::string font);
     FT_Face find_face_fontconfig(std::string font);
     FT_Face find_face_in_path_list(std::string font);

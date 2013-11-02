@@ -45,14 +45,16 @@ FontCache::FontCache()
 		PRINT("Can't initialize fontconfig library, text() objects will not be rendered");
 		return;
 	}
-	
-	FcConfigAppFontAddDir(config, reinterpret_cast<const FcChar8 *>("/data/openscad/fonts"));
-	FcConfigAppFontAddDir(config, reinterpret_cast<const FcChar8 *>("/System/Library/Fonts"));
+
+	add_font_dir("/System/Library/Fonts");
 	const char *home = getenv("HOME");
 	if (home) {
-		std::string fontdir = std::string(home) + "/Library/Fonts";
-		std::cout << "home font dir = " << fontdir << std::endl;
-		FcConfigAppFontAddDir(config, reinterpret_cast<const FcChar8 *>(fontdir.c_str()));
+		add_font_dir(std::string(home) + "/Library/Fonts");
+		add_font_dir(std::string(home) + "/.fonts");
+	}
+	const char *windir = getenv("WinDir");
+	if (windir) {
+		add_font_dir(std::string(windir) + "\\Fonts");
 	}
 	
 	const FT_Error error = FT_Init_FreeType(&library);
@@ -74,6 +76,12 @@ FontCache * FontCache::instance()
 		self = new FontCache();
 	}
 	return self;
+}
+
+void FontCache::add_font_dir(std::string path) {
+	if (fs::is_directory(path)) {
+		FcConfigAppFontAddDir(config, reinterpret_cast<const FcChar8 *>(path.c_str()));
+	}
 }
 
 bool FontCache::is_init_ok()
@@ -142,7 +150,7 @@ FT_Face FontCache::find_face_in_path_list(std::string font)
 	
 	std::string paths = (env_font_path == NULL) ? "/usr/share/fonts/truetype" : env_font_path;
 	typedef boost::split_iterator<std::string::iterator> string_split_iterator;
-	for (string_split_iterator it = make_split_iterator(paths, first_finder(":", boost::is_iequal()));it != string_split_iterator();it++) {
+	for (string_split_iterator it = boost::make_split_iterator(paths, boost::first_finder(":", boost::is_iequal()));it != string_split_iterator();it++) {
 		fs::path p(boost::copy_range<std::string>(*it));
 		if (fs::exists(p)) {
 			std::string path = boosty::absolute(p).string();
