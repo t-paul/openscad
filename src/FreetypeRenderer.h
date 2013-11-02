@@ -27,8 +27,10 @@
 #define	FREETYPERENDERER_H
 
 #include <string>
+#include <vector>
 #include <ft2build.h>
 #include FT_FREETYPE_H
+#include FT_GLYPH_H
 
 #include "FontCache.h"
 #include "DrawingCallback.h"
@@ -41,8 +43,37 @@ public:
     void render(DrawingCallback *cb, std::string text, std::string font, double size, double spacing, std::string direction, std::string language, std::string script) const;
 private:
     const static double scale = 1000;
+    FT_Outline_Funcs funcs;
     
     FontCache *cache;
+
+    class GlyphData {
+    public:
+        GlyphData(FT_Glyph glyph, hb_glyph_info_t *glyph_info, hb_glyph_position_t *glyph_pos) : glyph(glyph), glyph_pos(glyph_pos), glyph_info(glyph_info) {}
+        FT_Glyph get_glyph() const { return glyph; };
+        double get_x_offset() const { return glyph_pos->x_offset / 64.0 / 16.0; };
+        double get_y_offset() const { return glyph_pos->y_offset / 64.0 / 16.0; };
+        double get_x_advance() const { return glyph_pos->x_advance / 64.0 / 16.0; };
+        double get_y_advance() const { return glyph_pos->y_advance / 64.0 / 16.0; };
+    private:
+        FT_Glyph glyph;
+        hb_glyph_position_t *glyph_pos;
+        hb_glyph_info_t *glyph_info;
+    };
+
+    struct done_glyph : public std::unary_function<const GlyphData *, void> {
+        void operator() (const GlyphData *glyph_data) {
+            FT_Done_Glyph(glyph_data->get_glyph());
+            delete glyph_data;
+        }
+    };
+
+    class GlyphArray : public std::vector<const GlyphData *> {
+    public:
+        virtual ~GlyphArray() {
+            std::for_each(begin(), end(), done_glyph());
+        }
+    };
     
     static int outline_move_to_func(const FT_Vector *to, void *user);
     static int outline_line_to_func(const FT_Vector *to, void *user);
