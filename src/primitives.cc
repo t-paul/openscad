@@ -34,7 +34,6 @@
 #include "printutils.h"
 #include "visitor.h"
 #include "context.h"
-#include "DrawingCallback.h"
 #include "FreetypeRenderer.h"
 #include <sstream>
 #include <assert.h>
@@ -106,13 +105,12 @@ public:
 	}
 
 	bool center;
-	double x, y, z, h, r1, r2, size, spacing;
+	double x, y, z, h, r1, r2;
 	double fn, fs, fa;
 	primitive_type_e type;
 	int convexity;
 	Value points, paths, triangles;
-	std::string text;
-	std::string font, direction, language, script;
+	FreetypeRenderer::Params params;
 	virtual PolySet *evaluate_polyset(class PolySetEvaluator *) const;
 };
 
@@ -244,13 +242,13 @@ AbstractNode *PrimitiveModule::instantiate(const Context *ctx, const ModuleInsta
 	}
 	
 	if (type == TEXT) {
-		node->text = lookup_string_variable_with_default(c, "t", "");
-		node->size = lookup_double_variable_with_default(c, "size", 10.0);
-		node->spacing = lookup_double_variable_with_default(c, "spacing", 1.0);
-		node->font = lookup_string_variable_with_default(c, "font", "");
-		node->direction = lookup_string_variable_with_default(c, "direction", "ltr");
-		node->language = lookup_string_variable_with_default(c, "language", "en");
-		node->script = lookup_string_variable_with_default(c, "script", "latin");
+		node->params.set_text(lookup_string_variable_with_default(c, "t", ""));
+		node->params.set_size(lookup_double_variable_with_default(c, "size", 10.0));
+		node->params.set_spacing(lookup_double_variable_with_default(c, "spacing", 1.0));
+		node->params.set_font(lookup_string_variable_with_default(c, "font", ""));
+		node->params.set_direction(lookup_string_variable_with_default(c, "direction", "ltr"));
+		node->params.set_language(lookup_string_variable_with_default(c, "language", "en"));
+		node->params.set_script(lookup_string_variable_with_default(c, "script", "latin"));
 	}
 
 	node->convexity = c.lookup_variable("convexity", true).toDouble();
@@ -591,11 +589,9 @@ sphere_next_r2:
 	
 	if (this->type == TEXT)
 	{
-		const FreetypeRenderer *renderer = new FreetypeRenderer();
-		DrawingCallback *callback = new DrawingCallback(fn);
-		renderer->render(callback, text, font, size, spacing, direction, language, script);
 		delete p;
-		p = callback->get_result();
+		FreetypeRenderer renderer;
+		p = renderer.render(params);
 	}
 
 
@@ -639,15 +635,7 @@ std::string PrimitiveNode::toString() const
 		stream << "(points = " << this->points << ", paths = " << this->paths << ", convexity = " << this->convexity << ")";
 			break;
 	case TEXT:
-		stream << "($fn = " << this->fn
-			<< ", text = '" << this->text
-			<< ", size = " << this->size
-			<< ", spacing = " << this->spacing
-			<< ", font = " << this->font
-			<< ", direction = " << this->direction
-			<< ", language = " << this->language
-			<< ", script = " << this->script
-			<< "')";
+		stream << "(" << this->params << ")";
 		break;
 	default:
 		assert(false);
