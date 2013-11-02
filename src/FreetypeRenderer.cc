@@ -30,6 +30,9 @@
 #include <fontconfig/fontconfig.h>
 
 #include "printutils.h"
+
+#include "FontCache.h"
+#include "DrawingCallback.h"
 #include "FreetypeRenderer.h"
 
 #include FT_OUTLINE_H
@@ -80,34 +83,35 @@ int FreetypeRenderer::outline_cubic_to_func(const FT_Vector *c1, const FT_Vector
 	return 0; 
 }
 
-void FreetypeRenderer::render(DrawingCallback *callback, std::string text, std::string font, double size, double spacing, std::string direction, std::string language, std::string script) const
+PolySet * FreetypeRenderer::render(const FreetypeRenderer::Params &params) const
 {
 	FT_Face face;
 	FT_Error error;
+	DrawingCallback callback(params.fn);
 	
 	FontCache *cache = FontCache::instance();
 	if (!cache->is_init_ok()) {
-		return;
+		return NULL;
 	}
 
-	face = cache->get_font(font);
+	face = cache->get_font(params.font);
 	if (face == NULL) {
-		return;
+		return NULL;
 	}
 	
-	error = FT_Set_Char_Size(face, 0, size * scale, 100, 100);
+	error = FT_Set_Char_Size(face, 0, params.size * scale, 100, 100);
 	if (error) {
-		PRINTB("Can't set font size for font %s", font);
-		return;
+		PRINTB("Can't set font size for font %s", params.font);
+		return NULL;
 	}
 	
 	hb_font_t *hb_ft_font = hb_ft_font_create(face, NULL);
 
 	hb_buffer_t *hb_buf = hb_buffer_create();
-	hb_buffer_set_direction(hb_buf, hb_direction_from_string(direction.c_str(), -1));
-	hb_buffer_set_script(hb_buf, hb_script_from_string(script.c_str(), -1));
-	hb_buffer_set_language(hb_buf, hb_language_from_string(language.c_str(), -1));
-	hb_buffer_add_utf8(hb_buf, text.c_str(), strlen(text.c_str()), 0, strlen(text.c_str()));
+	hb_buffer_set_direction(hb_buf, hb_direction_from_string(params.direction.c_str(), -1));
+	hb_buffer_set_script(hb_buf, hb_script_from_string(params.script.c_str(), -1));
+	hb_buffer_set_language(hb_buf, hb_language_from_string(params.language.c_str(), -1));
+	hb_buffer_add_utf8(hb_buf, params.text.c_str(), strlen(params.text.c_str()), 0, strlen(params.text.c_str()));
 	hb_shape(hb_ft_font, hb_buf, NULL, 0);
 	
 	unsigned int glyph_count;
@@ -119,14 +123,14 @@ void FreetypeRenderer::render(DrawingCallback *callback, std::string text, std::
 		FT_UInt glyph_index = glyph_info[idx].codepoint;
 		error = FT_Load_Glyph(face, glyph_index, FT_LOAD_DEFAULT);
 		if (error) {
-			PRINTB("Could not load glyph %u for char at index %u in text '%s'", glyph_index % idx % text);
+			PRINTB("Could not load glyph %u for char at index %u in text '%s'", glyph_index % idx % params.text);
 			continue;
 		}
 
 		FT_Glyph glyph;
 		error = FT_Get_Glyph(face->glyph, &glyph);
 		if (error) {
-			PRINTB("Could not get glyph %u for char at index %u in text '%s'", glyph_index % idx % text);
+			PRINTB("Could not get glyph %u for char at index %u in text '%s'", glyph_index % idx % params.text);
 			continue;
 		}
 		const GlyphData *glyph_data = new GlyphData(glyph, &glyph_info[idx], &glyph_pos[idx]);
@@ -136,17 +140,19 @@ void FreetypeRenderer::render(DrawingCallback *callback, std::string text, std::
 	for (GlyphArray::iterator it = glyph_array.begin();it != glyph_array.end();it++) {
 		const GlyphData *glyph = (*it);
 		
-		callback->start_glyph();
-		callback->set_glyph_offset(glyph->get_x_offset(), glyph->get_y_offset());
+		callback.start_glyph();
+		callback.set_glyph_offset(glyph->get_x_offset(), glyph->get_y_offset());
 		FT_Outline outline = reinterpret_cast<FT_OutlineGlyph>(glyph->get_glyph())->outline;
-		FT_Outline_Decompose(&outline, &funcs, callback);
+		FT_Outline_Decompose(&outline, &funcs, &callback);
 
-		double adv_x  = glyph->get_x_advance() * spacing;
-		double adv_y  = glyph->get_y_advance() * spacing;
-		callback->add_glyph_advance(adv_x, adv_y);
-		callback->finish_glyph();
+		double adv_x  = glyph->get_x_advance() * params.spacing;
+		double adv_y  = glyph->get_y_advance() * params.spacing;
+		callback.add_glyph_advance(adv_x, adv_y);
+		callback.finish_glyph();
 	}
 
 	hb_buffer_destroy(hb_buf);
         hb_font_destroy(hb_ft_font);
+	
+	return callback.get_result();
 }

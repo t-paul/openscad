@@ -28,25 +28,69 @@
 
 #include <string>
 #include <vector>
+#include <ostream>
+
+#include <hb.h>
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include FT_GLYPH_H
 
-#include "FontCache.h"
-#include "DrawingCallback.h"
-
 class FreetypeRenderer {
 public:
+    class Params {
+    public:
+        void set_size(double size) {
+            this->size = size;
+        }
+        void set_spacing(double spacing) {
+            this->spacing = spacing;
+        }
+        void set_fn(double fn) {
+            this->fn = fn;
+        }
+        void set_text(std::string text) {
+            this->text = text;
+        }
+        void set_font(std::string font) {
+            this->font = font;
+        }
+        void set_direction(std::string direction) {
+            this->direction = direction;
+        }
+        void set_language(std::string language) {
+            this->language = language;
+        }
+        void set_script(std::string script) {
+            this->script = script;
+        }
+        friend std::ostream & operator << (std::ostream &stream, const FreetypeRenderer::Params &params) {
+		return stream
+                        << "$fn = " << params.fn
+			<< ", text = '" << params.text
+			<< "', size = " << params.size
+			<< ", spacing = " << params.spacing
+			<< ", font = '" << params.font
+			<< "', direction = '" << params.direction
+			<< "', language = '" << params.language
+			<< "', script = '" << params.script
+			<< "'";
+        }
+    private:
+        double size, spacing, fn;
+	std::string text;
+	std::string font, direction, language, script;
+        
+        friend FreetypeRenderer;
+    };
+    
     FreetypeRenderer();
     virtual ~FreetypeRenderer();
 
-    void render(DrawingCallback *cb, std::string text, std::string font, double size, double spacing, std::string direction, std::string language, std::string script) const;
+    PolySet * render(const FreetypeRenderer::Params &params) const;
 private:
     const static double scale = 1000;
     FT_Outline_Funcs funcs;
     
-    FontCache *cache;
-
     class GlyphData {
     public:
         GlyphData(FT_Glyph glyph, hb_glyph_info_t *glyph_info, hb_glyph_position_t *glyph_pos) : glyph(glyph), glyph_pos(glyph_pos), glyph_info(glyph_info) {}
