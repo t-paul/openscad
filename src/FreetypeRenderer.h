@@ -127,6 +127,9 @@ private:
             std::for_each(begin(), end(), done_glyph());
         }
     };
+
+    double calc_x_offset(std::string halign, double width) const;
+    double calc_y_offset(std::string valign, double ascend, double descend) const;
     
     static int outline_move_to_func(const FT_Vector *to, void *user);
     static int outline_line_to_func(const FT_Vector *to, void *user);

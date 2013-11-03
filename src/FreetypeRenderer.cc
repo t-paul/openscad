@@ -84,6 +84,36 @@ int FreetypeRenderer::outline_cubic_to_func(const FT_Vector *c1, const FT_Vector
 	return 0; 
 }
 
+double FreetypeRenderer::calc_x_offset(std::string halign, double width) const
+{
+	if (halign == "right") {
+		return -width;
+	} else if (halign == "center") {
+		return -width / 2.0;
+	} else {
+		if (halign != "left") {
+			PRINTB("Unknown value for the halign parameter (use \"left\", \"right\" or \"center\"): '%s'", halign);
+		}
+		return 0;
+	}
+}
+
+double FreetypeRenderer::calc_y_offset(std::string valign, double ascend, double descend) const
+{
+	if (valign == "top") {
+		return -ascend;
+	} else if (valign == "center") {
+		return descend / 2.0 - ascend / 2.0;
+	} else if (valign == "bottom") {
+		return descend;
+	} else {
+		if (valign != "baseline") {
+			PRINTB("Unknown value for the valign parameter (use \"baseline\", \"bottom\", \"top\" or \"center\"): '%s'", valign);
+		}
+		return 0;
+	}
+}
+
 PolySet * FreetypeRenderer::render(const FreetypeRenderer::Params &params) const
 {
 	FT_Face face;
@@ -158,29 +188,9 @@ PolySet * FreetypeRenderer::render(const FreetypeRenderer::Params &params) const
 		}
 	}
 	
-	double x_offset, y_offset;
-	if (params.halign == "right") {
-		x_offset = -width;
-	} else if (params.halign == "center") {
-		x_offset = -width / 2.0;
-	} else {
-		if (params.halign != "left") {
-			PRINTB("Unknown value for the halign parameter (use \"left\", \"right\" or \"center\"): '%s'", params.halign);
-		}
-		x_offset = 0;
-	}
-	if (params.valign == "top") {
-		y_offset = -ascend;
-	} else if (params.valign == "center") {
-		y_offset = descend / 2.0 - ascend / 2.0;
-	} else if (params.valign == "bottom") {
-		y_offset = descend;
-	} else {
-		if (params.valign != "baseline") {
-			PRINTB("Unknown value for the valign parameter (use \"baseline\", \"bottom\", \"top\" or \"center\"): '%s'", params.valign);
-		}
-		y_offset = 0;
-	}
+	double x_offset = calc_x_offset(params.halign, width);
+	double y_offset = calc_y_offset(params.valign, ascend, descend);
+
 	for (GlyphArray::iterator it = glyph_array.begin();it != glyph_array.end();it++) {
 		const GlyphData *glyph = (*it);
 		
