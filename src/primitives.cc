@@ -280,6 +280,8 @@ AbstractNode *PrimitiveModule::instantiate(const Context *ctx, const ModuleInsta
 		node->params.set_direction(lookup_string_variable_with_default(c, "direction", "ltr"));
 		node->params.set_language(lookup_string_variable_with_default(c, "language", "en"));
 		node->params.set_script(lookup_string_variable_with_default(c, "script", "latin"));
+		node->params.set_halign(lookup_string_variable_with_default(c, "halign", "left"));
+		node->params.set_valign(lookup_string_variable_with_default(c, "valign", "baseline"));
 	}
 
 	node->convexity = c.lookup_variable("convexity", true).toDouble();

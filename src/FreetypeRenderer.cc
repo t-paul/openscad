@@ -23,6 +23,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
+#include <math.h>
 #include <stdio.h>
 
 #include <iostream>
@@ -133,15 +134,58 @@ PolySet * FreetypeRenderer::render(const FreetypeRenderer::Params &params) const
 			PRINTB("Could not get glyph %u for char at index %u in text '%s'", glyph_index % idx % params.text);
 			continue;
 		}
-		const GlyphData *glyph_data = new GlyphData(glyph, &glyph_info[idx], &glyph_pos[idx]);
+		const GlyphData *glyph_data = new GlyphData(glyph, idx, &glyph_info[idx], &glyph_pos[idx]);
 		glyph_array.push_back(glyph_data);
 	}
 
+	double width = 0, ascend = 0, descend = 0;
+	for (GlyphArray::iterator it = glyph_array.begin();it != glyph_array.end();it++) {
+		const GlyphData *glyph = (*it);
+		
+		FT_BBox bbox;
+		FT_Glyph_Get_CBox(glyph->get_glyph(), FT_GLYPH_BBOX_GRIDFIT, &bbox);
+		
+		if (HB_DIRECTION_IS_HORIZONTAL(hb_buffer_get_direction(hb_buf))) {
+			double asc = std::max(0.0, bbox.yMax / 64.0 / 16.0);
+			double desc = std::max(0.0, -bbox.yMin / 64.0 / 16.0);
+			width += glyph->get_x_advance() * params.spacing;
+			ascend = std::max(ascend, asc);
+			descend = std::max(descend, desc);
+		} else {
+			double w_bbox = (bbox.xMax - bbox.xMin) / 64.0 / 16.0;
+			width = std::max(width, w_bbox);
+			ascend += glyph->get_y_advance() * params.spacing;
+		}
+	}
+	
+	double x_offset, y_offset;
+	if (params.halign == "right") {
+		x_offset = -width;
+	} else if (params.halign == "center") {
+		x_offset = -width / 2.0;
+	} else {
+		if (params.halign != "left") {
+			PRINTB("Unknown value for the halign parameter (use \"left\", \"right\" or \"center\"): '%s'", params.halign);
+		}
+		x_offset = 0;
+	}
+	if (params.valign == "top") {
+		y_offset = -ascend;
+	} else if (params.valign == "center") {
+		y_offset = descend / 2.0 - ascend / 2.0;
+	} else if (params.valign == "bottom") {
+		y_offset = descend;
+	} else {
+		if (params.valign != "baseline") {
+			PRINTB("Unknown value for the valign parameter (use \"baseline\", \"bottom\", \"top\" or \"center\"): '%s'", params.valign);
+		}
+		y_offset = 0;
+	}
 	for (GlyphArray::iterator it = glyph_array.begin();it != glyph_array.end();it++) {
 		const GlyphData *glyph = (*it);
 		
 		callback.start_glyph();
-		callback.set_glyph_offset(glyph->get_x_offset(), glyph->get_y_offset());
+		callback.set_glyph_offset(x_offset + glyph->get_x_offset(), y_offset + glyph->get_y_offset());
 		FT_Outline outline = reinterpret_cast<FT_OutlineGlyph>(glyph->get_glyph())->outline;
 		FT_Outline_Decompose(&outline, &funcs, &callback);
 
