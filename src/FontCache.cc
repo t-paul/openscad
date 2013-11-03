@@ -184,6 +184,10 @@ FT_Face FontCache::find_face_fontconfig(std::string font)
 
 	FT_Face face;
 	FT_Error error = FT_New_Face(library, (const char *)file_value.u.s, 0, &face);
+
+	FcPatternDestroy(pattern);
+	FcPatternDestroy(match);
+
 	return error ? NULL : face;
 }
 
