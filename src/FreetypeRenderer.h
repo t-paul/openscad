@@ -63,6 +63,12 @@ public:
         void set_script(std::string script) {
             this->script = script;
         }
+        void set_halign(std::string halign) {
+            this->halign = halign;
+        }
+        void set_valign(std::string valign) {
+            this->valign = valign;
+        }
         friend std::ostream & operator << (std::ostream &stream, const FreetypeRenderer::Params &params) {
 		return stream
                         << "$fn = " << params.fn
@@ -73,12 +79,13 @@ public:
 			<< "', direction = '" << params.direction
 			<< "', language = '" << params.language
 			<< "', script = '" << params.script
+			<< "', halign = '" << params.halign
+			<< "', valign = '" << params.valign
 			<< "'";
         }
     private:
         double size, spacing, fn;
-	std::string text;
-	std::string font, direction, language, script;
+	std::string text, font, direction, language, script, halign, valign;
         
         friend FreetypeRenderer;
     };
@@ -93,7 +100,8 @@ private:
     
     class GlyphData {
     public:
-        GlyphData(FT_Glyph glyph, hb_glyph_info_t *glyph_info, hb_glyph_position_t *glyph_pos) : glyph(glyph), glyph_pos(glyph_pos), glyph_info(glyph_info) {}
+        GlyphData(FT_Glyph glyph, unsigned int idx, hb_glyph_info_t *glyph_info, hb_glyph_position_t *glyph_pos) : glyph(glyph), idx(idx), glyph_pos(glyph_pos), glyph_info(glyph_info) {}
+        unsigned int get_idx() const { return idx; };
         FT_Glyph get_glyph() const { return glyph; };
         double get_x_offset() const { return glyph_pos->x_offset / 64.0 / 16.0; };
         double get_y_offset() const { return glyph_pos->y_offset / 64.0 / 16.0; };
@@ -101,6 +109,7 @@ private:
         double get_y_advance() const { return glyph_pos->y_advance / 64.0 / 16.0; };
     private:
         FT_Glyph glyph;
+        unsigned int idx;
         hb_glyph_position_t *glyph_pos;
         hb_glyph_info_t *glyph_info;
     };
