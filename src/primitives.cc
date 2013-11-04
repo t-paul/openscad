@@ -53,6 +53,17 @@ enum primitive_type_e {
 	TEXT
 };
 
+/*!
+	Returns the number of subdivision of a whole circle, given radius and
+	the three special variables $fn, $fs and $fa
+*/
+int get_fragments_from_r(double r, double fn, double fs, double fa)
+{
+	if (r < GRID_FINE) return 3;
+	if (fn > 0.0) return (int)(fn >= 3 ? fn : 3);
+	return (int)ceil(fmax(fmin(360.0 / fa, r*2*M_PI / fs), 5));
+}
+
 class PrimitiveModule : public AbstractModule
 {
 public:
@@ -273,8 +284,16 @@ AbstractNode *PrimitiveModule::instantiate(const Context *ctx, const ModuleInsta
 	}
 	
 	if (type == TEXT) {
+		double size = lookup_double_variable_with_default(c, "size", 10.0);
+		int segments = get_fragments_from_r(size, node->fn, node->fs, node->fa);
+		// The curved segments of most fonts are relatively short, so
+		// by using a fraction of the number of full circle segments
+		// the resolution will be better matching the detail level of
+		// other objects.
+		int text_segments = std::max(((int)floor(segments / 6)) + 2, 2);
+		node->params.set_size(size);
+		node->params.set_fn(text_segments);
 		node->params.set_text(lookup_string_variable_with_default(c, "t", ""));
-		node->params.set_size(lookup_double_variable_with_default(c, "size", 10.0));
 		node->params.set_spacing(lookup_double_variable_with_default(c, "spacing", 1.0));
 		node->params.set_font(lookup_string_variable_with_default(c, "font", ""));
 		node->params.set_direction(lookup_string_variable_with_default(c, "direction", "ltr"));
@@ -301,17 +320,6 @@ std::string PrimitiveModule::lookup_string_variable_with_default(Context &c, std
 {
 	const Value v = c.lookup_variable(variable, true);
 	return (v.type() == Value::STRING) ? v.toString() : def;
-}
-
-/*!
-	Returns the number of subdivision of a whole circle, given radius and
-	the three special variables $fn, $fs and $fa
-*/
-int get_fragments_from_r(double r, double fn, double fs, double fa)
-{
-	if (r < GRID_FINE) return 3;
-	if (fn > 0.0) return (int)(fn >= 3 ? fn : 3);
-	return (int)ceil(fmax(fmin(360.0 / fa, r*2*M_PI / fs), 5));
 }
 
 struct point2d {

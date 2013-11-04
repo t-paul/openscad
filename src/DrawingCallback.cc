@@ -36,7 +36,7 @@
 
 #include "DrawingCallback.h"
 
-DrawingCallback::DrawingCallback(double fn) : fn(fn),
+DrawingCallback::DrawingCallback(unsigned long fn) : fn(fn),
 	pen(Vector2d(0, 0)), offset(Vector2d(0, 0)), advance(Vector2d(0, 0))
 {
 }
@@ -94,7 +94,6 @@ void DrawingCallback::add_vertex(Vector2d v)
 	double x = offset[0] + advance[0];
 	double y = offset[1] + advance[1];
 	data->paths.back().indices.push_back(data->addPoint(x + v[0], y + v[1]));
-	pen = v;
 }
 
 void DrawingCallback::move_to(Vector2d to)
@@ -102,33 +101,33 @@ void DrawingCallback::move_to(Vector2d to)
 	data->paths.push_back(DxfData::Path());
 	data->paths.back().is_closed = true;
 	add_vertex(to);
+	pen = to;
 }
 
 void DrawingCallback::line_to(Vector2d to)
 {
 	add_vertex(to);
+	pen = to;
 }
 
 void DrawingCallback::curve_to(Vector2d c1, Vector2d to)
 {
-	int segments = std::max(((int)floor(fn / 6)) + 2, 2);
-	for (int idx = 1;idx <= segments;idx++) {
-		const double a = idx * (1.0 / segments);
+	for (unsigned long idx = 1;idx <= fn;idx++) {
+		const double a = idx * (1.0 / (double)fn);
 		const double x = pen[0] * t(a, 2) + c1[0] * 2 * t(a, 1) * a + to[0] * a * a;
 		const double y = pen[1] * t(a, 2) + c1[1] * 2 * t(a, 1) * a + to[1] * a * a;
 		add_vertex(Vector2d(x, y));
 	}
+	pen = to;
 }
 
 void DrawingCallback::curve_to(Vector2d c1, Vector2d c2, Vector2d to)
 {
-	const Vector2d pen = data->points.back();
-	
-	int segments = std::max(((int)floor(fn / 6)) + 2, 2);
-	for (int idx = 1;idx <= segments;idx++) {
-		const double a = idx * (1.0 / segments);
+	for (unsigned long idx = 1;idx <= fn;idx++) {
+		const double a = idx * (1.0 / (double)fn);
 		const double x = pen[0] * t(a, 3) + c1[0] * 3 * t(a, 2) * a + c2[0] * 3 * t(a, 1) * a * a + to[0] * a * a * a;
 		const double y = pen[1] * t(a, 3) + c1[1] * 3 * t(a, 2) * a + c2[1] * 3 * t(a, 1) * a * a + to[1] * a * a * a;
 		add_vertex(Vector2d(x, y));
 	}
+	pen = to;
 }
