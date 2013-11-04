@@ -34,7 +34,7 @@
 
 class DrawingCallback {
 public:
-    DrawingCallback(double fn);
+    DrawingCallback(unsigned long fn);
     virtual ~DrawingCallback();
     
     void start_glyph();
@@ -48,7 +48,7 @@ public:
     void curve_to(Vector2d c1, Vector2d to);
     void curve_to(Vector2d c1, Vector2d c2, Vector2d to);
 private:
-    double fn;
+    unsigned long fn;
     Vector2d pen;
     Vector2d offset;
     Vector2d advance;
