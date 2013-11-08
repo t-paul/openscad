@@ -78,9 +78,18 @@ FontCache * FontCache::instance()
 	return self;
 }
 
+void FontCache::register_font_file(std::string path) {
+	if (!FcConfigAppFontAddFile(config, reinterpret_cast<const FcChar8 *>(path.c_str()))) {
+		PRINTB("Can't register font '%s'", path);
+	}
+}
+
 void FontCache::add_font_dir(std::string path) {
-	if (fs::is_directory(path)) {
-		FcConfigAppFontAddDir(config, reinterpret_cast<const FcChar8 *>(path.c_str()));
+	if (!fs::is_directory(path)) {
+		return;
+	}
+	if (!FcConfigAppFontAddDir(config, reinterpret_cast<const FcChar8 *>(path.c_str()))) {
+		PRINTB("Can't register font directory '%s'", path);
 	}
 }
 

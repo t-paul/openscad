@@ -37,6 +37,7 @@
 #include <boost/filesystem.hpp>
 namespace fs = boost::filesystem;
 #include "boosty.h"
+#include "FontCache.h"
 #include <boost/foreach.hpp>
 #include <sstream>
 #include <sys/stat.h>
@@ -220,6 +221,21 @@ std::string Module::dump(const std::string &indent, const std::string &name) con
 		dump << indent << "}\n";
 	}
 	return dump.str();
+}
+
+void FileModule::registerUse(const std::string path) {
+	std::string extraw = boosty::extension_str(fs::path(path));
+	std::string ext = boost::algorithm::to_lower_copy(extraw);
+	
+	if ((ext == ".otf") || (ext == ".ttf")) {
+		if (fs::is_regular(path)) {
+			FontCache::instance()->register_font_file(path);
+		} else {
+			PRINTB("ERROR: Can't read font with path '%s'", path);
+		}
+	} else {
+		usedlibs.insert(path);
+	}
 }
 
 void FileModule::registerInclude(const std::string &localpath,
