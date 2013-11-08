@@ -403,6 +403,16 @@ if(${CMAKE_CXX_COMPILER} MATCHES ".*clang.*" AND NOT ${CGAL_CXX_FLAGS_INIT} STRE
 	string(REPLACE "--param=ssp-buffer-size=4" "" CGAL_CXX_FLAGS_INIT ${CGAL_CXX_FLAGS_INIT})
 endif()
 
+# find libraries using pkg-config
+
+find_package(PkgConfig REQUIRED)
+pkg_search_module(FONTCONFIG REQUIRED fontconfig)
+message(STATUS "fontconfig found: ${FONTCONFIG_VERSION}")
+pkg_search_module(FREETYPE REQUIRED freetype2)
+message(STATUS "freetype2 found: ${FREETYPE_VERSION}")
+pkg_search_module(HARFBUZZ REQUIRED harfbuzz)
+message(STATUS "harfbuzz found: ${HARFBUZZ_VERSION}")
+
 # Imagemagick
 
 if (SKIP_IMAGEMAGICK)
