@@ -32,8 +32,9 @@
 #include "dxftess.h"
 #include "polyset.h"
 #include "Tree.h"
+#ifdef ENABLE_CGAL
 #include "CGALEvaluator.h"
-
+#endif
 #include "DrawingCallback.h"
 
 DrawingCallback::DrawingCallback(unsigned long fn) : fn(fn),
@@ -52,6 +53,7 @@ void DrawingCallback::start_glyph()
 
 void DrawingCallback::finish_glyph()
 {
+#ifdef ENABLE_CGAL
 	PolySet *p = new PolySet();
 	p->is2d = true;
 	dxf_tesselate(p, *data, 0, Vector2d(1,1), true, false, 0);
@@ -69,6 +71,7 @@ void DrawingCallback::finish_glyph()
 			result += N;
 		}
 	}
+#endif
 	
 	delete data;
 	data = NULL;
@@ -76,7 +79,11 @@ void DrawingCallback::finish_glyph()
 
 PolySet * DrawingCallback::get_result()
 {
+#ifdef ENABLE_CGAL
 	return result.convertToPolyset();
+#else
+	return new PolySet();
+#endif
 }
 
 void DrawingCallback::set_glyph_offset(double offset_x, double offset_y)

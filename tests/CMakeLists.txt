@@ -404,14 +404,18 @@ if(${CMAKE_CXX_COMPILER} MATCHES ".*clang.*" AND NOT ${CGAL_CXX_FLAGS_INIT} STRE
 endif()
 
 # find libraries using pkg-config
-
 find_package(PkgConfig REQUIRED)
-pkg_search_module(FONTCONFIG REQUIRED fontconfig)
+
+pkg_search_module(FONTCONFIG REQUIRED fontconfig>=2.11.0)
 message(STATUS "fontconfig found: ${FONTCONFIG_VERSION}")
-pkg_search_module(FREETYPE REQUIRED freetype2)
+
+pkg_search_module(FREETYPE REQUIRED freetype2>=2.4.9)
 message(STATUS "freetype2 found: ${FREETYPE_VERSION}")
-pkg_search_module(HARFBUZZ REQUIRED harfbuzz)
+
+pkg_search_module(HARFBUZZ REQUIRED harfbuzz>=0.9.19)
 message(STATUS "harfbuzz found: ${HARFBUZZ_VERSION}")
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${FONTCONFIG_CFLAGS} ${FREETYPE_CFLAGS} ${HARFBUZZ_CFLAGS}")
 
 # Imagemagick
 
@@ -533,6 +537,8 @@ set(CORE_SOURCES
   ../src/fileutils.cc 
   ../src/progress.cc 
   ../src/boost-utils.cc 
+  ../src/FontCache.cc
+  ../src/FreetypeRenderer.cc
   ${FLEX_OpenSCADlexer_OUTPUTS}
   ${BISON_OpenSCADparser_OUTPUTS})
 
@@ -540,7 +546,8 @@ set(NOCGAL_SOURCES
   ../src/builtin.cc 
   ../src/dxftess.cc 
   ../src/import.cc
-  ../src/export.cc)
+  ../src/export.cc
+  ../src/DrawingCallback.cc)
 
 set(CGAL_SOURCES
   ${NOCGAL_SOURCES}
@@ -555,10 +562,10 @@ set(CGAL_SOURCES
   ../src/svg.cc)
 
 set(COMMON_SOURCES
-  ../src/nodedumper.cc 
-  ../src/traverser.cc 
-  ../src/PolySetEvaluator.cc 
-  ../src/PolySetCache.cc 
+  ../src/nodedumper.cc
+  ../src/traverser.cc
+  ../src/PolySetEvaluator.cc
+  ../src/PolySetCache.cc
   ../src/Tree.cc
   ../src/lodepng.cpp)
 
@@ -605,27 +612,27 @@ set(TESTS-NOCGAL-LIBRARIES ${TESTS-CORE-LIBRARIES})
 # modulecachetest
 #
 add_executable(modulecachetest modulecachetest.cc)
-target_link_libraries(modulecachetest tests-nocgal ${TESTS-NOCGAL-LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(modulecachetest tests-nocgal tests-common tests-core tests-nocgal ${TESTS-NOCGAL-LIBRARIES} ${Boost_LIBRARIES} ${FONTCONFIG_LDFLAGS} ${FREETYPE_LDFLAGS} ${HARFBUZZ_LDFLAGS})
 
 #
 # csgtexttest
 #
 add_executable(csgtexttest csgtexttest.cc CSGTextRenderer.cc CSGTextCache.cc)
-target_link_libraries(csgtexttest tests-nocgal ${TESTS-NOCGAL-LIBRARIES})
+target_link_libraries(csgtexttest tests-nocgal tests-common tests-core tests-nocgal ${TESTS-NOCGAL-LIBRARIES} ${FONTCONFIG_LDFLAGS} ${FREETYPE_LDFLAGS} ${HARFBUZZ_LDFLAGS})
 
 #
 # cgalcachetest
 #
 add_executable(cgalcachetest cgalcachetest.cc)
 set_target_properties(cgalcachetest PROPERTIES COMPILE_FLAGS "-DENABLE_CGAL ${CGAL_CXX_FLAGS_INIT}")
-target_link_libraries(cgalcachetest tests-cgal ${TESTS-CGAL-LIBRARIES} ${GLEW_LIBRARY} ${COCOA_LIBRARY})
+target_link_libraries(cgalcachetest tests-cgal tests-common tests-core tests-cgal ${FONTCONFIG_LDFLAGS} ${FREETYPE_LDFLAGS} ${HARFBUZZ_LDFLAGS} ${GLEW_LIBRARY} ${COCOA_LIBRARY} ${TESTS-CGAL-LIBRARIES} )
 
 #
 # openscad no-qt
 #
 add_executable(openscad_nogui ../src/openscad.cc)
 set_target_properties(openscad_nogui PROPERTIES COMPILE_FLAGS "-fno-strict-aliasing -DEIGEN_DONT_ALIGN -DENABLE_CGAL -DENABLE_OPENCSG ${CGAL_CXX_FLAGS_INIT}")
-target_link_libraries(openscad_nogui tests-offscreen tests-cgal tests-nocgal ${TESTS-CORE-LIBRARIES} ${TESTS-CGAL-LIBRARIES} ${GLEW_LIBRARY} ${Boost_LIBRARIES} ${OPENCSG_LIBRARY} ${COCOA_LIBRARY} )
+target_link_libraries(openscad_nogui tests-cgal tests-offscreen tests-nocgal tests-common tests-core tests-cgal ${TESTS-CORE-LIBRARIES} ${TESTS-CGAL-LIBRARIES} ${GLEW_LIBRARY} ${Boost_LIBRARIES} ${OPENCSG_LIBRARY} ${COCOA_LIBRARY} ${FONTCONFIG_LDFLAGS} ${FREETYPE_LDFLAGS} ${HARFBUZZ_LDFLAGS} )
 
 #
 # GUI binary tests

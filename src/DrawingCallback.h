@@ -30,7 +30,10 @@
 #include <Eigen/Core>
 
 #include "dxfdata.h"
+#include "polyset.h"
+#ifdef ENABLE_CGAL
 #include "CGAL_Nef_polyhedron.h"
+#endif
 
 class DrawingCallback {
 public:
@@ -54,7 +57,9 @@ private:
     Vector2d advance;
 
     DxfData *data;
+#ifdef ENABLE_CGAL
     CGAL_Nef_polyhedron result;
+#endif
     
     void add_vertex(Vector2d v);
     
