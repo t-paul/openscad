@@ -1,4 +1,5 @@
 use<write/write.scad>
+
 /* NOTES:
 	writecylinder(text="text",where=[0,0,0],radius=20,height=40);
 	
@@ -28,8 +29,6 @@ use<write/write.scad>
 
 */
 
-
-use <write.scad>
 
 translate([0,0,0])
 %cylinder(r=20,h=40);

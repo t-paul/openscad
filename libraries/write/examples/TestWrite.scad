@@ -1,5 +1,4 @@
 use <write/write.scad>
-//use <write_original_v3/write.scad>
 
 
 /*

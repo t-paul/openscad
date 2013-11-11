@@ -50,7 +50,6 @@ translate([-20, 0, 0])
 linear_extrude(height = 2)
 text(t = "懶惰的姜貓", size = 16, font = "AR-PL-New-Sung", direction = "ttb", language = "ch");
  
-/*
 translate([0, -60, 0])
 linear_extrude(height = 2)
 text(t = "Umlauts: äöü ÄÖÜ ß", size = 10, font = $ff);
@@ -66,4 +65,3 @@ text(t = "Braile: ⠁⠂⠃⠄⠅⠆⠇⠈⠉⠊⠋⠌⠍⠎⠏", size = 10, fon
 translate([0, -120, 0])
 linear_extrude(height = 2)
 text(t = "Cards: 🂡🂱🃁🃑", size = 10, font = $ff);
-*/

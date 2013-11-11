@@ -1,5 +1,5 @@
-/* This is a rework of version 3 to use the new OpenSCAD internal text primitive.
-   All credit to Harlan Martin (harlan@sutlog.com) for his great effort.
+/* This is a rewrite of version 3 to use the internal text primitive recently added to OpenSCAD.
+   Much credit to Harlan Martin (harlan@sutlog.com) for his great effort.
  */
 
 /* 	Version 3
@@ -35,8 +35,7 @@
 	t = 1; 			//mm letter thickness
 	space =1; 			//extra space between characters in (character widths)
 	rotate=0;			// text rotation (clockwise)
-	old_default_font = "Letters.dxf";	//default for aditional fonts
-	font = "DejaVuSansCondensed";
+	font = "Letters.dxf";	//default for aditional fonts
 
 
 // write cube defaults
@@ -282,28 +281,61 @@ module writethecube(text,where,size){
 }
 
 module write(word){
-	echo ("There are " ,len(word) ," letters in word" , word);
-
-    //Check if font ends in .dxf then load still (keep old functionality......)
-    //Assumes that the font file is named ".dxf" to force old behaviour -- not fail safe but pretty safe....
-    //OpenSCAD is also safe in that it doesn't mind either past the buffer end or negative indices
-    assign( use_dxf_file = ( font[len(font)-4] == ".") && (font[len(font)-3] == "d") && (font[len(font)-2] == "x") && (font[len(font)-1] == "f") )
-    rotate(rotate,[0,0,-1]){
+	
+	echo (h);
+	echo (word);
+	echo ("There are " ,len(word) ," letters in this string");
+//	echo ("The second letter is ",word[1]);
+//	echo (str(word[0],"_"));
+rotate(rotate,[0,0,-1]){
 	for (r = [0:len(word)]){   // count off each character
-	    echo ("Letter=", r);
-    	assign( use_lower_case_file = (((word[r] >= "a" ) && (word[r] <= "z"))) ) //Used when importing .DXF files
-		translate([0, (center)?(-h/2):(0), (center)?(0):(t/2) ]){
-			scale([.125*h,.125*h,t]){	
-				translate([ (-len(word)*5.5*space/2) + (r*5.5*space),0,0])
-				linear_extrude(height=1,convexity=10,center=true){
-				    if(use_dxf_file)
-				    {
-				        // If the letter is lower case, add an underscore to the end for file lookup
-				        import(file = font,layer=str(word[r], use_lower_case_file?"_":""));
-				    }
-				    else
-				    {
-					    text(t = word[r], size = 8, $fn = 40, font = font);
+		// if the letter is lower case, add an underscore to the end for file lookup
+		if ((word[r] == "a" ) || (word[r]== "b")  || (word[r]== "c") 
+	 	  || (word[r]== "d") || (word[r]== "e") || (word[r]== "f") 
+	 	  || (word[r]== "g") || (word[r]== "h")  || (word[r]== "i") 
+       	  	  || (word[r]== "j") || (word[r]== "k") || (word[r]== "l")
+       	 	  || (word[r]== "m") || (word[r]== "n") || (word[r]== "o") 
+       	 	  || (word[r]== "p") || (word[r]== "q") || (word[r]== "r") 
+	 	  || (word[r]== "s") || (word[r]== "t") || (word[r]== "u") 
+       	 	  || (word[r]== "v") || (word[r]== "w") || (word[r]== "x") 
+       	 	  || (word[r]== "y" )|| (word[r]== "z")){
+			if (center == true)  {
+				translate([0,-h/2,0]){
+					scale([.125*h,.125*h,t]){	
+						translate([ (-len(word)*5.5*space/2) + (r*5.5*space),0,0])
+						linear_extrude(height=1,convexity=10,center=true){
+							import(file = font,layer=str(word[r],"_"));
+						}
+					}
+				}
+			}else{
+				translate([0,0,t/2]){
+					scale([.125*h,.125*h,t]){	
+						translate([r*5.5*space,0,0])
+						linear_extrude(height=1,convexity=10,center=true){
+							import(file = font,layer=str(word[r],"_"));
+						}
+					}
+				}
+			}
+
+		}else{
+			if (center == true)  {
+				translate([0,-h/2,0]){
+					scale([.125*h,.125*h,t]){
+						translate([ (-len(word)*5.5*space/2) + (r*5.5*space),0,0])
+						linear_extrude(height=1,convexity=10,center=true){
+							import(file = font,layer=str(word[r]));
+						}
+					}
+				}
+			}else{
+				translate([0,0,t/2]){
+					scale([.125*h,.125*h,t]){
+						translate([r*5.5*space,0,0])
+						linear_extrude(height=1,convexity=10,center=true){
+							import(file = font,layer=str(word[r]));
+						}
 					}
 				}
 			}
