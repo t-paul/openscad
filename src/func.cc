@@ -46,6 +46,9 @@
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_real.hpp>
 
+/*Unicode support for string lengths and array accesses - use Harbuzz library functions (already in project for text render)*/
+#include <hb.h>
+
 #ifdef __WIN32__
 #include <process.h>
 int process_id = _getpid();
@@ -306,7 +309,23 @@ Value builtin_length(const Context *, const EvalContext *evalctx)
 {
 	if (evalctx->numArgs() == 1) {
 		if (evalctx->getArgValue(0).type() == Value::VECTOR) return Value(int(evalctx->getArgValue(0).toVector().size()));
-		if (evalctx->getArgValue(0).type() == Value::STRING) return Value(int(evalctx->getArgValue(0).toString().size()));
+		if (evalctx->getArgValue(0).type() == Value::STRING)
+		{
+#if 1 //INBUILT_STR_UNICODE_AWARE
+			//Take a unicode glyph count for the length -- rather than the string (num. of bytes) length.
+			//For byte/char strings this drops out to the same length.
+			//Use Harfbuzz lib as it is already in use for text rendering.
+			std::string text = evalctx->getArgValue(0).toString();
+			hb_buffer_t *hb_buf = hb_buffer_create();
+			hb_buffer_add_utf8(hb_buf, text.c_str(), strlen(text.c_str()), 0, strlen(text.c_str()));
+			unsigned int glyph_count = hb_buffer_get_length ( hb_buf );
+			hb_buffer_destroy(hb_buf);
+
+			return Value(int(glyph_count));
+#else
+			return Value(int(evalctx->getArgValue(0).toString().size()));
+#endif
+		}
 	}
 	return Value();
 }
