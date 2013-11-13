@@ -1,8 +1,7 @@
-/* This is a rework of version 3 to use the new OpenSCAD internal text primitive.
-   All credit to Harlan Martin (harlan@sutlog.com) for his great effort.
-
-TODO:  Until/unless OpenSCAD supports better strings internally for arrays then this code has ugly unicode support in it.
- */
+/*  Version 4.0
+   This is a rework of version 3 to use the new OpenSCAD internal text() primitive.
+   All credit to Harlan Martin (harlan@sutlog.com) for his great effort on the original.
+*/
 
 /* 	Version 3
 	Added support for font selection (default is Letters.dxf)
@@ -37,8 +36,9 @@ TODO:  Until/unless OpenSCAD supports better strings internally for arrays then 
 	t = 1; 			//mm letter thickness
 	space =1; 			//extra space between characters in (character widths)
 	rotate=0;			// text rotation (clockwise)
-	old_default_font = "Letters.dxf";	//default for aditional fonts
-	font = "Inconsolata"; //Pretty close to the above (I can see the ls are different though) - Widely available (but not everywhere I am sure......)
+	old_default_font = "Letters.dxf";	//default font if none provided
+	//font = "Inconsolata"; //Pretty close to the above (I can see the ls are different though) - Widely available (but not everywhere I am sure......)
+	font = old_default_font;
 
 
 // write cube defaults
@@ -68,7 +68,8 @@ TODO:  Until/unless OpenSCAD supports better strings internally for arrays then 
 // Its tedious and time consuming, but not very hard
 
 
-module writecylinder(text,where,radius,height, unicode=false){
+module writecylinder(text,where,radius,height){
+    echo ("writecylinder:There are " ,len(text) ," letters in text" , text);
 	wid=(.125* h *5.5 * space);
 	widall=wid*(len(text)-1)/2; 
 	//angle that measures width of letters on sphere
@@ -79,19 +80,19 @@ module writecylinder(text,where,radius,height, unicode=false){
 	if ((face=="top")||(face=="bottom") ){
 		if (face=="top" ){
 			if (center==true){
-				writecircle(text,where+[0,0,height/2],unicode=unicode,radius-h,rotate=rotate,font=font,h=h,t=t,
+				writecircle(text,where+[0,0,height/2],radius-h,rotate=rotate,font=font,h=h,t=t,
 				space=space,east=east,west=west,middle=middle,ccw=ccw);
 			}else{
-				writecircle(text,where+[0,0,height],unicode=unicode,radius-h,rotate=rotate,font=font,h=h,t=t,
+				writecircle(text,where+[0,0,height],radius-h,rotate=rotate,font=font,h=h,t=t,
 				space=space,east=east,west=west,middle=middle,ccw=ccw);
 			}
 		}else{
 			rotate(180,[1,0,0])
 			if (center==true){
-				writecircle(text,where+[0,0,height/2],radius-h,unicode=unicode,rotate=rotate,font=font,h=h,t=t,
+				writecircle(text,where+[0,0,height/2],radius-h,rotate=rotate,font=font,h=h,t=t,
 				space=space,east=east,west=west,middle=middle,ccw=ccw);
 			}else{
-				writecircle(text,where+[0,0,0],radius-h,unicode=unicode,rotate=rotate,font=font,h=h,t=t,
+				writecircle(text,where+[0,0,0],radius-h,rotate=rotate,font=font,h=h,t=t,
 				space=space,east=east,west=west,middle=middle,ccw=ccw);
 			}
 		}
@@ -101,13 +102,13 @@ module writecylinder(text,where,radius,height, unicode=false){
 			if (center==true)  {
 				rotate(-mmangle(radius)*(1-abs(rotate)/90),[0,0,1])
 				translate(where)
-				writethecylinder(text,where,radius,height,r1=radius,r2=radius,unicode=unicode,h=h,
+				writethecylinder(text,where,radius,height,r1=radius,r2=radius,h=h,
 					rotate=rotate,t=t,font=font,face=face,up=up,down=down,
 					east=east,west=west,center=center,space=space,rounded=rounded);
 			} else{
 				rotate(-mmangle(radius)*(1-abs(rotate)/90),[0,0,1])
 				translate(where+[0,0,height/2])
-					writethecylinder(text,where,radius,height,r1=radius,r2=radius,unicode=unicode,h=h,
+					writethecylinder(text,where,radius,height,r1=radius,r2=radius,h=h,
 					rotate=rotate,t=t,font=font,face=face,up=up,down=down,
 					east=east,west=west,center=center,space=space,rounded=rounded);
 			}
@@ -129,7 +130,8 @@ module writecylinder(text,where,radius,height, unicode=false){
 //		}
 	}
 }
-module writecircle(text,where,radius, unicode=false){
+module writecircle(text,where,radius){
+    echo ("writecircle:There are " ,len(text) ," letters in text" , text);
 	wid=(.125* h *5.5 * space);
 	widall=wid*(len(text)-1)/2;
 	//angle that measures width of letters on sphere
@@ -141,13 +143,13 @@ module writecircle(text,where,radius, unicode=false){
 		rotate(-rotate+east-west,[0,0,1]){
 			rotate(-mmangle(radius-middle),[0,0,1]){
 			translate(where)
-    			for (r = [0:(len(text)-1)/(unicode?2:1)]){
+				for (r=[0:len(text)-1]){
 					rotate(-90+r*NAngle(radius-middle),[0,0,1]) // bottom out=-270+r 
 					translate([radius-middle,0,0])
 					//rotate(90,[1,0,0])
 					//rotate(90,[0,1,0])
 					rotate(-270,[0,0,1])  // flip text (botom out = -270)
-					write(text[r],unicode=unicode,center=true,h=h,t=t,font=font);
+					write(text[r],center=true,h=h,t=t,font=font);
 				}
 			}
 		}
@@ -155,28 +157,20 @@ module writecircle(text,where,radius, unicode=false){
 		rotate(-rotate-east+west,[0,0,1]){
 			rotate(mmangle(radius-middle),[0,0,1]){
 			translate(where)
-    			for (r = [0:(len(text)-1)/(unicode?2:1)]){
+				for (r=[0:len(text)-1]){
 					rotate(90-r*NAngle(radius-middle),[0,0,1]) // bottom out=-270+r 
 					translate([radius-middle,0,0])
 					//rotate(90,[1,0,0])
 					//rotate(90,[0,1,0])
 					rotate(270,[0,0,1])  // flip text (botom out = -270)
-					
-					if(!unicode)
-				    {
-				        write(text[r],unicode=unicode,center=true,h=h,t=t,font=font);
-				    }
-				    else
-				    {
-				        write(str((text[2*r]), (text[2*r+1])),unicode=unicode,center=true,h=h,t=t,font=font);
-				    }
+					write(text[r],center=true,h=h,t=t,font=font);
 				}
 			}
 		}		
 	}
 
 }
-module writethecylinder(text,where,radius,height,r1,r2, unicode=false){
+module writethecylinder(text,where,radius,height,r1,r2){
 	wid=(.125* h *5.5 * space);
 	widall=wid*(len(text)-1)/2; 
 	//angle that measures width of letters on sphere
@@ -186,27 +180,20 @@ module writethecylinder(text,where,radius,height,r1,r2, unicode=false){
 	function mmangle(radius)=(widall/(pi2*radius)*360);
 			translate([0,0,up-down])
 			rotate(east-west,[0,0,1])
-			for (r = [0:(len(text)-1)/(unicode?2:1)]){
+			for (r=[0:len(text)-1]){
 				rotate(-90+(r*NAngle(radius)),[0,0,1])
 				translate([radius,0,-r*((rotate)/90*wid)+(len(text)-1)/2*((rotate)/90*wid)])
 				rotate(90,[1,0,0])
 				rotate(90,[0,1,0])
-				if(!unicode)
-				{
-				    write(text[r],unicode=unicode,center=true,h=h,rotate=rotate,t=t,font=font);
-				}
-				else
-				{
-				    write(str((text[2*r]), (text[2*r+1])),unicode=unicode,center=true,h=h,rotate=rotate,t=t,font=font);
-				}
-				
+				write(text[r],center=true,h=h,rotate=rotate,t=t,font=font);
 		//echo("zloc=",height/2-r*((rotate)/90*wid)+(len(text)-1)/2*((rotate)/90*wid));
 			}
 
 }
 
 
-module writesphere(text,where,radius, unicode=false){
+module writesphere(text,where,radius){
+    echo ("writesphere:There are " ,len(text) ," letters in text" , text);
 	wid=(.125* h *5.5 * space);
 	widall=wid*(len(text)-1)/2;
 	
@@ -222,36 +209,22 @@ module writesphere(text,where,radius, unicode=false){
 	rotate(-mmangle(radius),[0,0,1]){
 		if ( rounded== false ){
 			translate(where)
-			for (r = [0:(len(text)-1)/(unicode?2:1)]){
+			for (r=[0:len(text)-1]){
 				rotate(-90+r*NAngle(radius),[0,0,1])
 				translate([radius,0,0])
 				rotate(90,[1,0,0])
 				rotate(90,[0,1,0])
-				if(!unicode)
-				{
-				    write(text[r], unicode=unicode,center=true,h=h,rotate=rotate,t=t,font=font);
-				}
-				else
-				{
-				    write(str((text[2*r]), (text[2*r+1])), unicode=unicode,center=true,h=h,rotate=rotate,t=t,font=font);
-				}
+				write(text[r],center=true,h=h,rotate=rotate,t=t,font=font);
 			}
 		}else{
 			difference(){
 				translate(where)
-    			for (r = [0:(len(text)-1)/(unicode?2:1)]){
+				for (r=[0:len(text)-1]){
 					rotate(-90+r*NAngle(radius),[0,0,1])
 					translate([radius,0,0])
 					rotate(90,[1,0,0])
 					rotate(90,[0,1,0])
-					if(!unicode)
-				    {
-				        write(text[r], unicode=unicode,center=true,h=h,rotate=rotate,t=t*2+h,font=font);
-				    }
-				    else
-				    {
-				        write(str((text[2*r]), unicode=unicode, (text[2*r+1])),center=true,h=h,rotate=rotate,t=t*2+h,font=font);
-				    }
+					write(text[r],center=true,h=h,rotate=rotate,t=t*2+h,font=font);
 				}
 				difference(){ //rounded outside
 					sphere(radius+(t*2+h)*2);
@@ -265,7 +238,8 @@ module writesphere(text,where,radius, unicode=false){
 }
 
 
-module writecube(text,where,size, unicode=false){
+module writecube(text,where,size){
+    echo ("writecube:There are " ,len(text) ," letters in text" , text);
 	if (str(size)[0] != "["){  
 		// its a square cube (size was not a matrix so make it one)
 		writethecube(text,where,[size,size,size],h=h,rotate=rotate,space=space,
@@ -278,51 +252,50 @@ module writecube(text,where,size, unicode=false){
 	}
 }
 // I split the writecube module into 2 pieces.. easier to add features later
-module writethecube(text,where,size, unicode=false){
+module writethecube(text,where,size){
 		if (face=="front") {
 			translate([where[0]+right-left,where[1]-size[1]/2,where[2]+up-down])
 			rotate(90,[1,0,0])
-			write(text,unicode=unicode,center=true,h=h,rotate=rotate,t=t,font=font);
+			write(text,center=true,h=h,rotate=rotate,t=t,font=font);
 		}
 		if (face=="back") {
 			translate([where[0]+right-left,where[1]+size[1]/2,where[2]+up-down])
 			rotate(90,[1,0,0])   // rotate around the x axis
 			rotate(180,[0,1,0])  // rotate around the y axis (z before rotation)
-			write(text,unicode=unicode,center=true,h=h,rotate=rotate,t=t,font=font);
+			write(text,center=true,h=h,rotate=rotate,t=t,font=font);
 		}
 		if (face=="left") {
 			translate([where[0]-size[0]/2,where[1]-right+left,where[2]+up-down ])
 			rotate(90,[1,0,0])   // rotate around the x axis
 			rotate(90,[0,-1,0])  // rotate around the y axis  (z before rotation)
-			write(text,unicode=unicode,center=true,h=h,rotate=rotate,t=t,font=font);
+			write(text,center=true,h=h,rotate=rotate,t=t,font=font);
 		}
 		if (face=="right") {
 			translate([where[0]+size[0]/2,where[1]+right-left,where[2] +up-down])
 			rotate(90,[1,0,0])   // rotate around the x axis
 			rotate(90,[0,1,0])  // rotate around the y axis  (z before rotation)
-			write(text,unicode=unicode,center=true,h=h,rotate=rotate,t=t,font=font);
+			write(text,center=true,h=h,rotate=rotate,t=t,font=font);
 		}
 		if (face=="top") {
 			translate([where[0]+right-left,where[1]+up-down,where[2]+size[2]/2 ])
-			write(text,unicode=unicode,center=true,h=h,rotate=rotate,t=t,font=font);
+			write(text,center=true,h=h,rotate=rotate,t=t,font=font);
 		}
 		if (face=="bottom") {
 			translate([where[0]+right-left,where[1]-up+down,where[2]-size[2]/2 ])
 			rotate(180,[1,0,0])
-			write(text,unicode=unicode,center=true,h=h,rotate=rotate,t=t,font=font);
+			write(text,center=true,h=h,rotate=rotate,t=t,font=font);
 		}
 }
 
-//unicode_str -- Is not ideal. TODO: I expect we'll need to add better unicode array support in OpenSCAD.
-module write(word, unicode=false){
-	echo ("There are ", len(word)/(unicode?2:1), " letters in word", word, ".");
+module write(word){
+	echo ("There are " ,len(word) ," letters in word" , word);
 
-    //Check if font ends in .dxf then load still (keep old functionality......)
+    //Check if font ends in .dxf then load from .dxf still (keep old functionality......)
     //Assumes that the font file is named ".dxf" to force old behaviour -- not fail safe but pretty safe....
     //OpenSCAD is also safe in that it doesn't mind either past the buffer end or negative indices
     assign( use_dxf_file = ( font[len(font)-4] == ".") && (font[len(font)-3] == "d") && (font[len(font)-2] == "x") && (font[len(font)-1] == "f") )
     rotate(rotate,[0,0,-1]){
-	for (r = [0:(len(word)-1)/(unicode?2:1)]){// count off each character (only half the length when doing unicode as we read out two at a time to make a real char)
+	for (r = [0:len(word)-1]){   // count off each character
 	    echo ("Letter=", word[r]);
 		translate([0, (center)?(-h/2):(0), (center)?(0):(t/2) ]){
 			scale([.125*h,.125*h,t]){	
@@ -335,16 +308,7 @@ module write(word, unicode=false){
 				    }
 				    else
 				    {
-				        //Use the new text module
-				        if(!unicode)
-				        {
-					        text(t = word[r], size = 8, $fn = 40, font = font);
-					    }
-					    else
-					    {
-					        text(t = str((word[2*r]), (word[2*r+1])), size = 8, $fn = 40, font = font);
-					    }
-					        
+					    text(t = word[r], size = 8, $fn = 40, font = font);
 					}
 				}
 			}

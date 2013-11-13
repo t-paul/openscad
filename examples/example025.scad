@@ -24,17 +24,30 @@ text(t = "FreeType", size = 10, font = $ff);
 translate([0, -20, 0])
 linear_extrude(height = 6)
 text(t = "it works !!!", font = $ff, size = 17);
- 
+
+//Iterate across individual letters (chars) 
 s = "OpenSCAD";
 translate([45, 60, 5])
 rotate([-30, 0, 0])
-for (a = [0 : 7])
+for (a = [0 : (len(s)-1)])
 rotate([0, 0, 135 + 90 / 7 * a])
 translate([0, 70, 0])
 rotate([90, 0, 180])
 translate([-5, 0, 0])
 linear_extrude(height = 2)
 text(t = s[a], size = 20, font = $ff);
+
+//Iterate across individual letters (unicode) 
+s_u = "もしもし";
+translate([175, 60, -10])
+rotate([-30, 0, 0])
+for (a = [0 : (len(s_u)-1)])
+rotate([0, 0, 135 + 90 / 7 * a])
+translate([0, 70, 0])
+rotate([90, 0, 180])
+translate([-5, 0, 0])
+linear_extrude(height = 2)
+text(t = s_u[a], size = 15, font = "HanaMinA");
  
 translate([0, -80, 0])
 rotate([90, 0, 0])

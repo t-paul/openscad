@@ -1,7 +1,3 @@
-/* This is a rewrite of version 3 to use the internal text primitive recently added to OpenSCAD.
-   Much credit to Harlan Martin (harlan@sutlog.com) for his great effort.
- */
-
 /* 	Version 3
 	Added support for font selection (default is Letters.dxf)
 	Added WriteCube module
@@ -66,6 +62,7 @@
 
 
 module writecylinder(text,where,radius,height){
+    echo ("writecylinder:There are " ,len(text) ," letters in text" , text);
 	wid=(.125* h *5.5 * space);
 	widall=wid*(len(text)-1)/2; 
 	//angle that measures width of letters on sphere
@@ -127,6 +124,7 @@ module writecylinder(text,where,radius,height){
 	}
 }
 module writecircle(text,where,radius){
+    echo ("writecircle:There are " ,len(text) ," letters in text" , text);
 	wid=(.125* h *5.5 * space);
 	widall=wid*(len(text)-1)/2;
 	//angle that measures width of letters on sphere
@@ -188,6 +186,7 @@ module writethecylinder(text,where,radius,height,r1,r2){
 
 
 module writesphere(text,where,radius){
+    echo ("writesphere:There are " ,len(text) ," letters in text" , text);
 	wid=(.125* h *5.5 * space);
 	widall=wid*(len(text)-1)/2;
 	
@@ -233,6 +232,7 @@ module writesphere(text,where,radius){
 
 
 module writecube(text,where,size){
+    echo ("writecube:There are " ,len(text) ," letters in text" , text);
 	if (str(size)[0] != "["){  
 		// its a square cube (size was not a matrix so make it one)
 		writethecube(text,where,[size,size,size],h=h,rotate=rotate,space=space,
@@ -281,10 +281,11 @@ module writethecube(text,where,size){
 }
 
 module write(word){
+	echo ("There are " ,len(word) ," letters in word" , word);
 	
-	echo (h);
-	echo (word);
-	echo ("There are " ,len(word) ," letters in this string");
+//	echo (h);
+//	echo (word);
+//	echo ("There are " ,len(word) ," letters in this string");
 //	echo ("The second letter is ",word[1]);
 //	echo (str(word[0],"_"));
 rotate(rotate,[0,0,-1]){
