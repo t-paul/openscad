@@ -8,7 +8,7 @@
 #   OPENCSGDIR
 #   OPENSCAD_LIBRARIES
 #
-# Please see the 'Buildling' sections of the OpenSCAD user manual 
+# Please see the 'Building' sections of the OpenSCAD user manual 
 # for updated tips & workarounds.
 #
 # http://en.wikibooks.org/wiki/OpenSCAD_User_Manual
