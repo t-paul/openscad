@@ -150,7 +150,7 @@ Is a boost/libstdc++ bug. Fix like so:
 
 6. Other issues
 
-The OpenSCAD User Manual has a section on buildling. Please check there 
+The OpenSCAD User Manual has a section on building. Please check there 
 for updates:
 
 http://en.wikibooks.org/wiki/OpenSCAD_User_Manual
