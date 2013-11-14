@@ -50,33 +50,3 @@ writecylinder("west=90",[0,0,0],20,40,h=3,face="top",ccw=true,west=90);
 writecylinder("face = bottom",[0,0,0],20,40,face="bottom"); 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

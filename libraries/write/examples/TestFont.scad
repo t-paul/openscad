@@ -51,3 +51,4 @@ writesphere("😁😂😃😄😅😆😇😈😉😊😋😌😍😎😏😐",[
 writesphere("🂡🂱🃁🃑",[0,0,-11*z_offset],40.5,font="DejaVuSansCondensed",space=1.8);
 
 }
+

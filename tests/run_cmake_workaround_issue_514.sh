@@ -1,4 +1,18 @@
 
+echo "Execute CMake and then override"
+cmake .
+
+
+  #Don't use gcc 4.8 it will cause a crash :( -- is it only on linux?
+  CC=gcc
+  CXX=g++
+  if [ "`$CC --version|grep 4.8`" ]; then
+      echo "WARNING:gcc 4.8 causes a seg fault in CGAL -- see https://github.com/openscad/openscad/issues/514"
+      if [ "`gcc-4.7 --version|grep 4.7`" ]; then
+           echo "INFO:gcc 4.7 is installed -- let's use that instead (just for building CGAL and OpenSCAD)"
+
+
+
 echo "Can't override cmake in this directory -- CC=gcc-4.7 CXX=gxx-4.7 cmake doesn't work"
 echo "We get a little hacky!! -- see https://github.com/openscad/openscad/issues/514"
 echo "/usr/bin/c++ -> g++-4.7 "
@@ -31,3 +45,8 @@ done
 
 done
 
+
+      fi
+  fi
+
+echo "GCC hacking done if required."

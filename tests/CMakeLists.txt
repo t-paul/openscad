@@ -554,9 +554,6 @@ set(CORE_SOURCES
   ../src/csgops.cc 
   ../src/transform.cc 
   ../src/color.cc
-  ../src/DrawingCallback.cc  #For Text() primitive 
-  ../src/FontCache.cc        #For Text() primitive 
-  ../src/FreetypeRenderer.cc #For Text() primitive -- idealy move to OFFSCREEN? primitives.cc has a reference to FreeTypeRenderer though....
   ../src/primitives.cc 
   ../src/projection.cc 
   ../src/cgaladv.cc 
@@ -601,6 +598,13 @@ set(COMMON_SOURCES
   ../src/Tree.cc
   ../src/lodepng.cpp)
 
+#Keep it out of core as it has a few dependencies that we want to keep out of core
+set(TEXT_PRIMITVE_SOURCES
+  ../src/DrawingCallback.cc
+  ../src/FontCache.cc
+  ../src/FreetypeRenderer.cc
+  )
+
 #
 # Offscreen OpenGL context source code
 #
@@ -621,55 +625,76 @@ set(OFFSCREEN_SOURCES
   ../src/PlatformUtils.cc 
   ../src/${PLATFORMUTILS_SOURCE}
   ../src/OpenCSGRenderer.cc)
+  
 
 
 add_library(tests-core STATIC ${CORE_SOURCES})
-target_link_libraries(tests-core ${OPENGL_LIBRARIES} ${HARFBUZZ_LIBRARY} ${FREETYPE_LIBRARY} ${GLEW_LIBRARY} ${FONTCONFIG_LIBRARY} )
-set_target_properties(tests-core PROPERTIES COMPILE_FLAGS "-DENABLE_OPENCSG -DENABLE_CGAL ${CGAL_CXX_FLAGS_INIT}")
-set(TESTS-CORE-LIBRARIES ${OPENGL_LIBRARIES} ${Boost_LIBRARIES})
+#Was:target_link_libraries(tests-core ${OPENGL_LIBRARIES} )
+#Harfbuzz for unicode
+#target_link_libraries(tests-core ${OPENGL_LIBRARIES} ${HARFBUZZ_LIBRARY} ${GLEW_LIBRARY} )
+target_link_libraries(tests-core ${OPENGL_LIBRARIES} ${HARFBUZZ_LIBRARY} )
+set(TESTS-CORE-LIBRARIES ${OPENGL_LIBRARIES} ${Boost_LIBRARIES} ${HARFBUZZ_LIBRARY} )
+
+#This actually has a dependency on CGAL....
+#text() is a primitive so it should go into common -- but CGAL is dependent on common ....
+add_library(tests-text-primitive STATIC ${TEXT_PRIMITVE_SOURCES})
+set_target_properties(tests-text-primitive PROPERTIES COMPILE_FLAGS "-DENABLE_OPENCSG -DENABLE_CGAL ${CGAL_CXX_FLAGS_INIT}")
+target_link_libraries(tests-text-primitive tests-core ${HARFBUZZ_LIBRARY} ${FREETYPE_LIBRARY} ${FONTCONFIG_LIBRARY} ${HARFBUZZ_LIBRARY} ${FREETYPE_LIBRARY} ${FONTCONFIG_LIBRARY}  )
+set(TESTS-TEXT-PRIMITIVE-LIBRARIES tests-text-primitive ${HARFBUZZ_LIBRARY} ${FREETYPE_LIBRARY} ${FONTCONFIG_LIBRARY} tests-text-primitive ${FREETYPE_LIBRARY} ${FONTCONFIG_LIBRARY} tests-text-primitive )
+
 
 add_library(tests-common STATIC ${COMMON_SOURCES})
-set_target_properties(tests-common PROPERTIES COMPILE_FLAGS "-DENABLE_OPENCSG -DENABLE_CGAL ${CGAL_CXX_FLAGS_INIT}")
-target_link_libraries(tests-common tests-core)
+target_link_libraries(tests-common tests-core ${TESTS-CORE-LIBRARIES} tests-text-primitive ${TESTS-TEXT-PRIMITIVE-LIBRARIES} )
+set(TESTS-COMMON-LIBRARIES ${TESTS-CORE-LIBRARIES} ${TESTS-TEXT-PRIMITIVE-LIBRARIES} )
+
 
 add_library(tests-cgal STATIC ${CGAL_SOURCES})
-set_target_properties(tests-cgal PROPERTIES COMPILE_FLAGS "-DENABLE_OPENCSG -DENABLE_CGAL ${CGAL_CXX_FLAGS_INIT}")
+set_target_properties(tests-cgal PROPERTIES COMPILE_FLAGS "-DENABLE_CGAL ${CGAL_CXX_FLAGS_INIT}")
 target_link_libraries(tests-cgal tests-common)
-set(TESTS-CGAL-LIBRARIES ${CGAL_LIBRARY} ${CGAL_3RD_PARTY_LIBRARIES} ${GMP_LIBRARIES} ${MPFR_LIBRARIES} ${TESTS-CORE-LIBRARIES})
+#set(TESTS-CGAL-LIBRARIES ${CGAL_LIBRARY} ${CGAL_3RD_PARTY_LIBRARIES} ${GMP_LIBRARIES} ${MPFR_LIBRARIES} ${TESTS-CORE-LIBRARIES})
+set(TESTS-CGAL-LIBRARIES ${CGAL_LIBRARY} ${CGAL_3RD_PARTY_LIBRARIES} ${GMP_LIBRARIES} ${MPFR_LIBRARIES} ${TESTS-COMMON-LIBRARIES} )
+
+#For overcoming the circ-dependency of common<>cgal<>text-primitive/renderer
+set(TESTS-TEXT-PRIMITIVE-CIRC-DEP-LIBRARIES tests-cgal ${TESTS-CGAL-LIBRARIES} tests-text-primitive ${TESTS-TEXT-PRIMITIVE-LIBRARIES} tests-core ${TESTS-CORE-LIBRARIES} tests-common ${TESTS-COMMON-LIBRARIES} tests-cgal ${TESTS-CGAL-LIBRARIES} tests-text-primitive ${TESTS-TEXT-PRIMITIVE-LIBRARIES} tests-core ${TESTS-CORE-LIBRARIES} tests-common ${TESTS-COMMON-LIBRARIES} )
+
+
 
 add_library(tests-nocgal STATIC ${NOCGAL_SOURCES})
 target_link_libraries(tests-nocgal tests-common)
+set(TESTS-NOCGAL-LIBRARIES ${TESTS-CORE-LIBRARIES} ${TESTS-COMMON-LIBRARIES} )
+
 add_library(tests-offscreen STATIC ${OFFSCREEN_SOURCES})
 set_target_properties(tests-offscreen PROPERTIES COMPILE_FLAGS "-DENABLE_OPENCSG -DENABLE_CGAL ${CGAL_CXX_FLAGS_INIT}")
-set(TESTS-NOCGAL-LIBRARIES ${TESTS-CORE-LIBRARIES})
+
 
 #
 # modulecachetest
 #
 add_executable(modulecachetest modulecachetest.cc)
-set_target_properties(modulecachetest PROPERTIES COMPILE_FLAGS "-DENABLE_CGAL ${CGAL_CXX_FLAGS_INIT}")
-target_link_libraries(modulecachetest tests-nocgal tests-cgal tests-core tests-common ${TESTS-CORE-LIBRARIES}  ${TESTS-NOCGAL-LIBRARIES} ${TESTS-CGAL-LIBRARIES} ${Boost_LIBRARIES} tests-cgal boost_thread )
+target_link_libraries(modulecachetest tests-nocgal ${TESTS-NOCGAL-LIBRARIES} ${Boost_LIBRARIES} ${TESTS-TEXT-PRIMITIVE-CIRC-DEP-LIBRARIES} )
+
+
 
 #
 # csgtexttest
 #
 add_executable(csgtexttest csgtexttest.cc CSGTextRenderer.cc CSGTextCache.cc)
-set_target_properties(csgtexttest PROPERTIES COMPILE_FLAGS "-DENABLE_CGAL ${CGAL_CXX_FLAGS_INIT}")
-target_link_libraries(csgtexttest tests-nocgal tests-cgal tests-core tests-common ${TESTS-CORE-LIBRARIES}  ${TESTS-NOCGAL-LIBRARIES} ${TESTS-CGAL-LIBRARIES} tests-cgal boost_thread )
+target_link_libraries(csgtexttest tests-nocgal ${TESTS-NOCGAL-LIBRARIES} ${TESTS-TEXT-PRIMITIVE-CIRC-DEP-LIBRARIES} )
+
 
 #
 # cgalcachetest
 #
 add_executable(cgalcachetest cgalcachetest.cc)
 set_target_properties(cgalcachetest PROPERTIES COMPILE_FLAGS "-DENABLE_CGAL ${CGAL_CXX_FLAGS_INIT}")
-target_link_libraries(cgalcachetest tests-cgal ${TESTS-CGAL-LIBRARIES} ${GLEW_LIBRARY} ${COCOA_LIBRARY} )
+target_link_libraries(cgalcachetest tests-cgal ${TESTS-CGAL-LIBRARIES} ${GLEW_LIBRARY} ${COCOA_LIBRARY} ${TESTS-TEXT-PRIMITIVE-CIRC-DEP-LIBRARIES} )
 
 #
-# openscad no-qt
+# openscad_nogui (no-qt)
 #
 add_executable(openscad_nogui ../src/openscad.cc)
 set_target_properties(openscad_nogui PROPERTIES COMPILE_FLAGS "-fno-strict-aliasing -DEIGEN_DONT_ALIGN -DENABLE_CGAL -DENABLE_OPENCSG ${CGAL_CXX_FLAGS_INIT}")
-target_link_libraries(openscad_nogui tests-offscreen tests-cgal tests-nocgal ${TESTS-CORE-LIBRARIES} ${TESTS-CGAL-LIBRARIES} ${GLEW_LIBRARY} ${Boost_LIBRARIES} ${OPENCSG_LIBRARY} ${COCOA_LIBRARY} ${GLEW_LIBRARY} )
+target_link_libraries(openscad_nogui tests-offscreen tests-cgal tests-nocgal ${TESTS-CORE-LIBRARIES} ${TESTS-CGAL-LIBRARIES} ${GLEW_LIBRARY} ${Boost_LIBRARIES} ${OPENCSG_LIBRARY} ${COCOA_LIBRARY}  ${TESTS-TEXT-PRIMITIVE-CIRC-DEP-LIBRARIES} )
 
 #
 # GUI binary tests

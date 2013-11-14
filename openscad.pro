@@ -29,11 +29,11 @@ isEmpty(QT_VERSION) {
 
 #Don't use gcc 4.8 it will cause a crash :( -- is it only on linux?
 unix:!macx {
-    message( Cheking GCC to use )
-    system( g++ --version | grep 4.8 > NUL ) {
-        warning( g++ version 4.8 found -- WARNING gcc 4.8 causes a seg fault in CGAL -- see https://github.com/openscad/openscad/issues/514)
+    message( Cheking GCC in use )
+    system( g++ --version | grep 4.8 > /dev/null ) {
+        warning( g++ version 4.8 which causes a seg fault in CGAL -- see https://github.com/openscad/openscad/issues/514)
 
-        system( g++-4.7 --version | grep 4.7 > NUL ) {
+        system( g++-4.7 --version | grep 4.7 > /dev/null ) {
             message( g++ version 4.7 found -- use that instead for openSCAD and CGAL )
             QMAKE_CC=gcc-4.7
             QMAKE_CXX=g++-4.7
@@ -42,9 +42,9 @@ unix:!macx {
             warning( Couldn't find an alternative compiler. Seg faults are likely to occur... )
         }
     }
-}
 message("QMAKE_CC: $${QMAKE_CC}")
 message("QMAKE_CXX: $${QMAKE_CXX}")
+}
 
 # Populate VERSION, VERSION_YEAR, VERSION_MONTH, VERSION_DATE from system date
 include(version.pri)
