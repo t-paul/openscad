@@ -268,6 +268,45 @@ else()
   inclusion(EIGEN_DIR EIGEN_INCLUDE_DIR)
 endif()
 
+#HarfBuzz
+#Note t-paul is working on this too so his work will override this
+#TODO : Work on if in development directories
+find_package(HarfBuzz REQUIRED)
+if (HARFBUZZ_FOUND)
+  message(STATUS "BRODY ------------ HB")
+  inclusion(HARFBUZZ_DIR HARFBUZZ_INCLUDE_DIRS)
+  set(HARFBUZZ_LIBRARY ${HARFBUZZ_LIBRARIES})
+endif (HARFBUZZ_FOUND)
+message(STATUS "HARFBUZZ include: " ${HARFBUZZ_INCLUDE_DIR})
+message(STATUS "HARFBUZZ library: " ${HARFBUZZ_LIBRARY})
+
+#FreeType
+#Note t-paul is working on this too so his work will override this
+#BK - TODO : Tidy this to use findpackage
+#TODO : Work on if in development directories
+find_package(Freetype REQUIRED)
+if (FREETYPE_FOUND)
+  message(STATUS "BRODY ------------ FT")
+  inclusion(FREETYPE_DIR FREETYPE_INCLUDE_DIRS)
+  set(FREETYPE_LIBRARY ${FREETYPE_LIBRARIES})
+endif (FREETYPE_FOUND)
+message(STATUS "FREETYPE include: " ${FREETYPE_INCLUDE_DIR})
+message(STATUS "FREETYPE library: " ${FREETYPE_LIBRARY})
+
+#FontConfig
+#Note t-paul is working on this too so his work will override this
+#BK - TODO : Tidy this to use findpackage
+#TODO : Work on if in development directories
+find_package(Fontconfig REQUIRED)
+if (FONTCONFIG_FOUND)
+  message(STATUS "BRODY ------------ FC")
+  inclusion(FONTCONFIG_DIR FONTCONFIG_INCLUDE_DIRS)
+  set(FONTCONFIG_LIBRARY ${FONTCONFIG_LIBRARIES})
+endif (FONTCONFIG_FOUND)
+message(STATUS "FONTCONFIG include: " ${FONTCONFIG_INCLUDE_DIR})
+message(STATUS "FONTCONFIG library: " ${FONTCONFIG_LIBRARY})
+
+
 # OpenGL
 find_package(OpenGL REQUIRED)
 if (NOT OPENGL_GLU_FOUND)
@@ -307,7 +346,6 @@ endif()
 inclusion(OPENCSG_DIR OPENCSG_INCLUDE_DIR)
 
 # GLEW
-
 if(WIN32_STATIC_BUILD)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DGLEW_STATIC")
 endif()
@@ -387,6 +425,7 @@ elseif (NOT $ENV{OPENSCAD_LIBRARIES} STREQUAL "")
   endif()
 endif()
 message(STATUS "CGAL_DIR: " ${CGAL_DIR})
+#BK - NOTE This findpacakge returns an erroneous set of libs for boost (on Ubuntu 64 13.10)
 find_package(CGAL REQUIRED)
 message(STATUS "CGAL config found in " ${CGAL_USE_FILE} )
 foreach(cgal_incdir ${CGAL_INCLUDE_DIRS})
@@ -397,6 +436,15 @@ if("${CGAL_MAJOR_VERSION}.${CGAL_MINOR_VERSION}" VERSION_LESS 3.6)
   message(FATAL_ERROR "CGAL >= 3.6 required")
 endif()
 inclusion(CGAL_DIR CGAL_INCLUDE_DIRS)
+
+message(WARNING "BAD BOOST libs reported in CGAL_3RD_PARTY_LIBRARIES -- ${CGAL_3RD_PARTY_LIBRARIES}")
+#Get rid of several bad libraries suggested for BOOST dependencies
+# that come from this find_package (they don't even exist on some machines)
+#/usr/lib/libboost_thread.so;/usr/lib/libboost_system.so;
+#TODO: Perhaps add a check if they exist before deleting -- but boost will be added in properly anyway....
+string(REPLACE "/usr/lib/libboost_system.so" "" CGAL_3RD_PARTY_LIBRARIES ${CGAL_3RD_PARTY_LIBRARIES})
+string(REPLACE "/usr/lib/libboost_thread.so" "" CGAL_3RD_PARTY_LIBRARIES ${CGAL_3RD_PARTY_LIBRARIES})
+message(STATUS "CGAL_3RD_PARTY_LIBRARIES modified -- ${CGAL_3RD_PARTY_LIBRARIES}")
 
 if(${CMAKE_CXX_COMPILER} MATCHES ".*clang.*" AND NOT ${CGAL_CXX_FLAGS_INIT} STREQUAL "" )
 	string(REPLACE "-frounding-math" "" CGAL_CXX_FLAGS_INIT ${CGAL_CXX_FLAGS_INIT})
@@ -505,7 +553,10 @@ set(CORE_SOURCES
   ../src/polyset.cc 
   ../src/csgops.cc 
   ../src/transform.cc 
-  ../src/color.cc 
+  ../src/color.cc
+  ../src/DrawingCallback.cc  #For Text() primitive 
+  ../src/FontCache.cc        #For Text() primitive 
+  ../src/FreetypeRenderer.cc #For Text() primitive -- idealy move to OFFSCREEN? primitives.cc has a reference to FreeTypeRenderer though....
   ../src/primitives.cc 
   ../src/projection.cc 
   ../src/cgaladv.cc 
@@ -571,15 +622,18 @@ set(OFFSCREEN_SOURCES
   ../src/${PLATFORMUTILS_SOURCE}
   ../src/OpenCSGRenderer.cc)
 
+
 add_library(tests-core STATIC ${CORE_SOURCES})
-target_link_libraries(tests-core ${OPENGL_LIBRARIES})
+target_link_libraries(tests-core ${OPENGL_LIBRARIES} ${HARFBUZZ_LIBRARY} ${FREETYPE_LIBRARY} ${GLEW_LIBRARY} ${FONTCONFIG_LIBRARY} )
+set_target_properties(tests-core PROPERTIES COMPILE_FLAGS "-DENABLE_OPENCSG -DENABLE_CGAL ${CGAL_CXX_FLAGS_INIT}")
 set(TESTS-CORE-LIBRARIES ${OPENGL_LIBRARIES} ${Boost_LIBRARIES})
 
 add_library(tests-common STATIC ${COMMON_SOURCES})
+set_target_properties(tests-common PROPERTIES COMPILE_FLAGS "-DENABLE_OPENCSG -DENABLE_CGAL ${CGAL_CXX_FLAGS_INIT}")
 target_link_libraries(tests-common tests-core)
 
 add_library(tests-cgal STATIC ${CGAL_SOURCES})
-set_target_properties(tests-cgal PROPERTIES COMPILE_FLAGS "-DENABLE_CGAL ${CGAL_CXX_FLAGS_INIT}")
+set_target_properties(tests-cgal PROPERTIES COMPILE_FLAGS "-DENABLE_OPENCSG -DENABLE_CGAL ${CGAL_CXX_FLAGS_INIT}")
 target_link_libraries(tests-cgal tests-common)
 set(TESTS-CGAL-LIBRARIES ${CGAL_LIBRARY} ${CGAL_3RD_PARTY_LIBRARIES} ${GMP_LIBRARIES} ${MPFR_LIBRARIES} ${TESTS-CORE-LIBRARIES})
 
@@ -593,27 +647,29 @@ set(TESTS-NOCGAL-LIBRARIES ${TESTS-CORE-LIBRARIES})
 # modulecachetest
 #
 add_executable(modulecachetest modulecachetest.cc)
-target_link_libraries(modulecachetest tests-nocgal ${TESTS-NOCGAL-LIBRARIES} ${Boost_LIBRARIES})
+set_target_properties(modulecachetest PROPERTIES COMPILE_FLAGS "-DENABLE_CGAL ${CGAL_CXX_FLAGS_INIT}")
+target_link_libraries(modulecachetest tests-nocgal tests-cgal tests-core tests-common ${TESTS-CORE-LIBRARIES}  ${TESTS-NOCGAL-LIBRARIES} ${TESTS-CGAL-LIBRARIES} ${Boost_LIBRARIES} tests-cgal boost_thread )
 
 #
 # csgtexttest
 #
 add_executable(csgtexttest csgtexttest.cc CSGTextRenderer.cc CSGTextCache.cc)
-target_link_libraries(csgtexttest tests-nocgal ${TESTS-NOCGAL-LIBRARIES})
+set_target_properties(csgtexttest PROPERTIES COMPILE_FLAGS "-DENABLE_CGAL ${CGAL_CXX_FLAGS_INIT}")
+target_link_libraries(csgtexttest tests-nocgal tests-cgal tests-core tests-common ${TESTS-CORE-LIBRARIES}  ${TESTS-NOCGAL-LIBRARIES} ${TESTS-CGAL-LIBRARIES} tests-cgal boost_thread )
 
 #
 # cgalcachetest
 #
 add_executable(cgalcachetest cgalcachetest.cc)
 set_target_properties(cgalcachetest PROPERTIES COMPILE_FLAGS "-DENABLE_CGAL ${CGAL_CXX_FLAGS_INIT}")
-target_link_libraries(cgalcachetest tests-cgal ${TESTS-CGAL-LIBRARIES} ${GLEW_LIBRARY} ${COCOA_LIBRARY})
+target_link_libraries(cgalcachetest tests-cgal ${TESTS-CGAL-LIBRARIES} ${GLEW_LIBRARY} ${COCOA_LIBRARY} )
 
 #
 # openscad no-qt
 #
 add_executable(openscad_nogui ../src/openscad.cc)
 set_target_properties(openscad_nogui PROPERTIES COMPILE_FLAGS "-fno-strict-aliasing -DEIGEN_DONT_ALIGN -DENABLE_CGAL -DENABLE_OPENCSG ${CGAL_CXX_FLAGS_INIT}")
-target_link_libraries(openscad_nogui tests-offscreen tests-cgal tests-nocgal ${TESTS-CORE-LIBRARIES} ${TESTS-CGAL-LIBRARIES} ${GLEW_LIBRARY} ${Boost_LIBRARIES} ${OPENCSG_LIBRARY} ${COCOA_LIBRARY} )
+target_link_libraries(openscad_nogui tests-offscreen tests-cgal tests-nocgal ${TESTS-CORE-LIBRARIES} ${TESTS-CGAL-LIBRARIES} ${GLEW_LIBRARY} ${Boost_LIBRARIES} ${OPENCSG_LIBRARY} ${COCOA_LIBRARY} ${GLEW_LIBRARY} )
 
 #
 # GUI binary tests
