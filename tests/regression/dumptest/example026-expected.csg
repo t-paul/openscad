@@ -1,0 +1,51 @@
+group() {
+	multmatrix([[1, 0, 0, 0], [0, 0.86602540378, 0.5, 0], [0, -0.5, 0.86602540378, 0], [0, 0, 0, 1]]) {
+		group() {
+			multmatrix([[-0.70710678118, -0.70710678118, 0, 0], [0.70710678118, -0.70710678118, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]) {
+				multmatrix([[1, 0, 0, 0], [0, 1, 0, 70], [0, 0, 1, 0], [0, 0, 0, 1]]) {
+					multmatrix([[-1, 0, 0, 0], [0, 0, 1, 0], [0, 1, 0, 0], [0, 0, 0, 1]]) {
+						multmatrix([[1, 0, 0, -5], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]) {
+							linear_extrude(height = 2, center = false, convexity = 1, scale = [1, 1], $fn = 20, $fa = 12, $fs = 2) {
+								text($fn = 5, text = 'も', size = 15, spacing = 1, font = 'HanaMinA', direction = 'ltr', language = 'jp', script = 'latin', halign = 'left', valign = 'baseline');
+							}
+						}
+					}
+				}
+			}
+			multmatrix([[-0.96592582628, -0.2588190451, 0, 0], [0.2588190451, -0.96592582628, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]) {
+				multmatrix([[1, 0, 0, 0], [0, 1, 0, 70], [0, 0, 1, 0], [0, 0, 0, 1]]) {
+					multmatrix([[-1, 0, 0, 0], [0, 0, 1, 0], [0, 1, 0, 0], [0, 0, 0, 1]]) {
+						multmatrix([[1, 0, 0, -5], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]) {
+							linear_extrude(height = 2, center = false, convexity = 1, scale = [1, 1], $fn = 20, $fa = 12, $fs = 2) {
+								text($fn = 5, text = 'し', size = 15, spacing = 1, font = 'HanaMinA', direction = 'ltr', language = 'jp', script = 'latin', halign = 'left', valign = 'baseline');
+							}
+						}
+					}
+				}
+			}
+			multmatrix([[-0.96592582628, 0.2588190451, 0, 0], [-0.2588190451, -0.96592582628, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]) {
+				multmatrix([[1, 0, 0, 0], [0, 1, 0, 70], [0, 0, 1, 0], [0, 0, 0, 1]]) {
+					multmatrix([[-1, 0, 0, 0], [0, 0, 1, 0], [0, 1, 0, 0], [0, 0, 0, 1]]) {
+						multmatrix([[1, 0, 0, -5], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]) {
+							linear_extrude(height = 2, center = false, convexity = 1, scale = [1, 1], $fn = 20, $fa = 12, $fs = 2) {
+								text($fn = 5, text = 'も', size = 15, spacing = 1, font = 'HanaMinA', direction = 'ltr', language = 'jp', script = 'latin', halign = 'left', valign = 'baseline');
+							}
+						}
+					}
+				}
+			}
+			multmatrix([[-0.70710678118, 0.70710678118, 0, 0], [-0.70710678118, -0.70710678118, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]) {
+				multmatrix([[1, 0, 0, 0], [0, 1, 0, 70], [0, 0, 1, 0], [0, 0, 0, 1]]) {
+					multmatrix([[-1, 0, 0, 0], [0, 0, 1, 0], [0, 1, 0, 0], [0, 0, 0, 1]]) {
+						multmatrix([[1, 0, 0, -5], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]) {
+							linear_extrude(height = 2, center = false, convexity = 1, scale = [1, 1], $fn = 20, $fa = 12, $fs = 2) {
+								text($fn = 5, text = 'し', size = 15, spacing = 1, font = 'HanaMinA', direction = 'ltr', language = 'jp', script = 'latin', halign = 'left', valign = 'baseline');
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	group();
+}

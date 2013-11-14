@@ -1,0 +1,97 @@
+group() {
+	multmatrix([[1, 0, 0, 90], [0, 1, 0, 60], [0, 0, 1, 5], [0, 0, 0, 1]]) {
+		multmatrix([[1, 0, 0, 0], [0, 0.86602540378, 0.5, 0], [0, -0.5, 0.86602540378, 0], [0, 0, 0, 1]]) {
+			group() {
+				multmatrix([[-0.70710678118, -0.70710678118, 0, 0], [0.70710678118, -0.70710678118, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]) {
+					multmatrix([[1, 0, 0, 0], [0, 1, 0, 100], [0, 0, 1, 0], [0, 0, 0, 1]]) {
+						multmatrix([[-1, 0, 0, 0], [0, 0, 1, 0], [0, 1, 0, 0], [0, 0, 0, 1]]) {
+							multmatrix([[1, 0, 0, -5], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]) {
+								linear_extrude(height = 4, center = false, convexity = 1, scale = [1, 1], $fn = 20, $fa = 12, $fs = 2) {
+									text($fn = 5, text = 'O', size = 20, spacing = 1, font = 'DejaVuSansCondensed', direction = 'ltr', language = 'en', script = 'latin', halign = 'left', valign = 'baseline');
+								}
+							}
+						}
+					}
+				}
+				multmatrix([[-0.84672419922, -0.53203207651, 0, 0], [0.53203207651, -0.84672419922, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]) {
+					multmatrix([[1, 0, 0, 0], [0, 1, 0, 100], [0, 0, 1, 0], [0, 0, 0, 1]]) {
+						multmatrix([[-1, 0, 0, 0], [0, 0, 1, 0], [0, 1, 0, 0], [0, 0, 0, 1]]) {
+							multmatrix([[1, 0, 0, -5], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]) {
+								linear_extrude(height = 4, center = false, convexity = 1, scale = [1, 1], $fn = 20, $fa = 12, $fs = 2) {
+									text($fn = 5, text = 'p', size = 20, spacing = 1, font = 'DejaVuSansCondensed', direction = 'ltr', language = 'en', script = 'latin', halign = 'left', valign = 'baseline');
+								}
+							}
+						}
+					}
+				}
+				multmatrix([[-0.9438833303, -0.33027906195, 0, 0], [0.33027906195, -0.9438833303, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]) {
+					multmatrix([[1, 0, 0, 0], [0, 1, 0, 100], [0, 0, 1, 0], [0, 0, 0, 1]]) {
+						multmatrix([[-1, 0, 0, 0], [0, 0, 1, 0], [0, 1, 0, 0], [0, 0, 0, 1]]) {
+							multmatrix([[1, 0, 0, -5], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]) {
+								linear_extrude(height = 4, center = false, convexity = 1, scale = [1, 1], $fn = 20, $fa = 12, $fs = 2) {
+									text($fn = 5, text = 'e', size = 20, spacing = 1, font = 'DejaVuSansCondensed', direction = 'ltr', language = 'en', script = 'latin', halign = 'left', valign = 'baseline');
+								}
+							}
+						}
+					}
+				}
+				multmatrix([[-0.99371220989, -0.1119644761, 0, 0], [0.1119644761, -0.99371220989, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]) {
+					multmatrix([[1, 0, 0, 0], [0, 1, 0, 100], [0, 0, 1, 0], [0, 0, 0, 1]]) {
+						multmatrix([[-1, 0, 0, 0], [0, 0, 1, 0], [0, 1, 0, 0], [0, 0, 0, 1]]) {
+							multmatrix([[1, 0, 0, -5], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]) {
+								linear_extrude(height = 4, center = false, convexity = 1, scale = [1, 1], $fn = 20, $fa = 12, $fs = 2) {
+									text($fn = 5, text = 'n', size = 20, spacing = 1, font = 'DejaVuSansCondensed', direction = 'ltr', language = 'en', script = 'latin', halign = 'left', valign = 'baseline');
+								}
+							}
+						}
+					}
+				}
+				multmatrix([[-0.99371220989, 0.1119644761, 0, 0], [-0.1119644761, -0.99371220989, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]) {
+					multmatrix([[1, 0, 0, 0], [0, 1, 0, 100], [0, 0, 1, 0], [0, 0, 0, 1]]) {
+						multmatrix([[-1, 0, 0, 0], [0, 0, 1, 0], [0, 1, 0, 0], [0, 0, 0, 1]]) {
+							multmatrix([[1, 0, 0, -5], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]) {
+								linear_extrude(height = 4, center = false, convexity = 1, scale = [1, 1], $fn = 20, $fa = 12, $fs = 2) {
+									text($fn = 5, text = 'S', size = 20, spacing = 1, font = 'DejaVuSansCondensed', direction = 'ltr', language = 'en', script = 'latin', halign = 'left', valign = 'baseline');
+								}
+							}
+						}
+					}
+				}
+				multmatrix([[-0.9438833303, 0.33027906195, 0, 0], [-0.33027906195, -0.9438833303, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]) {
+					multmatrix([[1, 0, 0, 0], [0, 1, 0, 100], [0, 0, 1, 0], [0, 0, 0, 1]]) {
+						multmatrix([[-1, 0, 0, 0], [0, 0, 1, 0], [0, 1, 0, 0], [0, 0, 0, 1]]) {
+							multmatrix([[1, 0, 0, -5], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]) {
+								linear_extrude(height = 4, center = false, convexity = 1, scale = [1, 1], $fn = 20, $fa = 12, $fs = 2) {
+									text($fn = 5, text = 'C', size = 20, spacing = 1, font = 'DejaVuSansCondensed', direction = 'ltr', language = 'en', script = 'latin', halign = 'left', valign = 'baseline');
+								}
+							}
+						}
+					}
+				}
+				multmatrix([[-0.84672419922, 0.53203207651, 0, 0], [-0.53203207651, -0.84672419922, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]) {
+					multmatrix([[1, 0, 0, 0], [0, 1, 0, 100], [0, 0, 1, 0], [0, 0, 0, 1]]) {
+						multmatrix([[-1, 0, 0, 0], [0, 0, 1, 0], [0, 1, 0, 0], [0, 0, 0, 1]]) {
+							multmatrix([[1, 0, 0, -5], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]) {
+								linear_extrude(height = 4, center = false, convexity = 1, scale = [1, 1], $fn = 20, $fa = 12, $fs = 2) {
+									text($fn = 5, text = 'A', size = 20, spacing = 1, font = 'DejaVuSansCondensed', direction = 'ltr', language = 'en', script = 'latin', halign = 'left', valign = 'baseline');
+								}
+							}
+						}
+					}
+				}
+				multmatrix([[-0.70710678118, 0.70710678118, 0, 0], [-0.70710678118, -0.70710678118, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]) {
+					multmatrix([[1, 0, 0, 0], [0, 1, 0, 100], [0, 0, 1, 0], [0, 0, 0, 1]]) {
+						multmatrix([[-1, 0, 0, 0], [0, 0, 1, 0], [0, 1, 0, 0], [0, 0, 0, 1]]) {
+							multmatrix([[1, 0, 0, -5], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]) {
+								linear_extrude(height = 4, center = false, convexity = 1, scale = [1, 1], $fn = 20, $fa = 12, $fs = 2) {
+									text($fn = 5, text = 'D', size = 20, spacing = 1, font = 'DejaVuSansCondensed', direction = 'ltr', language = 'en', script = 'latin', halign = 'left', valign = 'baseline');
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	group();
+}
