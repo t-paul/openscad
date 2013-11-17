@@ -403,8 +403,8 @@ Value builtin_lookup(const Context *, const EvalContext *evalctx)
   Index values return as list:
     search("a","abcdabcd");
         - returns [0]
-    search("a","abcdabcd",0);
-        - returns [0,4]
+    search("a","abcdabcd",0); //All
+        - returns [[0,4]]
     search("a","abcdabcd",1);
         - returns [0]
     search("e","abcdabcd",1);
