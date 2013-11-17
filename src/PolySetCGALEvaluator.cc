@@ -3,6 +3,7 @@
 #include "cgalutils.h"
 #include <CGAL/convex_hull_3.h>
 
+#include "Tree.h"
 #include "polyset.h"
 #include "CGALEvaluator.h"
 #include "projectionnode.h"
@@ -10,13 +11,15 @@
 #include "rotateextrudenode.h"
 #include "cgaladvnode.h"
 #include "rendernode.h"
+#include "textnode.h"
 #include "dxfdata.h"
 #include "dxftess.h"
 #include "module.h"
+#include "calc.h"
+#include "FreetypeRenderer.h"
 
 #include "svg.h"
 #include "printutils.h"
-#include "openscad.h" // get_fragments_from_r()
 #include <boost/foreach.hpp>
 #include <vector>
 
@@ -460,7 +463,7 @@ PolySet *PolySetCGALEvaluator::rotateDxfData(const RotateExtrudeNode &node, DxfD
 			max_x = fmax(max_x, dxf.points[dxf.paths[i].indices[j]][0]);
 		}
 
-		int fragments = get_fragments_from_r(max_x, node.fn, node.fs, node.fa);
+		int fragments = Calc::get_fragments_from_r(max_x, node.fn, node.fs, node.fa);
 
 		double ***points;
 		points = new double**[fragments];
@@ -518,3 +521,30 @@ PolySet *PolySetCGALEvaluator::rotateDxfData(const RotateExtrudeNode &node, DxfD
 	
 	return ps;
 }
+
+PolySet *PolySetCGALEvaluator::evaluatePolySet(const TextNode &node)
+{
+	FreetypeRenderer renderer;
+	std::vector<PolySet *> polysets = renderer.render(node.get_params());
+
+	CGAL_Nef_polyhedron result;
+	for (std::vector<PolySet *>::iterator it = polysets.begin();it != polysets.end();it++) {
+		Tree nulltree;
+		CGALEvaluator tmpeval(nulltree);
+
+		PolySet *p = *it;
+		CGAL_Nef_polyhedron N = tmpeval.evaluateCGALMesh(*p);
+		delete p;
+	
+		if (!N.isNull()) {
+			if (result.isNull()) {
+				result = N.copy();
+			} else {
+				result += N;
+			}
+		}
+	}
+
+	return result.convertToPolyset();
+}
+

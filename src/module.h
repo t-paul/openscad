@@ -64,6 +64,8 @@ public:
 	virtual ~AbstractModule();
 	virtual class AbstractNode *instantiate(const Context *ctx, const ModuleInstantiation *inst, const class EvalContext *evalctx = NULL) const;
 	virtual std::string dump(const std::string &indent, const std::string &name) const;
+        virtual double lookup_double_variable_with_default(Context &c, std::string variable, double def) const;
+        virtual std::string lookup_string_variable_with_default(Context &c, std::string variable, std::string def) const;
 };
 
 class Module : public AbstractModule

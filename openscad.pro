@@ -207,6 +207,7 @@ HEADERS += src/typedefs.h \
            src/OpenCSGWarningDialog.h \
            src/AboutDialog.h \
            src/builtin.h \
+           src/calc.h \
            src/context.h \
            src/modcontext.h \
            src/evalcontext.h \
@@ -232,6 +233,7 @@ HEADERS += src/typedefs.h \
            src/transformnode.h \
            src/colornode.h \
            src/rendernode.h \
+           src/textnode.h \
            src/openscad.h \
            src/handle_dep.h \
            src/polyset.h \
@@ -299,6 +301,7 @@ SOURCES += src/version_check.cc \
            src/surface.cc \
            src/control.cc \
            src/render.cc \
+           src/text.cc \
            src/dxfdata.cc \
            src/dxfdim.cc \
            src/linearextrude.cc \
@@ -331,6 +334,7 @@ SOURCES += src/version_check.cc \
            src/AutoUpdater.cc \
            \
            src/builtin.cc \
+           src/calc.cc \
            src/export.cc \
            src/export_png.cc \
            src/import.cc \

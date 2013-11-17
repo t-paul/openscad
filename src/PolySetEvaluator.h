@@ -18,6 +18,7 @@ public:
 	virtual PolySet *evaluatePolySet(const class RotateExtrudeNode &) { return NULL; }
 	virtual PolySet *evaluatePolySet(const class CgaladvNode &) { return NULL; }
 	virtual PolySet *evaluatePolySet(const class RenderNode &) { return NULL; }
+	virtual PolySet *evaluatePolySet(const class TextNode &) { return NULL; }
 
 private:
 	const Tree &tree;

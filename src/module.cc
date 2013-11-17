@@ -57,6 +57,18 @@ AbstractNode *AbstractModule::instantiate(const Context *ctx, const ModuleInstan
 	return node;
 }
 
+double AbstractModule::lookup_double_variable_with_default(Context &c, std::string variable, double def) const
+{
+	const Value v = c.lookup_variable(variable, true);
+	return (v.type() == Value::NUMBER) ? v.toDouble() : def;
+}
+
+std::string AbstractModule::lookup_string_variable_with_default(Context &c, std::string variable, std::string def) const
+{
+	const Value v = c.lookup_variable(variable, true);
+	return (v.type() == Value::STRING) ? v.toString() : def;
+}
+
 std::string AbstractModule::dump(const std::string &indent, const std::string &name) const
 {
 	std::stringstream dump;

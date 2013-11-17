@@ -38,6 +38,10 @@
 
 #include FT_OUTLINE_H
 
+static inline Vector2d get_scaled_vector(const FT_Vector *ft_vector, double scale) {
+    return Vector2d(ft_vector->x / scale, ft_vector->y / scale);
+}
+
 FreetypeRenderer::FreetypeRenderer()
 {
 	funcs.move_to = outline_move_to_func;
@@ -114,7 +118,7 @@ double FreetypeRenderer::calc_y_offset(std::string valign, double ascend, double
 	}
 }
 
-PolySet * FreetypeRenderer::render(const FreetypeRenderer::Params &params) const
+std::vector<PolySet *> FreetypeRenderer::render(const FreetypeRenderer::Params &params) const
 {
 	FT_Face face;
 	FT_Error error;
@@ -122,18 +126,18 @@ PolySet * FreetypeRenderer::render(const FreetypeRenderer::Params &params) const
 	
 	FontCache *cache = FontCache::instance();
 	if (!cache->is_init_ok()) {
-		return NULL;
+		return std::vector<PolySet *>();
 	}
 
 	face = cache->get_font(params.font);
 	if (face == NULL) {
-		return NULL;
+		return std::vector<PolySet *>();
 	}
 	
 	error = FT_Set_Char_Size(face, 0, params.size * scale, 100, 100);
 	if (error) {
 		PRINTB("Can't set font size for font %s", params.font);
-		return NULL;
+		return std::vector<PolySet *>();
 	}
 	
 	hb_font_t *hb_ft_font = hb_ft_font_create(face, NULL);

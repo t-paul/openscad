@@ -23,56 +23,18 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-#ifndef FONTCACHE_H
-#define	FONTCACHE_H
 
-#include <map>
-#include <string>
+#include "calc.h"
+#include "grid.h"
 
-#include <time.h>
-
-#include <ft2build.h>
-#include FT_FREETYPE_H
-
-#include <fontconfig/fontconfig.h>
-
-#include <hb.h>
-#include <hb-ft.h>
-
-class FontCache {
-public:
-    const static unsigned int MAX_NR_OF_CACHE_ENTRIES = 3;
-    
-    FontCache();
-    virtual ~FontCache();
-
-    bool is_init_ok();
-    FT_Face get_font(std::string font);
-    void register_font_file(std::string path);
-    void clear();
-    
-    static FontCache * instance();
-private:
-    typedef std::pair<FT_Face, time_t> cache_entry_t;
-    typedef std::map<std::string, cache_entry_t> cache_t;
-
-    static FontCache *self;
-    
-    bool init_ok;
-    cache_t cache;
-    FcConfig *config;
-    FT_Library library;
-
-    void check_cleanup();
-    void dump_cache(std::string info);
-    
-    void add_font_dir(std::string path);
-    
-    FT_Face find_face(std::string font);
-    FT_Face find_face_fontconfig(std::string font);
-    FT_Face find_face_in_path_list(std::string font);
-    FT_Face find_face_in_path(std::string path, std::string font);
-};
-
-#endif	/* FONTCACHE_H */
+/*!
+	Returns the number of subdivision of a whole circle, given radius and
+	the three special variables $fn, $fs and $fa
+*/
+int Calc::get_fragments_from_r(double r, double fn, double fs, double fa)
+{
+	if (r < GRID_FINE) return 3;
+	if (fn > 0.0) return (int)(fn >= 3 ? fn : 3);
+	return (int)ceil(fmax(fmin(360.0 / fa, r*2*M_PI / fs), 5));
+}
 

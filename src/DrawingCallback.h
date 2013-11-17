@@ -26,14 +26,12 @@
 #ifndef DRAWINGCALLBACK_H
 #define	DRAWINGCALLBACK_H
 
+#include <vector>
 #include <math.h>
 #include <Eigen/Core>
 
 #include "dxfdata.h"
 #include "polyset.h"
-#ifdef ENABLE_CGAL
-#include "CGAL_Nef_polyhedron.h"
-#endif
 
 class DrawingCallback {
 public:
@@ -44,7 +42,7 @@ public:
     void finish_glyph();
     void set_glyph_offset(double offset_x, double offset_y);
     void add_glyph_advance(double advance_x, double advance_y);
-    PolySet *get_result();
+    std::vector<PolySet *> get_result();
 
     void move_to(Vector2d to);
     void line_to(Vector2d to);
@@ -57,9 +55,7 @@ private:
     Vector2d advance;
 
     DxfData *data;
-#ifdef ENABLE_CGAL
-    CGAL_Nef_polyhedron result;
-#endif
+    std::vector<PolySet *> result;
     
     void add_vertex(Vector2d v);
     
