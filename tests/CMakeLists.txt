@@ -375,6 +375,11 @@ set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/parser_yacc.c PROPERTIES
 
 # CGAL
 
+# Disable rounding math check to allow usage of Valgrind
+# This is needed as Valgrind currently does not correctly
+# handle rounding modes used by CGAL.
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DCGAL_DISABLE_ROUNDING_MATH_CHECK=ON")
+
 if (NOT $ENV{CGALDIR} STREQUAL "")
   set(CGAL_DIR "$ENV{CGALDIR}")
 elseif (NOT $ENV{OPENSCAD_LIBRARIES} STREQUAL "")
@@ -895,7 +900,16 @@ set_test_config(Heavy opencsgtest_minkowski3-tests
                       cgalpngtest_for-tests
                       cgalpngtest_for-nested-tests
                       cgalpngtest_intersection-tests
-                      cgalpngtest_text-search-test)
+                      cgalpngtest_text-search-test
+		      cgalpngtest_text-font-direction-tests
+		      cgalpngtest_text-font-tests
+		      cgalpngtest_text-font-alignment-tests
+		      opencsgtest_text-font-direction-tests
+		      opencsgtest_text-font-tests
+		      opencsgtest_text-font-alignment-tests
+		      throwntogethertest_text-font-direction-tests
+		      throwntogethertest_text-font-tests
+		      throwntogethertest_text-font-alignment-tests)
 
 foreach(FILE ${EXAMPLE_FILES})
   get_test_fullname(cgalpngtest ${FILE} TEST_FULLNAME)
