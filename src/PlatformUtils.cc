@@ -114,6 +114,7 @@ std::string PlatformUtils::info()
 	  << "\nOpenCSG version: " << OPENCSG_VERSION_STRING
 	  << "\nQt version: " << qtVersion
 	  << "\nMingW build: " << mingwstatus
+//TODO: Add in text libraries' version info here
 	  << "\nOPENSCADPATH: " << getenv("OPENSCADPATH") << "\n"
 	;
 	return s.str();

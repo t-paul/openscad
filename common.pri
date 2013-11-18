@@ -14,3 +14,5 @@ include(boost.pri)
 include(harfbuzz.pri)
 include(freetype.pri)
 include(fontconfig.pri)
+include(glib-2.0.pri)
+

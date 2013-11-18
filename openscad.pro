@@ -177,6 +177,7 @@ CONFIG += eigen
 CONFIG += harfbuzz
 CONFIG += freetype
 CONFIG += fontconfig
+CONFIG += glib-2.0
 
 #Uncomment the following line to enable QCodeEdit
 #CONFIG += qcodeedit

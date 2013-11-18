@@ -307,7 +307,6 @@ endif()
 inclusion(OPENCSG_DIR OPENCSG_INCLUDE_DIR)
 
 # GLEW
-
 if(WIN32_STATIC_BUILD)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DGLEW_STATIC")
 endif()
@@ -374,7 +373,6 @@ ADD_FLEX_BISON_DEPENDENCY(OpenSCADlexer OpenSCADparser)
 set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/parser_yacc.c PROPERTIES LANGUAGE "CXX")
 
 # CGAL
-
 if (NOT $ENV{CGALDIR} STREQUAL "")
   set(CGAL_DIR "$ENV{CGALDIR}")
 elseif (NOT $ENV{OPENSCAD_LIBRARIES} STREQUAL "")
@@ -387,7 +385,6 @@ elseif (NOT $ENV{OPENSCAD_LIBRARIES} STREQUAL "")
   endif()
 endif()
 message(STATUS "CGAL_DIR: " ${CGAL_DIR})
-#BK - NOTE This findpacakge returns an erroneous set of libs for boost (on Ubuntu 64 13.10)
 find_package(CGAL REQUIRED)
 message(STATUS "CGAL config found in " ${CGAL_USE_FILE} )
 foreach(cgal_incdir ${CGAL_INCLUDE_DIRS})
@@ -399,14 +396,23 @@ if("${CGAL_MAJOR_VERSION}.${CGAL_MINOR_VERSION}" VERSION_LESS 3.6)
 endif()
 inclusion(CGAL_DIR CGAL_INCLUDE_DIRS)
 
-message(WARNING "BAD BOOST libs reported in CGAL_3RD_PARTY_LIBRARIES -- ${CGAL_3RD_PARTY_LIBRARIES}")
-#Get rid of several bad libraries suggested for BOOST dependencies
+#Get rid of bad libraries suggested for BOOST dependencies
 # that come from this find_package (they don't even exist on some machines)
 #/usr/lib/libboost_thread.so;/usr/lib/libboost_system.so;
-#TODO: Perhaps add a check if they exist before removing -- but boost will be added in properly anyway....
-string(REPLACE "/usr/lib/libboost_system.so" "" CGAL_3RD_PARTY_LIBRARIES ${CGAL_3RD_PARTY_LIBRARIES})
-string(REPLACE "/usr/lib/libboost_thread.so" "" CGAL_3RD_PARTY_LIBRARIES ${CGAL_3RD_PARTY_LIBRARIES})
-message(STATUS "CGAL_3RD_PARTY_LIBRARIES modified -- ${CGAL_3RD_PARTY_LIBRARIES}")
+string(FIND "${CGAL_3RD_PARTY_LIBRARIES}" "/usr/lib/libboost_system.so" FIND_POSITION  )
+if(NOT "-1" STREQUAL ${FIND_POSITION} )
+if(NOT EXISTS "/usr/lib/libboost_system.so")
+  MESSAGE( WARNING "Found erroneous /usr/lib/libboost_system.so -- stripping" )
+  string(REPLACE "/usr/lib/libboost_system.so" "" CGAL_3RD_PARTY_LIBRARIES ${CGAL_3RD_PARTY_LIBRARIES})
+endif()
+endif() 
+string(FIND "${CGAL_3RD_PARTY_LIBRARIES}" "/usr/lib/libboost_thread.so" FIND_POSITION  )
+if(NOT "-1" STREQUAL ${FIND_POSITION} )
+if(NOT EXISTS "/usr/lib/libboost_thread.so")
+  MESSAGE( WARNING "Found erroneous /usr/lib/libboost_thread.so -- stripping" )
+  string(REPLACE "/usr/lib/libboost_thread.so" "" CGAL_3RD_PARTY_LIBRARIES ${CGAL_3RD_PARTY_LIBRARIES})
+endif()
+endif() 
 if(${CMAKE_CXX_COMPILER} MATCHES ".*clang.*" AND NOT ${CGAL_CXX_FLAGS_INIT} STREQUAL "" )
 	string(REPLACE "-frounding-math" "" CGAL_CXX_FLAGS_INIT ${CGAL_CXX_FLAGS_INIT})
 	string(REPLACE "--param=ssp-buffer-size=4" "" CGAL_CXX_FLAGS_INIT ${CGAL_CXX_FLAGS_INIT})
@@ -427,7 +433,15 @@ message(STATUS "freetype2 found: ${FREETYPE_VERSION}")
 pkg_search_module(HARFBUZZ REQUIRED harfbuzz>=0.9.19)
 message(STATUS "harfbuzz found: ${HARFBUZZ_VERSION}")
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${FONTCONFIG_CFLAGS} ${FREETYPE_CFLAGS} ${HARFBUZZ_CFLAGS}")
+pkg_search_module(GLIB2 glib-2.0)
+#Can't use the CXXFlags directly as they are ;-separated (which doesn't go well on a command line....)
+string(REPLACE ";" " " GLIB2_CFLAGS "${GLIB2_CFLAGS}")
+message(STATUS "glib-2.0 found: ${GLIB2_VERSION}")
+message(STATUS "GLIB2_CFLAGS: ${GLIB2_CFLAGS}")
+message(STATUS "GLIB2_LDFLAGS: ${GLIB2_LDFLAGS}")
+
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${FONTCONFIG_CFLAGS} ${FREETYPE_CFLAGS} ${HARFBUZZ_CFLAGS} ${GLIB2_CFLAGS} ")
 
 
 
@@ -608,7 +622,7 @@ set(OFFSCREEN_SOURCES
 
 add_library(tests-core STATIC ${CORE_SOURCES})
 target_link_libraries(tests-core ${OPENGL_LIBRARIES})
-set(TESTS-CORE-LIBRARIES ${OPENGL_LIBRARIES} ${Boost_LIBRARIES} ${FONTCONFIG_LDFLAGS} ${FREETYPE_LDFLAGS} ${HARFBUZZ_LDFLAGS})
+set(TESTS-CORE-LIBRARIES ${OPENGL_LIBRARIES} ${Boost_LIBRARIES} ${FONTCONFIG_LDFLAGS} ${FREETYPE_LDFLAGS} ${HARFBUZZ_LDFLAGS} ${GLIB2_LDFLAGS} )
 
 add_library(tests-common STATIC ${COMMON_SOURCES})
 target_link_libraries(tests-common tests-core)
