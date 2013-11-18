@@ -396,20 +396,19 @@ if("${CGAL_MAJOR_VERSION}.${CGAL_MINOR_VERSION}" VERSION_LESS 3.6)
 endif()
 inclusion(CGAL_DIR CGAL_INCLUDE_DIRS)
 
-#Get rid of bad libraries suggested for BOOST dependencies
-# that come from this find_package (they don't even exist on some machines)
+#Get rid of bad libraries suggested for BOOST dependencies (they don't exist on some machines and cause build failures).
 #/usr/lib/libboost_thread.so;/usr/lib/libboost_system.so;
 string(FIND "${CGAL_3RD_PARTY_LIBRARIES}" "/usr/lib/libboost_system.so" FIND_POSITION  )
 if(NOT "-1" STREQUAL ${FIND_POSITION} )
 if(NOT EXISTS "/usr/lib/libboost_system.so")
-  MESSAGE( WARNING "Found erroneous /usr/lib/libboost_system.so -- stripping" )
+  MESSAGE( WARNING "CGAL_3RD_PARTY_LIBRARIES:Found erroneous /usr/lib/libboost_system.so -- stripping" )
   string(REPLACE "/usr/lib/libboost_system.so" "" CGAL_3RD_PARTY_LIBRARIES ${CGAL_3RD_PARTY_LIBRARIES})
 endif()
 endif() 
 string(FIND "${CGAL_3RD_PARTY_LIBRARIES}" "/usr/lib/libboost_thread.so" FIND_POSITION  )
 if(NOT "-1" STREQUAL ${FIND_POSITION} )
 if(NOT EXISTS "/usr/lib/libboost_thread.so")
-  MESSAGE( WARNING "Found erroneous /usr/lib/libboost_thread.so -- stripping" )
+  MESSAGE( WARNING "CGAL_3RD_PARTY_LIBRARIES:Found erroneous /usr/lib/libboost_thread.so -- stripping" )
   string(REPLACE "/usr/lib/libboost_thread.so" "" CGAL_3RD_PARTY_LIBRARIES ${CGAL_3RD_PARTY_LIBRARIES})
 endif()
 endif() 
@@ -418,32 +417,39 @@ if(${CMAKE_CXX_COMPILER} MATCHES ".*clang.*" AND NOT ${CGAL_CXX_FLAGS_INIT} STRE
 	string(REPLACE "--param=ssp-buffer-size=4" "" CGAL_CXX_FLAGS_INIT ${CGAL_CXX_FLAGS_INIT})
 endif()
 
-# Find installed libraries using pkg-config
+# Find system installed and built libraries using pkg-config for several components
+# This requires that the env. variable PKG_CONFIG_PATH points into the development tree
+# See setenv-*.sh
+if (NOT $ENV{OPENSCAD_LIBRARIES} STREQUAL "")
+if (NOT $ENV{PKG_CONFIG_PATH} STREQUAL "")
+  #message(STATUS "Using PKG_CONFIG_PATH=$ENV{PKG_CONFIG_PATH}" )
+else()
+  message(WARNING "PKG_CONFIG_PATH environment not set -- several (pkg-config-based) built components will not be found" )
+endif()
+endif()
 find_package(PkgConfig REQUIRED)
 
-#TODO: Look at getting built from sources fixed.
-
-#pkg_search_module(FONTCONFIG REQUIRED fontconfig>=2.11.0)
+#Fontconfig
 pkg_search_module(FONTCONFIG REQUIRED fontconfig>=2.10.93)
 message(STATUS "fontconfig found: ${FONTCONFIG_VERSION}")
 
+#Freetype2
 pkg_search_module(FREETYPE REQUIRED freetype2>=2.4.9)
 message(STATUS "freetype2 found: ${FREETYPE_VERSION}")
 
+#Harfbuzz
 pkg_search_module(HARFBUZZ REQUIRED harfbuzz>=0.9.19)
 message(STATUS "harfbuzz found: ${HARFBUZZ_VERSION}")
 
-pkg_search_module(GLIB2 glib-2.0)
+#GLib-2
+pkg_search_module(GLIB2 REQUIRED glib-2.0>=2.2.0)
 #Can't use the CXXFlags directly as they are ;-separated (which doesn't go well on a command line....)
 string(REPLACE ";" " " GLIB2_CFLAGS "${GLIB2_CFLAGS}")
 message(STATUS "glib-2.0 found: ${GLIB2_VERSION}")
-message(STATUS "GLIB2_CFLAGS: ${GLIB2_CFLAGS}")
-message(STATUS "GLIB2_LDFLAGS: ${GLIB2_LDFLAGS}")
-
+#message(STATUS "GLIB2_CFLAGS: ${GLIB2_CFLAGS}")
+#message(STATUS "GLIB2_LDFLAGS: ${GLIB2_LDFLAGS}")
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${FONTCONFIG_CFLAGS} ${FREETYPE_CFLAGS} ${HARFBUZZ_CFLAGS} ${GLIB2_CFLAGS} ")
-
-
 
 # Imagemagick
 

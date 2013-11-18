@@ -546,6 +546,7 @@ build_boost 1.54.0
 # NB! For CGAL, also update the actual download URL in the function
 build_cgal 4.3
 build_glew 1.10.0
+build_glib2 2.38.1
 build_opencsg 1.3.2
 build_freetype 2.5.0.1 --without-png
 export FREETYPE_CFLAGS="-I$DEPLOYDIR/include -I$DEPLOYDIR/include/freetype2"

@@ -25,6 +25,8 @@ setenv_common()
  export LD_RUN_PATH=$DEPLOYDIR/lib:$DEPLOYDIR/lib64
  export OPENSCAD_LIBRARIES=$DEPLOYDIR
  export GLEWDIR=$DEPLOYDIR
+ export PKG_CONFIG_PATH=$DEPLOYDIR/lib/pkgconfig:$PKG_CONFIG_PATH
+ #export CMAKE_PREFIX_PATH=$DEPLOYDIR:$CMAKE_PREFIX_PATH
 
  echo BASEDIR: $BASEDIR
  echo DEPLOYDIR: $DEPLOYDIR
@@ -33,6 +35,9 @@ setenv_common()
  echo LD_RUN_PATH modified
  echo OPENSCAD_LIBRARIES modified
  echo GLEWDIR modified
+ echo PKG_CONFIG_PATH modified
+ #echo CMAKE_PREFIX_PATH modified
+
 
  if [ "`uname -m | grep sparc64`" ]; then
    echo detected sparc64. forcing 32 bit with export ABI=32

@@ -96,6 +96,7 @@ Follow the instructions for the platform you're compiling on below.
 * [fontconfig (2.10)](http://fontconfig.org/)
 * [freetype2 (2.4)](http://freetype.org/)
 * [harfbuzz (0.9.19)](http://harfbuzz.org/)
+* [glib2 (2.2.0)](https://developer.gnome.org/glib/)
 * [GCC C++ Compiler (4.2 ->)](http://gcc.gnu.org/)
 * [Bison (2.4)](http://www.gnu.org/software/bison/)
 * [Flex (2.5.35)](http://flex.sourceforge.net/)
