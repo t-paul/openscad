@@ -76,9 +76,9 @@ test_search_and_echo( [0], "a","aЛaЛaЛaЛa" );
 test_search_and_echo( [0], "a","a🂡a🂡a🂡a🂡a" );
 test_search_and_echo( [0], "a","a🂡Л🂡a🂡Л🂡a" );
 
-test_search_and_echo( [0,2,4,6,8], "a","aЛaЛaЛaЛa",0 );
-test_search_and_echo( [0,2,4,6,8], "a","a🂡a🂡a🂡a🂡a", 0 );
-test_search_and_echo( [0,4,8]    , "a","a🂡Л🂡a🂡Л🂡a", 0 );
+test_search_and_echo( [[0,2,4,6,8]], "a","aЛaЛaЛaЛa",0 );
+test_search_and_echo( [[0,2,4,6,8]], "a","a🂡a🂡a🂡a🂡a", 0 );
+test_search_and_echo( [[0,4,8]]    , "a","a🂡Л🂡a🂡Л🂡a", 0 );
 
 echo ("----- Lookup of 2-byte into 2-byte");
 test_search_and_echo( [0]       , "Л","ЛЛЛЛ" );
@@ -95,22 +95,30 @@ echo ("----- Lookup of 4-byte into 2-byte");
 test_search_and_echo( [] , "🂡","ЛЛЛЛ" );
 
 echo ("----- Lookup of 2-byte into mixed multi-byte");
-test_search_and_echo( [2] , 	"Л","aЛaЛaЛaЛa",1 );
+test_search_and_echo( [1] , 	"Л","aЛaЛaЛaЛa",1 );
 test_search_and_echo( [] , 	"Л","a🂡a🂡a🂡a🂡a", 1 );
 test_search_and_echo( [2] , 	"Л","a🂡Л🂡a🂡Л🂡a", 1 );
 
-test_search_and_echo( [[0,2,4,6,8]] , 	"Л","aЛaЛaЛaЛa",0 );
+test_search_and_echo( [[1,3,5,7]] , 	"Л","aЛaЛaЛaЛa",0 );
 test_search_and_echo( [[]] , 				"Л","a🂡a🂡a🂡a🂡a", 0 );
 test_search_and_echo( [[2,6]] , 			"Л","a🂡Л🂡a🂡Л🂡a", 0 );
 
 echo ("----- Lookup of 4-byte into mixed multi-byte");
 test_search_and_echo( [] , 			"🂡","aЛaЛaЛaЛa",1 );
-test_search_and_echo( [1,3,5,7] , "🂡","a🂡a🂡a🂡a🂡a", 1 );
-test_search_and_echo( [1,3,5,7] , "🂡","a🂡Л🂡a🂡Л🂡a", 1 );
+test_search_and_echo( [1] , "🂡","a🂡a🂡a🂡a🂡a", 1 );
 
 test_search_and_echo( [[]] , 			"🂡","aЛaЛaЛaЛa",0 );
 test_search_and_echo( [[1,3,5,7]] , "🂡","a🂡a🂡a🂡a🂡a", 0 );
 test_search_and_echo( [[1,3,5,7]] , "🂡","a🂡Л🂡a🂡Л🂡a", 0 );
+
+
+echo ("----- Lookup of mixed multi-byte into mixed multi-byte");
+
+test_search_and_echo( [[0,2,4,6,8],[1,3,5,7],[]], "aЛ🂡","aЛaЛaЛaЛa",0 );
+test_search_and_echo( [[0,2,4,6,8],[],[1,3,5,7]], "aЛ🂡","a🂡a🂡a🂡a🂡a", 0 );
+test_search_and_echo( [[0,4,8],[2,6],[1,3,5,7]]    , "aЛ🂡","a🂡Л🂡a🂡Л🂡a", 0 );
+test_search_and_echo( [[1,3,5,7],[0,4,8],[2,6]]    , "🂡aЛ","a🂡Л🂡a🂡Л🂡a", 0 );
+
 
 //Something real to compile. Needed?
 //cube();
