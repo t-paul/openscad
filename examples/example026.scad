@@ -13,7 +13,13 @@ chinese_font  = "AR PL UKai CN";
 //chinese_font  = "AR PL UMing CN";
 arabic_font   = "Amiri-Regular";
 
+translate([0, -20, 0])
+rotate([90, 0, 0])
+linear_extrude(height = 2)
+text(t = "كسول", size = 16, font = arabic_font, direction = "rtl", language = "ar", script = "arabic");
 
+if(enable_showcase)
+{
 
 //Rotate a word (in Japanese)
 //Iterate across individual letters (unicode) 
@@ -26,14 +32,11 @@ for (a = [0 : (len(s_u)-1)])
   translate([-5, 0, 0])
   linear_extrude(height = 2)
   text(t = s_u[a], size = 15, font = japanese_font, language="jp");
+
+}
  
 if(enable_showcase)
 {
- 
-translate([0, -20, 0])
-rotate([90, 0, 0])
-linear_extrude(height = 2)
-text(t = "كسول الزنجبيل القط", size = 16, font = arabic_font, direction = "rtl", language = "ar", script = "arabic");
 
 rotate([90, 0, 0]) 
 translate([-20, -40, -100])
