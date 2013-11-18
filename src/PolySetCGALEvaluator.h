@@ -17,6 +17,7 @@ public:
 	virtual PolySet *evaluatePolySet(const RotateExtrudeNode &node);
 	virtual PolySet *evaluatePolySet(const CgaladvNode &node);
 	virtual PolySet *evaluatePolySet(const RenderNode &node);
+	virtual PolySet *evaluatePolySet(const class TextNode &node);
 	bool debug;
 protected:
 	PolySet *extrudeDxfData(const LinearExtrudeNode &node, class DxfData &dxf);

@@ -268,45 +268,6 @@ else()
   inclusion(EIGEN_DIR EIGEN_INCLUDE_DIR)
 endif()
 
-#HarfBuzz
-#Note t-paul is working on this too so his work will override this
-#TODO : Work on if in development directories
-find_package(HarfBuzz REQUIRED)
-if (HARFBUZZ_FOUND)
-  message(STATUS "BRODY ------------ HB")
-  inclusion(HARFBUZZ_DIR HARFBUZZ_INCLUDE_DIRS)
-  set(HARFBUZZ_LIBRARY ${HARFBUZZ_LIBRARIES})
-endif (HARFBUZZ_FOUND)
-message(STATUS "HARFBUZZ include: " ${HARFBUZZ_INCLUDE_DIR})
-message(STATUS "HARFBUZZ library: " ${HARFBUZZ_LIBRARY})
-
-#FreeType
-#Note t-paul is working on this too so his work will override this
-#BK - TODO : Tidy this to use findpackage
-#TODO : Work on if in development directories
-find_package(Freetype REQUIRED)
-if (FREETYPE_FOUND)
-  message(STATUS "BRODY ------------ FT")
-  inclusion(FREETYPE_DIR FREETYPE_INCLUDE_DIRS)
-  set(FREETYPE_LIBRARY ${FREETYPE_LIBRARIES})
-endif (FREETYPE_FOUND)
-message(STATUS "FREETYPE include: " ${FREETYPE_INCLUDE_DIR})
-message(STATUS "FREETYPE library: " ${FREETYPE_LIBRARY})
-
-#FontConfig
-#Note t-paul is working on this too so his work will override this
-#BK - TODO : Tidy this to use findpackage
-#TODO : Work on if in development directories
-find_package(Fontconfig REQUIRED)
-if (FONTCONFIG_FOUND)
-  message(STATUS "BRODY ------------ FC")
-  inclusion(FONTCONFIG_DIR FONTCONFIG_INCLUDE_DIRS)
-  set(FONTCONFIG_LIBRARY ${FONTCONFIG_LIBRARIES})
-endif (FONTCONFIG_FOUND)
-message(STATUS "FONTCONFIG include: " ${FONTCONFIG_INCLUDE_DIR})
-message(STATUS "FONTCONFIG library: " ${FONTCONFIG_LIBRARY})
-
-
 # OpenGL
 find_package(OpenGL REQUIRED)
 if (NOT OPENGL_GLU_FOUND)
@@ -346,6 +307,7 @@ endif()
 inclusion(OPENCSG_DIR OPENCSG_INCLUDE_DIR)
 
 # GLEW
+
 if(WIN32_STATIC_BUILD)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DGLEW_STATIC")
 endif()
@@ -441,15 +403,33 @@ message(WARNING "BAD BOOST libs reported in CGAL_3RD_PARTY_LIBRARIES -- ${CGAL_3
 #Get rid of several bad libraries suggested for BOOST dependencies
 # that come from this find_package (they don't even exist on some machines)
 #/usr/lib/libboost_thread.so;/usr/lib/libboost_system.so;
-#TODO: Perhaps add a check if they exist before deleting -- but boost will be added in properly anyway....
+#TODO: Perhaps add a check if they exist before removing -- but boost will be added in properly anyway....
 string(REPLACE "/usr/lib/libboost_system.so" "" CGAL_3RD_PARTY_LIBRARIES ${CGAL_3RD_PARTY_LIBRARIES})
 string(REPLACE "/usr/lib/libboost_thread.so" "" CGAL_3RD_PARTY_LIBRARIES ${CGAL_3RD_PARTY_LIBRARIES})
 message(STATUS "CGAL_3RD_PARTY_LIBRARIES modified -- ${CGAL_3RD_PARTY_LIBRARIES}")
-
 if(${CMAKE_CXX_COMPILER} MATCHES ".*clang.*" AND NOT ${CGAL_CXX_FLAGS_INIT} STREQUAL "" )
 	string(REPLACE "-frounding-math" "" CGAL_CXX_FLAGS_INIT ${CGAL_CXX_FLAGS_INIT})
 	string(REPLACE "--param=ssp-buffer-size=4" "" CGAL_CXX_FLAGS_INIT ${CGAL_CXX_FLAGS_INIT})
 endif()
+
+# Find installed libraries using pkg-config
+find_package(PkgConfig REQUIRED)
+
+#TODO: Look at getting built from sources fixed.
+
+#pkg_search_module(FONTCONFIG REQUIRED fontconfig>=2.11.0)
+pkg_search_module(FONTCONFIG REQUIRED fontconfig>=2.10.93)
+message(STATUS "fontconfig found: ${FONTCONFIG_VERSION}")
+
+pkg_search_module(FREETYPE REQUIRED freetype2>=2.4.9)
+message(STATUS "freetype2 found: ${FREETYPE_VERSION}")
+
+pkg_search_module(HARFBUZZ REQUIRED harfbuzz>=0.9.19)
+message(STATUS "harfbuzz found: ${HARFBUZZ_VERSION}")
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${FONTCONFIG_CFLAGS} ${FREETYPE_CFLAGS} ${HARFBUZZ_CFLAGS}")
+
+
 
 # Imagemagick
 
@@ -498,9 +478,11 @@ message(STATUS "OpenSCAD version: ${VERSION}")
 string(REGEX MATCHALL "^[0-9]+|[0-9]+|[0-9]+$" MYLIST "${VERSION}")
 list(GET MYLIST 0 OPENSCAD_YEAR)
 list(GET MYLIST 1 OPENSCAD_MONTH)
+math(EXPR OPENSCAD_MONTH ${OPENSCAD_MONTH}) # get rid of leading zero
 list(LENGTH MYLIST VERSIONLEN)
 if (${VERSIONLEN} EQUAL 3)
   list(GET MYLIST 2 OPENSCAD_DAY)
+  math(EXPR OPENSCAD_DAY ${OPENSCAD_DAY}) # get rid of leading zero
 endif()
 
 add_definitions(-DOPENSCAD_VERSION=${VERSION} -DOPENSCAD_YEAR=${OPENSCAD_YEAR} -DOPENSCAD_MONTH=${OPENSCAD_MONTH})
@@ -539,6 +521,7 @@ set(CORE_SOURCES
   ../src/linalg.cc
   ../src/handle_dep.cc 
   ../src/value.cc 
+  ../src/calc.cc 
   ../src/expr.cc 
   ../src/func.cc 
   ../src/localscope.cc 
@@ -553,7 +536,7 @@ set(CORE_SOURCES
   ../src/polyset.cc 
   ../src/csgops.cc 
   ../src/transform.cc 
-  ../src/color.cc
+  ../src/color.cc 
   ../src/primitives.cc 
   ../src/projection.cc 
   ../src/cgaladv.cc 
@@ -565,10 +548,14 @@ set(CORE_SOURCES
   ../src/dxfdim.cc 
   ../src/linearextrude.cc 
   ../src/rotateextrude.cc 
+  ../src/text.cc 
   ../src/printutils.cc 
   ../src/fileutils.cc 
   ../src/progress.cc 
   ../src/boost-utils.cc 
+  ../src/FontCache.cc
+  ../src/DrawingCallback.cc
+  ../src/FreetypeRenderer.cc
   ${FLEX_OpenSCADlexer_OUTPUTS}
   ${BISON_OpenSCADparser_OUTPUTS})
 
@@ -598,13 +585,6 @@ set(COMMON_SOURCES
   ../src/Tree.cc
   ../src/lodepng.cpp)
 
-#Keep it out of core as it has a few dependencies that we want to keep out of core
-set(TEXT_PRIMITVE_SOURCES
-  ../src/DrawingCallback.cc
-  ../src/FontCache.cc
-  ../src/FreetypeRenderer.cc
-  )
-
 #
 # Offscreen OpenGL context source code
 #
@@ -625,43 +605,22 @@ set(OFFSCREEN_SOURCES
   ../src/PlatformUtils.cc 
   ../src/${PLATFORMUTILS_SOURCE}
   ../src/OpenCSGRenderer.cc)
-  
-
 
 add_library(tests-core STATIC ${CORE_SOURCES})
-#Was:target_link_libraries(tests-core ${OPENGL_LIBRARIES} )
-#Harfbuzz for unicode
-#target_link_libraries(tests-core ${OPENGL_LIBRARIES} ${HARFBUZZ_LIBRARY} ${GLEW_LIBRARY} )
-target_link_libraries(tests-core ${OPENGL_LIBRARIES} ${HARFBUZZ_LIBRARY} )
-set(TESTS-CORE-LIBRARIES ${OPENGL_LIBRARIES} ${Boost_LIBRARIES} ${HARFBUZZ_LIBRARY} )
-
-#This actually has a dependency on CGAL....
-#text() is a primitive so it should go into common -- but CGAL is dependent on common ....
-add_library(tests-text-primitive STATIC ${TEXT_PRIMITVE_SOURCES})
-set_target_properties(tests-text-primitive PROPERTIES COMPILE_FLAGS "-DENABLE_OPENCSG -DENABLE_CGAL ${CGAL_CXX_FLAGS_INIT}")
-target_link_libraries(tests-text-primitive tests-core ${HARFBUZZ_LIBRARY} ${FREETYPE_LIBRARY} ${FONTCONFIG_LIBRARY} ${HARFBUZZ_LIBRARY} ${FREETYPE_LIBRARY} ${FONTCONFIG_LIBRARY}  )
-set(TESTS-TEXT-PRIMITIVE-LIBRARIES tests-text-primitive ${HARFBUZZ_LIBRARY} ${FREETYPE_LIBRARY} ${FONTCONFIG_LIBRARY} tests-text-primitive ${FREETYPE_LIBRARY} ${FONTCONFIG_LIBRARY} tests-text-primitive )
-
+target_link_libraries(tests-core ${OPENGL_LIBRARIES})
+set(TESTS-CORE-LIBRARIES ${OPENGL_LIBRARIES} ${Boost_LIBRARIES} ${FONTCONFIG_LDFLAGS} ${FREETYPE_LDFLAGS} ${HARFBUZZ_LDFLAGS})
 
 add_library(tests-common STATIC ${COMMON_SOURCES})
-target_link_libraries(tests-common tests-core ${TESTS-CORE-LIBRARIES} tests-text-primitive ${TESTS-TEXT-PRIMITIVE-LIBRARIES} )
-set(TESTS-COMMON-LIBRARIES ${TESTS-CORE-LIBRARIES} ${TESTS-TEXT-PRIMITIVE-LIBRARIES} )
-
+target_link_libraries(tests-common tests-core)
 
 add_library(tests-cgal STATIC ${CGAL_SOURCES})
 set_target_properties(tests-cgal PROPERTIES COMPILE_FLAGS "-DENABLE_CGAL ${CGAL_CXX_FLAGS_INIT}")
 target_link_libraries(tests-cgal tests-common)
-#set(TESTS-CGAL-LIBRARIES ${CGAL_LIBRARY} ${CGAL_3RD_PARTY_LIBRARIES} ${GMP_LIBRARIES} ${MPFR_LIBRARIES} ${TESTS-CORE-LIBRARIES})
-set(TESTS-CGAL-LIBRARIES ${CGAL_LIBRARY} ${CGAL_3RD_PARTY_LIBRARIES} ${GMP_LIBRARIES} ${MPFR_LIBRARIES} ${TESTS-COMMON-LIBRARIES} )
-
-#For overcoming the circ-dependency of common<>cgal<>text-primitive/renderer
-set(TESTS-TEXT-PRIMITIVE-CIRC-DEP-LIBRARIES tests-cgal ${TESTS-CGAL-LIBRARIES} tests-text-primitive ${TESTS-TEXT-PRIMITIVE-LIBRARIES} tests-core ${TESTS-CORE-LIBRARIES} tests-common ${TESTS-COMMON-LIBRARIES} tests-cgal ${TESTS-CGAL-LIBRARIES} tests-text-primitive ${TESTS-TEXT-PRIMITIVE-LIBRARIES} tests-core ${TESTS-CORE-LIBRARIES} tests-common ${TESTS-COMMON-LIBRARIES} )
-
-
+set(TESTS-CGAL-LIBRARIES tests-core ${TESTS-CORE-LIBRARIES} ${CGAL_LIBRARY} ${CGAL_3RD_PARTY_LIBRARIES} ${GMP_LIBRARIES} ${MPFR_LIBRARIES})
 
 add_library(tests-nocgal STATIC ${NOCGAL_SOURCES})
 target_link_libraries(tests-nocgal tests-common)
-set(TESTS-NOCGAL-LIBRARIES ${TESTS-CORE-LIBRARIES} ${TESTS-COMMON-LIBRARIES} )
+set(TESTS-NOCGAL-LIBRARIES tests-core ${TESTS-CORE-LIBRARIES})
 
 add_library(tests-offscreen STATIC ${OFFSCREEN_SOURCES})
 set_target_properties(tests-offscreen PROPERTIES COMPILE_FLAGS "-DENABLE_OPENCSG -DENABLE_CGAL ${CGAL_CXX_FLAGS_INIT}")
@@ -671,30 +630,27 @@ set_target_properties(tests-offscreen PROPERTIES COMPILE_FLAGS "-DENABLE_OPENCSG
 # modulecachetest
 #
 add_executable(modulecachetest modulecachetest.cc)
-target_link_libraries(modulecachetest tests-nocgal ${TESTS-NOCGAL-LIBRARIES} ${Boost_LIBRARIES} ${TESTS-TEXT-PRIMITIVE-CIRC-DEP-LIBRARIES} )
-
-
+target_link_libraries(modulecachetest tests-nocgal ${TESTS-NOCGAL-LIBRARIES} )
 
 #
 # csgtexttest
 #
 add_executable(csgtexttest csgtexttest.cc CSGTextRenderer.cc CSGTextCache.cc)
-target_link_libraries(csgtexttest tests-nocgal ${TESTS-NOCGAL-LIBRARIES} ${TESTS-TEXT-PRIMITIVE-CIRC-DEP-LIBRARIES} )
-
+target_link_libraries(csgtexttest tests-nocgal ${TESTS-NOCGAL-LIBRARIES})
 
 #
 # cgalcachetest
 #
 add_executable(cgalcachetest cgalcachetest.cc)
 set_target_properties(cgalcachetest PROPERTIES COMPILE_FLAGS "-DENABLE_CGAL ${CGAL_CXX_FLAGS_INIT}")
-target_link_libraries(cgalcachetest tests-cgal ${TESTS-CGAL-LIBRARIES} ${GLEW_LIBRARY} ${COCOA_LIBRARY} ${TESTS-TEXT-PRIMITIVE-CIRC-DEP-LIBRARIES} )
+target_link_libraries(cgalcachetest tests-cgal ${TESTS-CGAL-LIBRARIES} ${GLEW_LIBRARY} ${COCOA_LIBRARY})
 
 #
 # openscad_nogui (no-qt)
 #
 add_executable(openscad_nogui ../src/openscad.cc)
 set_target_properties(openscad_nogui PROPERTIES COMPILE_FLAGS "-fno-strict-aliasing -DEIGEN_DONT_ALIGN -DENABLE_CGAL -DENABLE_OPENCSG ${CGAL_CXX_FLAGS_INIT}")
-target_link_libraries(openscad_nogui tests-offscreen tests-cgal tests-nocgal ${TESTS-CORE-LIBRARIES} ${TESTS-CGAL-LIBRARIES} ${GLEW_LIBRARY} ${Boost_LIBRARIES} ${OPENCSG_LIBRARY} ${COCOA_LIBRARY}  ${TESTS-TEXT-PRIMITIVE-CIRC-DEP-LIBRARIES} )
+target_link_libraries(openscad_nogui tests-offscreen tests-cgal ${TESTS-CGAL-LIBRARIES} ${GLEW_LIBRARY} ${OPENCSG_LIBRARY} ${COCOA_LIBRARY})
 
 #
 # GUI binary tests

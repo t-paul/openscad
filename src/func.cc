@@ -311,7 +311,6 @@ Value builtin_length(const Context *, const EvalContext *evalctx)
 		if (evalctx->getArgValue(0).type() == Value::VECTOR) return Value(int(evalctx->getArgValue(0).toVector().size()));
 		if (evalctx->getArgValue(0).type() == Value::STRING)
 		{
-#if 1 //INBUILT_STR_UNICODE_AWARE
 			//Take a unicode glyph count for the length -- rather than the string (num. of bytes) length.
 			//For byte/char strings this drops out to the same length.
 			//Use Harfbuzz lib as it is already in use for text rendering.
@@ -322,9 +321,6 @@ Value builtin_length(const Context *, const EvalContext *evalctx)
 			hb_buffer_destroy(hb_buf);
 
 			return Value(int(glyph_count));
-#else
-			return Value(int(evalctx->getArgValue(0).toString().size()));
-#endif
 		}
 	}
 	return Value();

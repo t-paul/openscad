@@ -350,13 +350,12 @@ build_cgal()
       fi
   echo "CC=$CC  CXX=$CXX"
   fi
-
   DEBUGBOOSTFIND=0 # for debugging FindBoost.cmake (not for debugging boost)
   Boost_NO_SYSTEM_PATHS=1
   if [ "`echo $2 | grep use-sys-libs`" ]; then
     CC=$CC CXX=$CXX   cmake -DCMAKE_INSTALL_PREFIX=$DEPLOYDIR -DWITH_CGAL_Qt3=OFF -DWITH_CGAL_Qt4=OFF -DWITH_CGAL_ImageIO=OFF -DCMAKE_BUILD_TYPE=$CGAL_BUILDTYPE -DBoost_DEBUG=$DEBUGBOOSTFIND ..
   else
-    CC=$CC CXX=$CXX   cmake -DCMAKE_INSTALL_PREFIX=$DEPLOYDIR -DGMP_INCLUDE_DIR=$DEPLOYDIR/include -DGMP_LIBRARIES=$DEPLOYDIR/lib/libgmp.so -DGMPXX_LIBRARIES=$DEPLOYDIR/lib/libgmpxx.so -DGMPXX_INCLUDE_DIR=$DEPLOYDIR/include -DMPFR_INCLUDE_DIR=$DEPLOYDIR/include -DMPFR_LIBRARIES=$DEPLOYDIR/lib/libmpfr.so -DWITH_CGAL_Qt3=OFF -DWITH_CGAL_Qt4=OFF -DWITH_CGAL_ImageIO=OFF -DBOOST_LIBRARYDIR=$DEPLOYDIR/lib -DBOOST_INCLUDEDIR=$DEPLOYDIR/include -DCMAKE_BUILD_TYPE=$CGAL_BUILD_TYPE -DBoost_DEBUG=$DEBUGBOOSTFIND -DBoost_NO_SYSTEM_PATHS=1 ..
+    CC=$CC CXX=$CXX   cmake -DCMAKE_INSTALL_PREFIX=$DEPLOYDIR -DGMP_INCLUDE_DIR=$DEPLOYDIR/include -DGMP_LIBRARIES=$DEPLOYDIR/lib/libgmp.so -DGMPXX_LIBRARIES=$DEPLOYDIR/lib/libgmpxx.so -DGMPXX_INCLUDE_DIR=$DEPLOYDIR/include -DMPFR_INCLUDE_DIR=$DEPLOYDIR/include -DMPFR_LIBRARIES=$DEPLOYDIR/lib/libmpfr.so -DWITH_CGAL_Qt3=OFF -DWITH_CGAL_Qt4=OFF -DWITH_CGAL_ImageIO=OFF -DBOOST_LIBRARYDIR=$DEPLOYDIR/lib -DBOOST_INCLUDEDIR=$DEPLOYDIR/include -DCMAKE_BUILD_TYPE=$CGAL_BUILDTYPE -DBoost_DEBUG=$DEBUGBOOSTFIND -DBoost_NO_SYSTEM_PATHS=1 ..
   fi
   make -j$NUMCPU
   make install
@@ -626,8 +625,8 @@ build_glew 1.9.0
 build_opencsg 1.3.2
 build_freetype 2.5.0.1
 build_fontconfig 2.11.0
-#BK - these aren't happy just yet
-#build_ragel 6.8
-#build_harfbuzz 0.9.23 --with-glib=yes
+#BK - these aren't happy just yet (ragel has some sed issue)
+build_ragel 6.8
+build_harfbuzz 0.9.23 --with-glib=yes
 
 echo "OpenSCAD dependencies built and installed to " $BASEDIR

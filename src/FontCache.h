@@ -41,13 +41,14 @@
 
 class FontCache {
 public:
-    const static int MAX_NR_OF_CACHE_ENTRIES = 3;
+    const static unsigned int MAX_NR_OF_CACHE_ENTRIES = 3;
     
     FontCache();
     virtual ~FontCache();
 
     bool is_init_ok();
     FT_Face get_font(std::string font);
+    void register_font_file(std::string path);
     void clear();
     
     static FontCache * instance();

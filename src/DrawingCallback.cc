@@ -31,9 +31,6 @@
 #include "dxfdata.h"
 #include "dxftess.h"
 #include "polyset.h"
-#include "Tree.h"
-#include "CGALEvaluator.h"
-
 #include "DrawingCallback.h"
 
 DrawingCallback::DrawingCallback(unsigned long fn) : fn(fn),
@@ -56,27 +53,15 @@ void DrawingCallback::finish_glyph()
 	p->is2d = true;
 	dxf_tesselate(p, *data, 0, Vector2d(1,1), true, false, 0);
 	dxf_border_to_ps(p, *data);
-
-	Tree nulltree;
-	CGALEvaluator tmpeval(nulltree);
-	CGAL_Nef_polyhedron N = tmpeval.evaluateCGALMesh(*p);
-	delete p;
-	
-	if (!N.isNull()) {
-		if (result.isNull()) {
-			result = N.copy();
-		} else {
-			result += N;
-		}
-	}
+	result.push_back(p);
 	
 	delete data;
 	data = NULL;
 }
 
-PolySet * DrawingCallback::get_result()
+std::vector<PolySet *> DrawingCallback::get_result()
 {
-	return result.convertToPolyset();
+	return result;
 }
 
 void DrawingCallback::set_glyph_offset(double offset_x, double offset_y)
