@@ -3,7 +3,7 @@
 
 #include <glib.h>
 #include <hb.h>
-#include <fontconfig.h>
+//#include <fontconfig.h> //TODO: fontconfig C flags not working in test CMake compilation
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
@@ -121,7 +121,7 @@ std::string PlatformUtils::info()
 	  << "\nOpenCSG version: " << OPENCSG_VERSION_STRING
 	  << "\nQt version: " << qtVersion
 	  << "\nMingW build: " << mingwstatus
-	  << "\nFontconfig version: " << FC_MAJOR << "." << FC_MINOR << "." << FC_REVISION
+	  //<< "\nFontconfig version: " << FC_MAJOR << "." << FC_MINOR << "." << FC_REVISION
 	  << "\nFreetype2 version: "  << FREETYPE_MAJOR << "." << FREETYPE_MINOR << "." << FREETYPE_PATCH
 	  << "\nHarfbuzz version: "   << HB_VERSION_MAJOR << "." << HB_VERSION_MINOR << "." << HB_VERSION_MICRO
 	  << "\nGLib version: "       << GLIB_MAJOR_VERSION << "." << GLIB_MINOR_VERSION << "." << GLIB_MICRO_VERSION
