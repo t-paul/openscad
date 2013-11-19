@@ -403,6 +403,22 @@ if("${CGAL_MAJOR_VERSION}.${CGAL_MINOR_VERSION}" VERSION_LESS 3.6)
 endif()
 inclusion(CGAL_DIR CGAL_INCLUDE_DIRS)
 
+#Get rid of bad libraries suggested for BOOST dependencies (they don't exist on some machines and cause build failures).
+#/usr/lib/libboost_thread.so;/usr/lib/libboost_system.so;
+string(FIND "${CGAL_3RD_PARTY_LIBRARIES}" "/usr/lib/libboost_system.so" FIND_POSITION  )
+if(NOT "-1" STREQUAL ${FIND_POSITION} )
+if(NOT EXISTS "/usr/lib/libboost_system.so")
+  MESSAGE( WARNING "CGAL_3RD_PARTY_LIBRARIES:Found erroneous /usr/lib/libboost_system.so -- stripping" )
+  string(REPLACE "/usr/lib/libboost_system.so" "" CGAL_3RD_PARTY_LIBRARIES ${CGAL_3RD_PARTY_LIBRARIES})
+endif()
+endif() 
+string(FIND "${CGAL_3RD_PARTY_LIBRARIES}" "/usr/lib/libboost_thread.so" FIND_POSITION  )
+if(NOT "-1" STREQUAL ${FIND_POSITION} )
+if(NOT EXISTS "/usr/lib/libboost_thread.so")
+  MESSAGE( WARNING "CGAL_3RD_PARTY_LIBRARIES:Found erroneous /usr/lib/libboost_thread.so -- stripping" )
+  string(REPLACE "/usr/lib/libboost_thread.so" "" CGAL_3RD_PARTY_LIBRARIES ${CGAL_3RD_PARTY_LIBRARIES})
+endif()
+endif() 
 if(${CMAKE_CXX_COMPILER} MATCHES ".*clang.*" AND NOT ${CGAL_CXX_FLAGS_INIT} STREQUAL "" )
 	string(REPLACE "-frounding-math" "" CGAL_CXX_FLAGS_INIT ${CGAL_CXX_FLAGS_INIT})
 	string(REPLACE "--param=ssp-buffer-size=4" "" CGAL_CXX_FLAGS_INIT ${CGAL_CXX_FLAGS_INIT})
@@ -415,21 +431,31 @@ if (NOT $ENV{OPENSCAD_LIBRARIES} STREQUAL "")
   set(ENV{PKG_CONFIG_LIBDIR} "$ENV{OPENSCAD_LIBRARIES}/lib/pkgconfig")
 endif()
 
-# find libraries using pkg-config
+# Find libraries (system installed or dependency built) using pkg-config
 find_package(PkgConfig REQUIRED)
 
-pkg_search_module(FONTCONFIG REQUIRED fontconfig>=2.11.0)
+#Fontconfig
+pkg_search_module(FONTCONFIG REQUIRED fontconfig>=2.10.93)
 message(STATUS "fontconfig found: ${FONTCONFIG_VERSION}")
 
+#Freetype2
 pkg_search_module(FREETYPE REQUIRED freetype2>=2.4.9)
 message(STATUS "freetype2 found: ${FREETYPE_VERSION}")
 
+#Harfbuzz
 pkg_search_module(HARFBUZZ REQUIRED harfbuzz>=0.9.19)
 message(STATUS "harfbuzz found: ${HARFBUZZ_VERSION}")
+
+#GLib-2
+pkg_search_module(GLIB2 REQUIRED glib-2.0>=2.2.0)
+#Can't use the CXXFlags directly as they are ;-separated
+string(REPLACE ";" " " GLIB2_CFLAGS "${GLIB2_CFLAGS}")
+message(STATUS "glib-2.0 found: ${GLIB2_VERSION}")
 
 add_definitions(${FONTCONFIG_CFLAGS})
 add_definitions(${FREETYPE_CFLAGS})
 add_definitions(${HARFBUZZ_CFLAGS})
+add_definitions(${GLIB2_CFLAGS})
 
 # Imagemagick
 
@@ -608,7 +634,7 @@ set(OFFSCREEN_SOURCES
 
 add_library(tests-core STATIC ${CORE_SOURCES})
 target_link_libraries(tests-core ${OPENGL_LIBRARIES})
-set(TESTS-CORE-LIBRARIES ${OPENGL_LIBRARIES} ${Boost_LIBRARIES})
+set(TESTS-CORE-LIBRARIES ${OPENGL_LIBRARIES} ${Boost_LIBRARIES} ${FONTCONFIG_LDFLAGS} ${FREETYPE_LDFLAGS} ${HARFBUZZ_LDFLAGS} ${GLIB2_LDFLAGS} )
 
 add_library(tests-common STATIC ${COMMON_SOURCES})
 target_link_libraries(tests-common tests-core)
@@ -616,39 +642,45 @@ target_link_libraries(tests-common tests-core)
 add_library(tests-cgal STATIC ${CGAL_SOURCES})
 set_target_properties(tests-cgal PROPERTIES COMPILE_FLAGS "-DENABLE_CGAL ${CGAL_CXX_FLAGS_INIT}")
 target_link_libraries(tests-cgal tests-common)
-set(TESTS-CGAL-LIBRARIES ${CGAL_LIBRARY} ${CGAL_3RD_PARTY_LIBRARIES} ${GMP_LIBRARIES} ${MPFR_LIBRARIES} ${TESTS-CORE-LIBRARIES})
+set(TESTS-CGAL-LIBRARIES tests-core ${TESTS-CORE-LIBRARIES} ${CGAL_LIBRARY} ${CGAL_3RD_PARTY_LIBRARIES} ${GMP_LIBRARIES} ${MPFR_LIBRARIES})
 
 add_library(tests-nocgal STATIC ${NOCGAL_SOURCES})
 target_link_libraries(tests-nocgal tests-common)
+set(TESTS-NOCGAL-LIBRARIES tests-core ${TESTS-CORE-LIBRARIES})
+
 add_library(tests-offscreen STATIC ${OFFSCREEN_SOURCES})
 set_target_properties(tests-offscreen PROPERTIES COMPILE_FLAGS "-DENABLE_OPENCSG -DENABLE_CGAL ${CGAL_CXX_FLAGS_INIT}")
-set(TESTS-NOCGAL-LIBRARIES ${TESTS-CORE-LIBRARIES})
 
 #
 # modulecachetest
 #
 add_executable(modulecachetest modulecachetest.cc)
-target_link_libraries(modulecachetest tests-nocgal ${TESTS-NOCGAL-LIBRARIES} ${Boost_LIBRARIES} ${FONTCONFIG_LDFLAGS} ${FREETYPE_LDFLAGS} ${HARFBUZZ_LDFLAGS})
+target_link_libraries(modulecachetest tests-nocgal ${TESTS-NOCGAL-LIBRARIES} )
 
 #
 # csgtexttest
 #
 add_executable(csgtexttest csgtexttest.cc CSGTextRenderer.cc CSGTextCache.cc)
-target_link_libraries(csgtexttest tests-nocgal ${TESTS-NOCGAL-LIBRARIES} ${FONTCONFIG_LDFLAGS} ${FREETYPE_LDFLAGS} ${HARFBUZZ_LDFLAGS})
+target_link_libraries(csgtexttest tests-nocgal ${TESTS-NOCGAL-LIBRARIES})
 
 #
 # cgalcachetest
 #
 add_executable(cgalcachetest cgalcachetest.cc)
 set_target_properties(cgalcachetest PROPERTIES COMPILE_FLAGS "-DENABLE_CGAL ${CGAL_CXX_FLAGS_INIT}")
-target_link_libraries(cgalcachetest tests-cgal ${TESTS-CGAL-LIBRARIES} ${GLEW_LIBRARY} ${COCOA_LIBRARY} ${FONTCONFIG_LDFLAGS} ${FREETYPE_LDFLAGS} ${HARFBUZZ_LDFLAGS})
+target_link_libraries(cgalcachetest tests-cgal ${TESTS-CGAL-LIBRARIES} ${GLEW_LIBRARY} ${COCOA_LIBRARY})
+
+
 
 #
-# openscad no-qt
+# openscad_no_gui (no-qt)
 #
 add_executable(openscad_nogui ../src/openscad.cc)
 set_target_properties(openscad_nogui PROPERTIES COMPILE_FLAGS "-fno-strict-aliasing -DEIGEN_DONT_ALIGN -DENABLE_CGAL -DENABLE_OPENCSG ${CGAL_CXX_FLAGS_INIT}")
 target_link_libraries(openscad_nogui tests-offscreen tests-cgal tests-nocgal ${TESTS-CORE-LIBRARIES} ${TESTS-CGAL-LIBRARIES} ${GLEW_LIBRARY} ${Boost_LIBRARIES} ${OPENCSG_LIBRARY} ${COCOA_LIBRARY} ${FONTCONFIG_LDFLAGS} ${FREETYPE_LDFLAGS} ${HARFBUZZ_LDFLAGS})
+
+ 
+
 
 #
 # GUI binary tests
@@ -828,8 +860,10 @@ list(APPEND ECHO_FILES ${FUNCTION_FILES}
             ${CMAKE_SOURCE_DIR}/../testdata/scad/misc/dim-all.scad
             ${CMAKE_SOURCE_DIR}/../testdata/scad/misc/string-test.scad
             ${CMAKE_SOURCE_DIR}/../testdata/scad/misc/string-indexing.scad
+            ${CMAKE_SOURCE_DIR}/../testdata/scad/misc/string-unicode.scad
             ${CMAKE_SOURCE_DIR}/../testdata/scad/misc/vector-values.scad
             ${CMAKE_SOURCE_DIR}/../testdata/scad/misc/search-tests.scad
+            ${CMAKE_SOURCE_DIR}/../testdata/scad/misc/search-tests-unicode.scad
             ${CMAKE_SOURCE_DIR}/../testdata/scad/misc/recursion-tests.scad
             ${CMAKE_SOURCE_DIR}/../testdata/scad/misc/value-reassignment-tests.scad
             ${CMAKE_SOURCE_DIR}/../testdata/scad/misc/value-reassignment-tests2.scad

@@ -1,6 +1,12 @@
 #include "PlatformUtils.h"
 #include "boosty.h"
 
+#include <glib.h>
+#include <hb.h>
+//#include <fontconfig.h> //TODO: fontconfig C flags not working in test CMake compilation
+#include <ft2build.h>
+#include FT_FREETYPE_H
+
 bool PlatformUtils::createLibraryPath()
 {
 	std::string path = PlatformUtils::libraryPath();
@@ -106,6 +112,7 @@ std::string PlatformUtils::info()
 	std::string cgal_2d_kernelEx = "";
 #endif // ENABLE_CGAL
 
+
 	s << "OpenSCAD Version: " << TOSTRING(OPENSCAD_VERSION)
           << "\nCompiler, build date: " << compiler_info << ", " << __DATE__
 	  << "\nBoost version: " << BOOST_LIB_VERSION
@@ -114,6 +121,10 @@ std::string PlatformUtils::info()
 	  << "\nOpenCSG version: " << OPENCSG_VERSION_STRING
 	  << "\nQt version: " << qtVersion
 	  << "\nMingW build: " << mingwstatus
+	  //<< "\nFontconfig version: " << FC_MAJOR << "." << FC_MINOR << "." << FC_REVISION
+	  << "\nFreetype2 version: "  << FREETYPE_MAJOR << "." << FREETYPE_MINOR << "." << FREETYPE_PATCH
+	  << "\nHarfbuzz version: "   << HB_VERSION_MAJOR << "." << HB_VERSION_MINOR << "." << HB_VERSION_MICRO
+	  << "\nGLib version: "       << GLIB_MAJOR_VERSION << "." << GLIB_MINOR_VERSION << "." << GLIB_MICRO_VERSION
 	  << "\nOPENSCADPATH: " << getenv("OPENSCADPATH") << "\n"
 	;
 	return s.str();

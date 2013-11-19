@@ -4,6 +4,8 @@
 # this assumes you have sudo installed or are running as root.
 #
 
+#TODO: Other supported platforms (only did debian/Ubuntu) for added libs: fc, ft2 HB and glib...
+
 get_fedora_deps()
 {
  sudo yum install qt-devel bison flex eigen2-devel python-paramiko \
@@ -60,7 +62,7 @@ get_debian_deps()
   libXi-dev libmpfr-dev libboost-dev libglew-dev libeigen2-dev \
   libeigen3-dev libcgal-dev libopencsg-dev libgmp3-dev libgmp-dev \
   python-paramiko curl imagemagick libfontconfig-dev libfreetype6-dev \
-  libharfbuzz-dev ; do
+  libharfbuzz-dev libglib2.0-dev; do
    sudo apt-get -y install $pkg;
  done
 }

@@ -611,6 +611,7 @@ build_boost 1.53.0
 build_cgal 4.0.2
 build_glew 1.9.0
 build_opencsg 1.3.2
+build_glib2 2.38.2
 build_freetype 2.5.0.1
 build_fontconfig 2.11.0
 build_ragel 6.8

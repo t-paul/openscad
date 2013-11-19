@@ -29,7 +29,7 @@ build_freetype()
 
 build_fontconfig()
 {
-  version=$1
+  version="$1"
 
   if [ -e $DEPLOYDIR/include/fontconfig ]; then
     echo "fontconfig already installed. not building"
@@ -51,7 +51,7 @@ build_fontconfig()
 
 build_ragel()
 {
-  version=$1
+  version="$1"
 
   if [ -f $DEPLOYDIR/bin/ragel ]; then
     echo "ragel already installed. not building"
@@ -66,7 +66,7 @@ build_ragel()
   fi
   tar xzf "ragel-$version.tar.gz"
   cd "ragel-$version"
-  sed -i "" -e "s/setiosflags(ios::right)/std::&/g" ragel/javacodegen.cpp
+  sed -i -e "s/setiosflags(ios::right)/std::&/g" "ragel/javacodegen.cpp"
   ./configure --prefix="$DEPLOYDIR"
   make -j$NUMCPU
   make install
@@ -74,7 +74,7 @@ build_ragel()
 
 build_harfbuzz()
 {
-  version=$1
+  version="$1"
   extra_config_flags="$2"
 
   if [ -e $DEPLOYDIR/include/harfbuzz ]; then
@@ -90,10 +90,36 @@ build_harfbuzz()
   fi
   tar xzf "harfbuzz-$version.tar.gz"
   cd "harfbuzz-$version"
-  # disable doc directories as they make problems on Mac OS Build
-  sed -i "" -e "s/SUBDIRS = src util test docs/SUBDIRS = src util test/g" Makefile.am
-  sed -i "" -e "s/^docs.*$//" configure.ac
+  # Disable doc directories as they make problems on Mac OS Build
+  sed -i -e "s/SUBDIRS = src util test docs/SUBDIRS = src util test/g" Makefile.am
+  sed -i -e "s/^docs.*$//" configure.ac
   ./autogen.sh --prefix="$DEPLOYDIR" --with-freetype=yes --with-gobject=no --with-cairo=no --with-icu=no $extra_config_flags
   make -j$NUMCPU
   make install
+}
+
+
+build_glib2()
+{
+  version="$1"
+  maj_min_version="${version%.*}" #Drop micro
+
+  if [ -e $DEPLOYDIR/lib/glib-2.0 ]; then
+    echo "glib2 already installed. not building"
+    return
+  fi
+
+  echo "Building glib2 $version..."
+  cd "$BASEDIR"/src
+  rm -rf "glib-$version"
+  if [ ! -f "glib-$version.tar.xz" ]; then
+    curl --insecure -LO "http://ftp.gnome.org/pub/gnome/sources/glib/$maj_min_version/glib-$version.tar.xz"
+  fi
+  tar xJf "glib-$version.tar.xz"
+  cd "glib-$version"
+
+  ./configure --prefix="$DEPLOYDIR"
+  make -j$NUMCPU
+  make install
+   
 }
