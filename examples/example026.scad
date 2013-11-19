@@ -13,6 +13,8 @@ chinese_font  = "AR PL UKai CN";
 //chinese_font  = "AR PL UMing CN";
 arabic_font   = "Amiri-Regular";
 
+s_u = "もしもし";
+
 translate([0, -20, 0])
 rotate([90, 0, 0])
 linear_extrude(height = 2)
@@ -23,7 +25,6 @@ if(enable_showcase)
 
 //Rotate a word (in Japanese)
 //Iterate across individual letters (unicode) 
-s_u = "もしもし";
 rotate([-30, 0, 0])
 for (a = [0 : (len(s_u)-1)])
   rotate([0, 0, 135 + 90 / (len(s_u)-1) * a])

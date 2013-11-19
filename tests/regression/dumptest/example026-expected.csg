@@ -1,0 +1,11 @@
+group() {
+	multmatrix([[1, 0, 0, 0], [0, 1, 0, -20], [0, 0, 1, 0], [0, 0, 0, 1]]) {
+		multmatrix([[1, 0, 0, 0], [0, 0, -1, 0], [0, 1, 0, 0], [0, 0, 0, 1]]) {
+			linear_extrude(height = 2, center = false, convexity = 1, scale = [1, 1], $fn = 20, $fa = 12, $fs = 2) {
+				($fn = 5, text = 'كسول', size = 16, spacing = 1, font = 'Amiri-Regular', direction = 'rtl', language = 'ar', script = 'arabic', halign = 'left', valign = 'baseline');
+			}
+		}
+	}
+	group();
+	group();
+}
