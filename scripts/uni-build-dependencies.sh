@@ -338,17 +338,6 @@ build_cgal()
     CGAL_BUILDTYPE="Debug"
   fi
 
-  #Don't use gcc 4.8 it will cause a crash :( -- is it only on linux?
-  CC=gcc
-  CXX=g++
-  if [ "`$CC --version|grep 4.8`" ]; then
-      echo "WARNING:gcc 4.8 causes a seg fault in CGAL -- see https://github.com/openscad/openscad/issues/514"
-      if [ "`gcc-4.7 --version|grep 4.7`" ]; then
-           echo "INFO:gcc 4.7 is installed -- let's use that instead (just for building CGAL and OpenSCAD)"
-           CC=gcc-4.7
-           CXX=g++-4.7
-      fi
-  fi
   DEBUGBOOSTFIND=0 # for debugging FindBoost.cmake (not for debugging boost)
   Boost_NO_SYSTEM_PATHS=1
   if [ "`echo $2 | grep use-sys-libs`" ]; then
