@@ -597,12 +597,13 @@ public:
     //Check that the index is positive and less than the size in bytes
     if ((i >= 0) && (i < (int)str.size())) {
 	  //Ensure character (not byte) index is inside the character/glyph array
-	  if( (unsigned) i < g_utf8_strlen( str.c_str(), str.size() ) )
-	  {
-		  gchar utf8_of_cp[6];
-		  gchar* ptr = g_utf8_offset_to_pointer (str.c_str(), i);
-		  g_utf8_strncpy ( utf8_of_cp, ptr, 1 );
-		  v = std::string( utf8_of_cp );
+	  if( (unsigned) i < g_utf8_strlen( str.c_str(), str.size() ) )	{
+		  gchar utf8_of_cp[6] = ""; //A buffer for a single unichar to be copied into
+		  gchar* ptr = g_utf8_offset_to_pointer(str.c_str(), i);
+		  if(ptr) {
+		    g_utf8_strncpy(utf8_of_cp, ptr, 1);
+		  }
+		  v = std::string(utf8_of_cp);
 	  }
       //      std::cout << "bracket_visitor: " <<  v << "\n";
     }

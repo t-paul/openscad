@@ -452,40 +452,30 @@ Value builtin_search(const Context *, const EvalContext *evalctx)
 		unsigned int searchTableSize;
 		unsigned int findThisSize;
 
-		//if (searchTable.type() == Value::STRING) searchTableSize = searchTable.toString().size();
-		if (searchTable.type() == Value::STRING)
-		{
+		if (searchTable.type() == Value::STRING) {
 			searchTableSize = g_utf8_strlen( searchTable.toString().c_str(), searchTable.toString().size() );
-		}
-		else searchTableSize = searchTable.toVector().size();
+		} else searchTableSize = searchTable.toVector().size();
 
 		findThisSize =  g_utf8_strlen( findThis.toString().c_str(), findThis.toString().size() );
 
-		//for (size_t i = 0; i < findThis.toString().size(); i++) {
 		for (size_t i = 0; i < findThisSize; i++) {
 		  unsigned int matchCount = 0;
-			Value::VectorType resultvec;
+		  Value::VectorType resultvec;
 		  for (size_t j = 0; j < searchTableSize; j++) {
 		    bool match = false;
-
-		    if(searchTable.type() == Value::VECTOR)
-		    {
-		    	//match = (findThis.toString()[i] == searchTable.toVector()[j].toVector()[index_col_num].toString()[0]);
-		    	gchar* ptr_ft = g_utf8_offset_to_pointer (findThis.toString().c_str(), i);
-		        gchar* ptr_st = g_utf8_offset_to_pointer (searchTable.toVector()[j].toVector()[index_col_num].toString().c_str(), 0);
-
-		        match = (g_utf8_get_char(ptr_ft) == g_utf8_get_char(ptr_st));
+		    if(searchTable.type() == Value::VECTOR) {
+		    	gchar* ptr_ft = g_utf8_offset_to_pointer(findThis.toString().c_str(), i);
+		        gchar* ptr_st = g_utf8_offset_to_pointer(searchTable.toVector()[j].toVector()[index_col_num].toString().c_str(), 0);
+		        if((ptr_ft) && (ptr_st)) {
+		            match = (g_utf8_get_char(ptr_ft) == g_utf8_get_char(ptr_st));
+		        }
+		    } else if(searchTable.type() == Value::STRING){
+		    	gchar* ptr_ft = g_utf8_offset_to_pointer(findThis.toString().c_str(), i);
+		    	gchar* ptr_st = g_utf8_offset_to_pointer(searchTable.toString().c_str(), j);
+		    	if((ptr_ft) && (ptr_st)) {
+		            match = (g_utf8_get_char(ptr_ft) == g_utf8_get_char(ptr_st));
+		        }
 		    }
-		    else
-		    if(searchTable.type() == Value::STRING)
-		    {
-		    	//match = (findThis.toString()[i] == searchTable.toString()[j]);
-		    	gchar* ptr_ft = g_utf8_offset_to_pointer (findThis.toString().c_str(), i);
-		    	gchar* ptr_st = g_utf8_offset_to_pointer (searchTable.toString().c_str(), j);
-
-		    	match = (g_utf8_get_char(ptr_ft) == g_utf8_get_char(ptr_st));
-		    }
-
 			if(match)
 			{
 		      Value resultValue((double(j)));
@@ -499,13 +489,12 @@ Value builtin_search(const Context *, const EvalContext *evalctx)
 		      if (num_returns_per_match > 1 && matchCount >= num_returns_per_match) break;
 		    }
 		  }
-		  //if (matchCount == 0) PRINTB("  WARNING: search term not found: \"%s\"", findThis.toString()[i]);
-		  if (matchCount == 0)
-		  {
-			  gchar* ptr_ft = g_utf8_offset_to_pointer (findThis.toString().c_str(), i);
-			  gchar utf8_of_cp[6];
-			  g_utf8_strncpy ( utf8_of_cp, ptr_ft, 1 );
-
+		  if (matchCount == 0) {
+			  gchar* ptr_ft = g_utf8_offset_to_pointer(findThis.toString().c_str(), i);
+			  gchar utf8_of_cp[6] = ""; //A buffer for a single unichar to be copied into
+			  if(ptr_ft) {
+		        g_utf8_strncpy( utf8_of_cp, ptr_ft, 1 );
+		      }
 			  PRINTB("  WARNING: search term not found: \"%s\"", utf8_of_cp );
 		  }
 		  if (num_returns_per_match == 0 || num_returns_per_match > 1) {
