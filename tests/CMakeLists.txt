@@ -307,6 +307,7 @@ endif()
 inclusion(OPENCSG_DIR OPENCSG_INCLUDE_DIR)
 
 # GLEW
+
 if(WIN32_STATIC_BUILD)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DGLEW_STATIC")
 endif()
@@ -373,6 +374,11 @@ ADD_FLEX_BISON_DEPENDENCY(OpenSCADlexer OpenSCADparser)
 set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/parser_yacc.c PROPERTIES LANGUAGE "CXX")
 
 # CGAL
+
+# Disable rounding math check to allow usage of Valgrind
+# This is needed as Valgrind currently does not correctly
+# handle rounding modes used by CGAL.
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DCGAL_DISABLE_ROUNDING_MATH_CHECK=ON")
 if (NOT $ENV{CGALDIR} STREQUAL "")
   set(CGAL_DIR "$ENV{CGALDIR}")
 elseif (NOT $ENV{OPENSCAD_LIBRARIES} STREQUAL "")
@@ -417,16 +423,14 @@ if(${CMAKE_CXX_COMPILER} MATCHES ".*clang.*" AND NOT ${CGAL_CXX_FLAGS_INIT} STRE
 	string(REPLACE "--param=ssp-buffer-size=4" "" CGAL_CXX_FLAGS_INIT ${CGAL_CXX_FLAGS_INIT})
 endif()
 
-# Find system installed and built libraries using pkg-config for several components
-# This requires that the env. variable PKG_CONFIG_PATH points into the development tree
-# See setenv-*.sh
 if (NOT $ENV{OPENSCAD_LIBRARIES} STREQUAL "")
-if (NOT $ENV{PKG_CONFIG_PATH} STREQUAL "")
-  #message(STATUS "Using PKG_CONFIG_PATH=$ENV{PKG_CONFIG_PATH}" )
-else()
-  message(WARNING "PKG_CONFIG_PATH environment not set -- several (pkg-config-based) built components will not be found" )
+  # Force pkg-config to look _only_ in the local library folder
+  # in case OPENSCAD_LIBRARIES is set.
+  set(ENV{PKG_CONFIG_PATH} "$ENV{OPENSCAD_LIBRARIES}/lib/pkgconfig")
+  set(ENV{PKG_CONFIG_LIBDIR} "$ENV{OPENSCAD_LIBRARIES}/lib/pkgconfig")
 endif()
-endif()
+
+# Find libraries (system installed or dependency built) using pkg-config
 find_package(PkgConfig REQUIRED)
 
 #Fontconfig
@@ -443,11 +447,14 @@ message(STATUS "harfbuzz found: ${HARFBUZZ_VERSION}")
 
 #GLib-2
 pkg_search_module(GLIB2 REQUIRED glib-2.0>=2.2.0)
-#Can't use the CXXFlags directly as they are ;-separated (which doesn't go well on a command line....)
+#Can't use the CXXFlags directly as they are ;-separated
 string(REPLACE ";" " " GLIB2_CFLAGS "${GLIB2_CFLAGS}")
 message(STATUS "glib-2.0 found: ${GLIB2_VERSION}")
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${FONTCONFIG_CFLAGS} ${FREETYPE_CFLAGS} ${HARFBUZZ_CFLAGS} ${GLIB2_CFLAGS} ")
+add_definitions(${FONTCONFIG_CFLAGS})
+add_definitions(${FREETYPE_CFLAGS})
+add_definitions(${HARFBUZZ_CFLAGS})
+add_definitions(${GLIB2_CFLAGS})
 
 # Imagemagick
 
@@ -596,10 +603,10 @@ set(CGAL_SOURCES
   ../src/svg.cc)
 
 set(COMMON_SOURCES
-  ../src/nodedumper.cc 
-  ../src/traverser.cc 
-  ../src/PolySetEvaluator.cc 
-  ../src/PolySetCache.cc 
+  ../src/nodedumper.cc
+  ../src/traverser.cc
+  ../src/PolySetEvaluator.cc
+  ../src/PolySetCache.cc
   ../src/Tree.cc
   ../src/lodepng.cpp)
 
@@ -626,7 +633,7 @@ set(OFFSCREEN_SOURCES
 
 add_library(tests-core STATIC ${CORE_SOURCES})
 target_link_libraries(tests-core ${OPENGL_LIBRARIES})
-set(TESTS-CORE-LIBRARIES ${OPENGL_LIBRARIES} ${Boost_LIBRARIES} ${FONTCONFIG_LDFLAGS} ${FREETYPE_LDFLAGS} ${HARFBUZZ_LDFLAGS} ${GLIB2_LDFLAGS} )
+set(TESTS-CORE-LIBRARIES ${OPENGL_LIBRARIES} ${Boost_LIBRARIES})
 
 add_library(tests-common STATIC ${COMMON_SOURCES})
 target_link_libraries(tests-common tests-core)
@@ -634,41 +641,39 @@ target_link_libraries(tests-common tests-core)
 add_library(tests-cgal STATIC ${CGAL_SOURCES})
 set_target_properties(tests-cgal PROPERTIES COMPILE_FLAGS "-DENABLE_CGAL ${CGAL_CXX_FLAGS_INIT}")
 target_link_libraries(tests-cgal tests-common)
-set(TESTS-CGAL-LIBRARIES tests-core ${TESTS-CORE-LIBRARIES} ${CGAL_LIBRARY} ${CGAL_3RD_PARTY_LIBRARIES} ${GMP_LIBRARIES} ${MPFR_LIBRARIES})
+set(TESTS-CGAL-LIBRARIES ${CGAL_LIBRARY} ${CGAL_3RD_PARTY_LIBRARIES} ${GMP_LIBRARIES} ${MPFR_LIBRARIES} ${TESTS-CORE-LIBRARIES})
 
 add_library(tests-nocgal STATIC ${NOCGAL_SOURCES})
 target_link_libraries(tests-nocgal tests-common)
-set(TESTS-NOCGAL-LIBRARIES tests-core ${TESTS-CORE-LIBRARIES})
-
 add_library(tests-offscreen STATIC ${OFFSCREEN_SOURCES})
 set_target_properties(tests-offscreen PROPERTIES COMPILE_FLAGS "-DENABLE_OPENCSG -DENABLE_CGAL ${CGAL_CXX_FLAGS_INIT}")
-
+set(TESTS-NOCGAL-LIBRARIES ${TESTS-CORE-LIBRARIES})
 
 #
 # modulecachetest
 #
 add_executable(modulecachetest modulecachetest.cc)
-target_link_libraries(modulecachetest tests-nocgal ${TESTS-NOCGAL-LIBRARIES} )
+target_link_libraries(modulecachetest tests-nocgal ${TESTS-NOCGAL-LIBRARIES} ${Boost_LIBRARIES} ${FONTCONFIG_LDFLAGS} ${FREETYPE_LDFLAGS} ${HARFBUZZ_LDFLAGS})
 
 #
 # csgtexttest
 #
 add_executable(csgtexttest csgtexttest.cc CSGTextRenderer.cc CSGTextCache.cc)
-target_link_libraries(csgtexttest tests-nocgal ${TESTS-NOCGAL-LIBRARIES})
+target_link_libraries(csgtexttest tests-nocgal ${TESTS-NOCGAL-LIBRARIES} ${FONTCONFIG_LDFLAGS} ${FREETYPE_LDFLAGS} ${HARFBUZZ_LDFLAGS})
 
 #
 # cgalcachetest
 #
 add_executable(cgalcachetest cgalcachetest.cc)
 set_target_properties(cgalcachetest PROPERTIES COMPILE_FLAGS "-DENABLE_CGAL ${CGAL_CXX_FLAGS_INIT}")
-target_link_libraries(cgalcachetest tests-cgal ${TESTS-CGAL-LIBRARIES} ${GLEW_LIBRARY} ${COCOA_LIBRARY})
+target_link_libraries(cgalcachetest tests-cgal ${TESTS-CGAL-LIBRARIES} ${GLEW_LIBRARY} ${COCOA_LIBRARY} ${FONTCONFIG_LDFLAGS} ${FREETYPE_LDFLAGS} ${HARFBUZZ_LDFLAGS})
 
 #
-# openscad_nogui (no-qt)
+# openscad no-qt
 #
 add_executable(openscad_nogui ../src/openscad.cc)
 set_target_properties(openscad_nogui PROPERTIES COMPILE_FLAGS "-fno-strict-aliasing -DEIGEN_DONT_ALIGN -DENABLE_CGAL -DENABLE_OPENCSG ${CGAL_CXX_FLAGS_INIT}")
-target_link_libraries(openscad_nogui tests-offscreen tests-cgal ${TESTS-CGAL-LIBRARIES} ${GLEW_LIBRARY} ${OPENCSG_LIBRARY} ${COCOA_LIBRARY})
+target_link_libraries(openscad_nogui tests-offscreen tests-cgal tests-nocgal ${TESTS-CORE-LIBRARIES} ${TESTS-CGAL-LIBRARIES} ${GLEW_LIBRARY} ${Boost_LIBRARIES} ${OPENCSG_LIBRARY} ${COCOA_LIBRARY} ${FONTCONFIG_LDFLAGS} ${FREETYPE_LDFLAGS} ${HARFBUZZ_LDFLAGS})
 
 #
 # GUI binary tests
@@ -848,10 +853,8 @@ list(APPEND ECHO_FILES ${FUNCTION_FILES}
             ${CMAKE_SOURCE_DIR}/../testdata/scad/misc/dim-all.scad
             ${CMAKE_SOURCE_DIR}/../testdata/scad/misc/string-test.scad
             ${CMAKE_SOURCE_DIR}/../testdata/scad/misc/string-indexing.scad
-            ${CMAKE_SOURCE_DIR}/../testdata/scad/misc/string-unicode.scad
             ${CMAKE_SOURCE_DIR}/../testdata/scad/misc/vector-values.scad
             ${CMAKE_SOURCE_DIR}/../testdata/scad/misc/search-tests.scad
-            ${CMAKE_SOURCE_DIR}/../testdata/scad/misc/search-tests-unicode.scad
             ${CMAKE_SOURCE_DIR}/../testdata/scad/misc/recursion-tests.scad
             ${CMAKE_SOURCE_DIR}/../testdata/scad/misc/value-reassignment-tests.scad
             ${CMAKE_SOURCE_DIR}/../testdata/scad/misc/value-reassignment-tests2.scad
@@ -922,7 +925,16 @@ set_test_config(Heavy opencsgtest_minkowski3-tests
                       cgalpngtest_for-tests
                       cgalpngtest_for-nested-tests
                       cgalpngtest_intersection-tests
-                      cgalpngtest_text-search-test)
+                      cgalpngtest_text-search-test
+		      cgalpngtest_text-font-direction-tests
+		      cgalpngtest_text-font-tests
+		      cgalpngtest_text-font-alignment-tests
+		      opencsgtest_text-font-direction-tests
+		      opencsgtest_text-font-tests
+		      opencsgtest_text-font-alignment-tests
+		      throwntogethertest_text-font-direction-tests
+		      throwntogethertest_text-font-tests
+		      throwntogethertest_text-font-alignment-tests)
 
 foreach(FILE ${EXAMPLE_FILES})
   get_test_fullname(cgalpngtest ${FILE} TEST_FULLNAME)
