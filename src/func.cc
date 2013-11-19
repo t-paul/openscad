@@ -390,11 +390,17 @@ Value builtin_lookup(const Context *, const EvalContext *evalctx)
   num_returns_per_match : int;
   index_col_num : int;
 
+ The search string and searched strings can be unicode strings.
+
  Examples:
   Index values return as list:
     search("a","abcdabcd");
         - returns [0]
-    search("a","abcdabcd",0); //All
+    search("Л","Л");  //A unicode string
+        - returns [0]
+    search("🂡aЛ","a🂡Л🂡a🂡Л🂡a",0);
+        - returns [[1,3,5,7],[0,4,8],[2,6]]
+    search("a","abcdabcd",0); //Search up to all matches
         - returns [[0,4]]
     search("a","abcdabcd",1);
         - returns [0]
@@ -419,9 +425,6 @@ Value builtin_lookup(const Context *, const EvalContext *evalctx)
     Return first two matches per search vector element; vector of vectors:
       search("abce",[ ["a",1],["b",2],["c",3],["d",4],["a",5],["b",6],["c",7],["d",8],["e",9] ], 2);
         - returns [[0,4],[1,5],[2,6],[8]]
-
-    TODO: Supports unicode -- add an example or two here
-
 */
 Value builtin_search(const Context *, const EvalContext *evalctx)
 {

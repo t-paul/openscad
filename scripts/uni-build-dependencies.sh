@@ -348,7 +348,6 @@ build_cgal()
            CC=gcc-4.7
            CXX=g++-4.7
       fi
-  echo "CC=$CC  CXX=$CXX"
   fi
   DEBUGBOOSTFIND=0 # for debugging FindBoost.cmake (not for debugging boost)
   Boost_NO_SYSTEM_PATHS=1

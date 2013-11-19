@@ -446,8 +446,6 @@ pkg_search_module(GLIB2 REQUIRED glib-2.0>=2.2.0)
 #Can't use the CXXFlags directly as they are ;-separated (which doesn't go well on a command line....)
 string(REPLACE ";" " " GLIB2_CFLAGS "${GLIB2_CFLAGS}")
 message(STATUS "glib-2.0 found: ${GLIB2_VERSION}")
-#message(STATUS "GLIB2_CFLAGS: ${GLIB2_CFLAGS}")
-#message(STATUS "GLIB2_LDFLAGS: ${GLIB2_LDFLAGS}")
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${FONTCONFIG_CFLAGS} ${FREETYPE_CFLAGS} ${HARFBUZZ_CFLAGS} ${GLIB2_CFLAGS} ")
 

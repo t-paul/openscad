@@ -31,10 +31,10 @@ isEmpty(QT_VERSION) {
 unix:!macx {
     message( Cheking GCC in use )
     system( g++ --version | grep 4.8 > /dev/null ) {
-        warning( g++ version 4.8 which causes a seg fault in CGAL -- see https://github.com/openscad/openscad/issues/514)
+        warning( gcc/g++ version 4.8 which causes a seg fault in CGAL -- see https://github.com/openscad/openscad/issues/514)
 
         system( g++-4.7 --version | grep 4.7 > /dev/null ) {
-            message( g++ version 4.7 found -- use that instead for openSCAD and CGAL )
+            message( gcc/g++ version 4.7 found -- use that instead for OpenSCAD and CGAL )
             QMAKE_CC=gcc-4.7
             QMAKE_CXX=g++-4.7
         }
@@ -42,8 +42,6 @@ unix:!macx {
             warning( Couldn't find an alternative compiler. Seg faults are likely to occur... )
         }
     }
-message("QMAKE_CC: $${QMAKE_CC}")
-message("QMAKE_CXX: $${QMAKE_CXX}")
 }
 
 # Populate VERSION, VERSION_YEAR, VERSION_MONTH, VERSION_DATE from system date
