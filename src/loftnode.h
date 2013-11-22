@@ -18,6 +18,7 @@ public:
 	virtual PolySet *evaluate_polyset(class PolySetEvaluator *) const;
 
         double slices;
+        double height;
         std::string offset_x;
         std::string offset_y;
         

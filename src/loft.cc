@@ -76,6 +76,8 @@ std::string LoftNode::toString() const
 	stream << this->name() << "("
 		<< "offset_x = " << offset_x
 		<< ", offset_y = " << offset_y
+                << ", slices = " << slices
+                << ", height = " << height
 		<< ")";
 
 	return stream.str();
@@ -97,6 +99,7 @@ AbstractNode *LoftModule::instantiate(const Context *ctx, const ModuleInstantiat
 	Context c(ctx);
 	c.setVariables(args, evalctx);
 
+        node->height = c.lookup_variable("height").toDouble();
 	node->slices = c.lookup_variable("slices").toDouble();
 	node->offset_x = c.lookup_variable("offset_x").toString();
 	node->offset_y = c.lookup_variable("offset_y").toString();
@@ -104,7 +107,8 @@ AbstractNode *LoftModule::instantiate(const Context *ctx, const ModuleInstantiat
 	std::vector<AbstractNode *> instantiatednodes = inst->instantiateChildren(evalctx);
 	node->children.insert(node->children.end(), instantiatednodes.begin(), instantiatednodes.end());
 
-	for (double v = 0;v < 1;v += 1/node->slices) {
+        for (int a = 0;a <= node->slices;a++) {
+                double v = (double)a / node->slices;
 		AssignmentList func_args;
 		std::string var("x");
 		func_args += Assignment(var, new Expression(Value(v)));

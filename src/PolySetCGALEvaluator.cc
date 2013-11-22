@@ -520,63 +520,88 @@ PolySet *PolySetCGALEvaluator::rotateDxfData(const RotateExtrudeNode &node, DxfD
 	return ps;
 }
 
+static void add_poly(PolySet *ps,
+        double x1, double y1, double z1,
+        double x2, double y2, double z2,
+        double x3, double y3, double z3,
+        double x4, double y4, double z4)
+{
+#if 0
+        std::cout
+                << std::right
+                << std::fixed
+                << std::setprecision(3)
+                << "[" << std::setw(8) << x1
+                << ", " << std::setw(8) << y1
+                << ", " << std::setw(8) << z1
+                << "], [" << std::setw(8) << x2
+                << ", " << std::setw(8) << y2
+                << ", " << std::setw(8) << z2
+                << "], [" << std::setw(8) << x3
+                << ", " << std::setw(8) << y3
+                << ", " << std::setw(8) << z3
+                << "], [" << std::setw(8) << x4
+                << ", " << std::setw(8) << y4
+                << ", " << std::setw(8) << z4
+                << "],"
+                << std::endl;
+#endif
+	ps->append_poly();
+	ps->append_vertex(x1, y1, z1);
+	ps->append_vertex(x2, y2, z2);
+	ps->append_vertex(x3, y3, z3);
+	ps->append_vertex(x4, y4, z4);
+}
+
 PolySet *PolySetCGALEvaluator::evaluatePolySet(const LoftNode &node)
 {
 	PolySet *ps = new PolySet();
 
 	double x1 = -10, x2 = 10, y1 = -10, y2 = 10;
 	
-	int count = node.values_x.size();
-	ps->append_poly();
-	ps->append_vertex(x1 + node.values_x[0], y1 + node.values_y[0], 0);
-	ps->append_vertex(x2 + node.values_x[0], y1 + node.values_y[0], 0);
-	ps->append_vertex(x2 + node.values_x[0], y2 + node.values_y[0], 0);
-	ps->append_vertex(x1 + node.values_x[0], y2 + node.values_y[0], 0);
-	for (int a = 1;a < count;a++) {
-		double ox1 = node.values_x[a - 1];
-		double ox2 = node.values_x[a];
-		double oy1 = node.values_y[a - 1];
-		double oy2 = node.values_y[a];
-
-		/*
-		+----------+ y2
-		|          |
-		|          |
-		|          |
-		|          |
-		+----------+ y1
-		x1         x2
-		*/
+	int max_idx = node.values_x.size() - 1;
+        add_poly(ps,
+                x2 + node.values_x[0], y1 + node.values_y[0], 0,
+                x1 + node.values_x[0], y1 + node.values_y[0], 0,
+                x1 + node.values_x[0], y2 + node.values_y[0], 0,
+                x2 + node.values_x[0], y2 + node.values_y[0], 0);
+	add_poly(ps,
+                x2 + node.values_x[max_idx], y2 + node.values_y[max_idx], node.height,
+                x1 + node.values_x[max_idx], y2 + node.values_y[max_idx], node.height,
+                x1 + node.values_x[max_idx], y1 + node.values_y[max_idx], node.height,
+                x2 + node.values_x[max_idx], y1 + node.values_y[max_idx], node.height);
+	for (int a = 1;a <= max_idx;a++) {
+                double h1 = ((a - 1) * node.height) / max_idx;
+                double h2 = (a * node.height) / max_idx;
+		double ox1 = round(node.values_x[a - 1] * 1000.0) / 1000.0;
+		double ox2 = round(node.values_x[a] * 1000.0) / 1000.0;
+		double oy1 = round(node.values_y[a - 1] * 1000.0) / 1000.0;
+		double oy2 = round(node.values_y[a] * 1000.0) / 1000.0;
 		
-		ps->append_poly();
-		ps->append_vertex(x1 + ox1, y1 + oy1, a - 1);
-		ps->append_vertex(x2 + ox1, y1 + oy1, a - 1);
-		ps->append_vertex(x2 + ox2, y1 + oy2, a);
-		ps->append_vertex(x1 + ox2, y1 + oy2, a);
+                add_poly(ps,
+                        x1 + ox1, y1 + oy1, h1,
+                        x2 + ox1, y1 + oy1, h1,
+                        x2 + ox2, y1 + oy2, h2,
+                        x1 + ox2, y1 + oy2, h2);
 
-		ps->append_poly();
-		ps->append_vertex(x2 + ox1, y1 + oy1, a - 1);
-		ps->append_vertex(x2 + ox1, y2 + oy1, a - 1);
-		ps->append_vertex(x2 + ox2, y2 + oy2, a);
-		ps->append_vertex(x2 + ox2, y1 + oy2, a);
+		add_poly(ps,
+                        x2 + ox1, y1 + oy1, h1,
+                        x2 + ox1, y2 + oy1, h1,
+                        x2 + ox2, y2 + oy2, h2,
+                        x2 + ox2, y1 + oy2, h2);
 
-		ps->append_poly();
-		ps->append_vertex(x2 + ox1, y2 + oy1, a - 1);
-		ps->append_vertex(x1 + ox1, y2 + oy1, a - 1);
-		ps->append_vertex(x1 + ox2, y2 + oy2, a);
-		ps->append_vertex(x2 + ox2, y2 + oy2, a);
+		add_poly(ps,
+                        x2 + ox1, y2 + oy1, h1,
+                        x1 + ox1, y2 + oy1, h1,
+                        x1 + ox2, y2 + oy2, h2,
+                        x2 + ox2, y2 + oy2, h2);
 
-		ps->append_poly();
-		ps->append_vertex(x1 + ox1, y2 + oy1, a - 1);
-		ps->append_vertex(x1 + ox1, y1 + oy1, a - 1);
-		ps->append_vertex(x1 + ox2, y1 + oy2, a);
-		ps->append_vertex(x1 + ox2, y2 + oy2, a);
+		add_poly(ps,
+                        x1 + ox1, y2 + oy1, h1,
+                        x1 + ox1, y1 + oy1, h1,
+                        x1 + ox2, y1 + oy2, h2,
+                        x1 + ox2, y2 + oy2, h2);
 	}
-	ps->append_poly();
-	ps->append_vertex(x1 + node.values_x[count - 1], y2 + node.values_y[count - 1], count - 1);
-	ps->append_vertex(x2 + node.values_x[count - 1], y2 + node.values_y[count - 1], count - 1);
-	ps->append_vertex(x2 + node.values_x[count - 1], y1 + node.values_y[count - 1], count - 1);
-	ps->append_vertex(x1 + node.values_x[count - 1], y1 + node.values_y[count - 1], count - 1);
 	
 	return ps;
 }
