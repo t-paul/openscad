@@ -17,13 +17,20 @@ public:
 
 	virtual PolySet *evaluate_polyset(class PolySetEvaluator *) const;
 
+        int max_idx;
         double slices;
         double height;
+        std::string rotate;
+        std::string scale_x;
+        std::string scale_y;
         std::string offset_x;
         std::string offset_y;
         
-        std::vector<double> values_x;
-        std::vector<double> values_y;
+        std::vector<double> values_rotate;
+        std::vector<double> values_scale_x;
+        std::vector<double> values_scale_y;
+        std::vector<double> values_offset_x;
+        std::vector<double> values_offset_y;
 };
 
 #endif

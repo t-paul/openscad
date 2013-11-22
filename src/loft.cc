@@ -74,7 +74,10 @@ std::string LoftNode::toString() const
 	std::stringstream stream;
 
 	stream << this->name() << "("
-		<< "offset_x = " << offset_x
+		<< "rotate = " << rotate
+		<< ", scale_x = " << scale_x
+		<< ", scale_y = " << scale_y
+		<< ", offset_x = " << offset_x
 		<< ", offset_y = " << offset_y
                 << ", slices = " << slices
                 << ", height = " << height
@@ -88,6 +91,8 @@ class LoftModule : public AbstractModule
 public:
 	LoftModule() { }
 	virtual AbstractNode *instantiate(const Context *ctx, const ModuleInstantiation *inst, const EvalContext *evalctx) const;
+private:
+	virtual void evaluate(Value &val, std::vector<double> &vec, EvalContext &ctx) const;
 };
 
 AbstractNode *LoftModule::instantiate(const Context *ctx, const ModuleInstantiation *inst, const EvalContext *evalctx) const
@@ -101,29 +106,46 @@ AbstractNode *LoftModule::instantiate(const Context *ctx, const ModuleInstantiat
 
         node->height = c.lookup_variable("height").toDouble();
 	node->slices = c.lookup_variable("slices").toDouble();
-	node->offset_x = c.lookup_variable("offset_x").toString();
-	node->offset_y = c.lookup_variable("offset_y").toString();
+	Value rotate = c.lookup_variable("rotate");
+	Value scale_x = c.lookup_variable("scale_x");
+	Value scale_y = c.lookup_variable("scale_y");
+	Value offset_x = c.lookup_variable("offset_x");
+	Value offset_y = c.lookup_variable("offset_y");
+	
+	node->rotate = rotate.toString();
+	node->scale_x = scale_x.toString();
+	node->scale_y = scale_y.toString();
+	node->offset_x = offset_x.toString();
+	node->offset_y = offset_y.toString();
 
 	std::vector<AbstractNode *> instantiatednodes = inst->instantiateChildren(evalctx);
 	node->children.insert(node->children.end(), instantiatednodes.begin(), instantiatednodes.end());
 
-        for (int a = 0;a <= node->slices;a++) {
+	node->max_idx = floor(node->slices);
+        for (int a = 0;a <= node->max_idx;a++) {
                 double v = (double)a / node->slices;
 		AssignmentList func_args;
 		std::string var("x");
 		func_args += Assignment(var, new Expression(Value(v)));
 		EvalContext func_context(evalctx, func_args);
-		Value val_x = func_context.evaluate_function(node->offset_x, &func_context);
-		Value val_y = func_context.evaluate_function(node->offset_y, &func_context);
-		std::cout << "x(" << v << "): " << val_x
-			<< ", y(" << v << "): " << val_y
-			<< std::endl;
-		
-		node->values_x.push_back(val_x.toDouble());
-		node->values_y.push_back(val_y.toDouble());
+		evaluate(rotate, node->values_rotate, func_context);
+		evaluate(scale_x, node->values_scale_x, func_context);
+		evaluate(scale_y, node->values_scale_y, func_context);
+		evaluate(offset_x, node->values_offset_x, func_context);
+		evaluate(offset_y, node->values_offset_y, func_context);
 	}
 	
 	return node;
+}
+
+void LoftModule::evaluate(Value &func, std::vector<double> &vec, EvalContext &ctx) const
+{
+	if (func.type() != Value::STRING) {
+		return;
+	}
+	
+	Value val = ctx.evaluate_function(func.toString(), &ctx);
+	vec.push_back(val.toDouble());
 }
 
 void register_builtin_loft()

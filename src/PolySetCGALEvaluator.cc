@@ -550,7 +550,18 @@ static void add_poly(PolySet *ps,
 	ps->append_vertex(x1, y1, z1);
 	ps->append_vertex(x2, y2, z2);
 	ps->append_vertex(x3, y3, z3);
+	ps->append_poly();
+	ps->append_vertex(x3, y3, z3);
 	ps->append_vertex(x4, y4, z4);
+	ps->append_vertex(x1, y1, z1);
+}
+
+static double x(double x1, double y1, double sx1, double ox1, double r1) {
+	return (cos(r1) * x1 - sin(r1) * y1) * sx1 + ox1;
+}
+
+static double y(double x1, double y1, double sy1, double oy1, double r1) {
+	return (sin(r1) * x1 + cos(r1) * y1) * sy1 + oy1;
 }
 
 PolySet *PolySetCGALEvaluator::evaluatePolySet(const LoftNode &node)
@@ -559,48 +570,64 @@ PolySet *PolySetCGALEvaluator::evaluatePolySet(const LoftNode &node)
 
 	double x1 = -10, x2 = 10, y1 = -10, y2 = 10;
 	
-	int max_idx = node.values_x.size() - 1;
+	int max_idx = node.max_idx;
+	double rb = node.values_rotate.empty() ? 0.0 : node.values_rotate[0];
+	double rt = node.values_rotate.empty() ? 0.0 : node.values_rotate[max_idx];
+	double sxb = node.values_scale_x.empty() ? 1.0 : node.values_scale_x[0];
+	double sxt = node.values_scale_x.empty() ? 1.0 : node.values_scale_x[max_idx];
+	double syb = node.values_scale_y.empty() ? 1.0 : node.values_scale_y[0];
+	double syt = node.values_scale_y.empty() ? 1.0 : node.values_scale_y[max_idx];
+	double oxb = node.values_offset_x.empty() ? 0.0 : node.values_offset_x[0];
+	double oxt = node.values_offset_x.empty() ? 0.0 : node.values_offset_x[max_idx];
+	double oyb = node.values_offset_y.empty() ? 0.0 : node.values_offset_y[0];
+	double oyt = node.values_offset_y.empty() ? 0.0 : node.values_offset_y[max_idx];
         add_poly(ps,
-                x2 + node.values_x[0], y1 + node.values_y[0], 0,
-                x1 + node.values_x[0], y1 + node.values_y[0], 0,
-                x1 + node.values_x[0], y2 + node.values_y[0], 0,
-                x2 + node.values_x[0], y2 + node.values_y[0], 0);
+		x(x2, y1, sxb, oxb, rb), y(x2, y1, syb, oyb, rb), 0,
+		x(x1, y1, sxb, oxb, rb), y(x1, y1, syb, oyb, rb), 0,
+		x(x1, y2, sxb, oxb, rb), y(x1, y2, syb, oyb, rb), 0,
+		x(x2, y2, sxb, oxb, rb), y(x2, y2, syb, oyb, rb), 0);
 	add_poly(ps,
-                x2 + node.values_x[max_idx], y2 + node.values_y[max_idx], node.height,
-                x1 + node.values_x[max_idx], y2 + node.values_y[max_idx], node.height,
-                x1 + node.values_x[max_idx], y1 + node.values_y[max_idx], node.height,
-                x2 + node.values_x[max_idx], y1 + node.values_y[max_idx], node.height);
+		x(x2, y2, sxt, oxt, rt), y(x2, y2, syt, oyt, rt), node.height,
+		x(x1, y2, sxt, oxt, rt), y(x1, y2, syt, oyt, rt), node.height,
+		x(x1, y1, sxt, oxt, rt), y(x1, y1, syt, oyt, rt), node.height,
+		x(x2, y1, sxt, oxt, rt), y(x2, y1, syt, oyt, rt), node.height);
 	for (int a = 1;a <= max_idx;a++) {
                 double h1 = ((a - 1) * node.height) / max_idx;
                 double h2 = (a * node.height) / max_idx;
-		double ox1 = round(node.values_x[a - 1] * 1000.0) / 1000.0;
-		double ox2 = round(node.values_x[a] * 1000.0) / 1000.0;
-		double oy1 = round(node.values_y[a - 1] * 1000.0) / 1000.0;
-		double oy2 = round(node.values_y[a] * 1000.0) / 1000.0;
+		double r1 = node.values_rotate.empty() ? 0.0 : node.values_rotate[a - 1];
+		double r2 = node.values_rotate.empty() ? 0.0 : node.values_rotate[a];
+		double sx1 = node.values_scale_x.empty() ? 1.0 : node.values_scale_x[a - 1];
+		double sx2 = node.values_scale_x.empty() ? 1.0 : node.values_scale_x[a];
+		double sy1 = node.values_scale_y.empty() ? 1.0 : node.values_scale_y[a - 1];
+		double sy2 = node.values_scale_y.empty() ? 1.0 : node.values_scale_y[a];
+		double ox1 = node.values_offset_x.empty() ? 0.0 : node.values_offset_x[a - 1];
+		double ox2 = node.values_offset_x.empty() ? 0.0 : node.values_offset_x[a];
+		double oy1 = node.values_offset_y.empty() ? 0.0 : node.values_offset_y[a - 1];
+		double oy2 = node.values_offset_y.empty() ? 0.0 : node.values_offset_y[a];
 		
                 add_poly(ps,
-                        x1 + ox1, y1 + oy1, h1,
-                        x2 + ox1, y1 + oy1, h1,
-                        x2 + ox2, y1 + oy2, h2,
-                        x1 + ox2, y1 + oy2, h2);
+			x(x1, y1, sx1, ox1, r1), y(x1, y1, sy1, oy1, r1), h1,
+			x(x2, y1, sx1, ox1, r1), y(x2, y1, sy1, oy1, r1), h1,
+			x(x2, y1, sx2, ox2, r2), y(x2, y1, sy2, oy2, r2), h2,
+			x(x1, y1, sx2, ox2, r2), y(x1, y1, sy2, oy2, r2), h2);
 
 		add_poly(ps,
-                        x2 + ox1, y1 + oy1, h1,
-                        x2 + ox1, y2 + oy1, h1,
-                        x2 + ox2, y2 + oy2, h2,
-                        x2 + ox2, y1 + oy2, h2);
+			x(x2, y1, sx1, ox1, r1), y(x2, y1, sy1, oy1, r1), h1,
+			x(x2, y2, sx1, ox1, r1), y(x2, y2, sy1, oy1, r1), h1,
+			x(x2, y2, sx2, ox2, r2), y(x2, y2, sy2, oy2, r2), h2,
+			x(x2, y1, sx2, ox2, r2), y(x2, y1, sy2, oy2, r2), h2);
 
 		add_poly(ps,
-                        x2 + ox1, y2 + oy1, h1,
-                        x1 + ox1, y2 + oy1, h1,
-                        x1 + ox2, y2 + oy2, h2,
-                        x2 + ox2, y2 + oy2, h2);
+			x(x2, y2, sx1, ox1, r1), y(x2, y2, sy1, oy1, r1), h1,
+			x(x1, y2, sx1, ox1, r1), y(x1, y2, sy1, oy1, r1), h1,
+			x(x1, y2, sx2, ox2, r2), y(x1, y2, sy2, oy2, r2), h2,
+			x(x2, y2, sx2, ox2, r2), y(x2, y2, sy2, oy2, r2), h2);
 
 		add_poly(ps,
-                        x1 + ox1, y2 + oy1, h1,
-                        x1 + ox1, y1 + oy1, h1,
-                        x1 + ox2, y1 + oy2, h2,
-                        x1 + ox2, y2 + oy2, h2);
+			x(x1, y2, sx1, ox1, r1), y(x1, y2, sy1, oy1, r1), h1,
+			x(x1, y1, sx1, ox1, r1), y(x1, y1, sy1, oy1, r1), h1,
+			x(x1, y1, sx2, ox2, r2), y(x1, y1, sy2, oy2, r2), h2,
+			x(x1, y2, sx2, ox2, r2), y(x1, y2, sy2, oy2, r2), h2);
 	}
 	
 	return ps;
