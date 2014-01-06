@@ -562,6 +562,7 @@ int main(int argc, char **argv)
 
 	setlocale(LC_ALL,"");
 	bindtextdomain("openscad","./po");
+	bind_textdomain_codeset("openscad", "UTF-8");
 	textdomain("openscad");
 
 #ifdef Q_WS_MAC
