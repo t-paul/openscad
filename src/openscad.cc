@@ -106,7 +106,7 @@ static void help(const char *progname)
   for (int i=0;i<tablen;i++) tabstr[i] = ' ';
   tabstr[tablen] = '\0';
 
-	PRINTB("Usage: %1% [ -o output_file [ -d deps_file ] ]\\\n"
+	PRINTB(_("Usage: %1% [ -o output_file [ -d deps_file ] ]\\\n"
          "%2%[ -m make_command ] [ -D var=val [..] ] \\\n"
          "%2%[ --version ] [ --info ] \\\n"
          "%2%[ --camera=translatex,y,z,rotx,y,z,dist | \\\n"
@@ -114,7 +114,7 @@ static void help(const char *progname)
          "%2%[ --imgsize=width,height ] [ --projection=(o)rtho|(p)ersp] \\\n"
          "%2%[ --render | --preview[=throwntogether] ] \\\n"
          "%2%[ --enable=<feature> ] \\\n"
-         "%2%filename\n",
+         "%2%filename\n"),
  				 progname % (const char *)tabstr);
 	exit(1);
 }
@@ -123,7 +123,7 @@ static void help(const char *progname)
 #define TOSTRING(x) STRINGIFY(x)
 static void version()
 {
-	PRINTB("OpenSCAD version %s\n", TOSTRING(OPENSCAD_VERSION));
+	PRINTB(_("OpenSCAD version %s\n"), TOSTRING(OPENSCAD_VERSION));
 	exit(1);
 }
 
@@ -559,6 +559,11 @@ int gui(const vector<string> &inputFiles, const fs::path &original_path, int arg
 int main(int argc, char **argv)
 {
 	int rc = 0;
+
+	setlocale(LC_ALL,"");
+	bindtextdomain("openscad","./po");
+	textdomain("openscad");
+
 #ifdef Q_WS_MAC
 	set_output_handler(CocoaUtils::nslog, NULL);
 #endif
@@ -575,7 +580,7 @@ int main(int argc, char **argv)
 	const char *output_file = NULL;
 	const char *deps_output_file = NULL;
 
-	po::options_description desc("Allowed options");
+	po::options_description desc(_("Allowed options"));
 	desc.add_options()
 		("help,h", "help message")
 		("version,v", "print the version")
@@ -593,7 +598,7 @@ int main(int argc, char **argv)
 		("D,D", po::value<vector<string> >(), "var=val")
 		("enable", po::value<vector<string> >(), "enable experimental features");
 
-	po::options_description hidden("Hidden options");
+	po::options_description hidden(_("Hidden options"));
 	hidden.add_options()
 		("input-file", po::value< vector<string> >(), "input file");
 
@@ -629,12 +634,12 @@ int main(int argc, char **argv)
 		output_file = vm["o"].as<string>().c_str();
 	}
 	if (vm.count("s")) {
-		PRINT("DEPRECATED: The -s option is deprecated. Use -o instead.\n");
+		PRINT(_("DEPRECATED: The -s option is deprecated. Use -o instead.\n"));
 		if (output_file) help(argv[0]);
 		output_file = vm["s"].as<string>().c_str();
 	}
 	if (vm.count("x")) { 
-		PRINT("DEPRECATED: The -x option is deprecated. Use -o instead.\n");
+		PRINT(_("DEPRECATED: The -x option is deprecated. Use -o instead.\n"));
 		if (output_file) help(argv[0]);
 		output_file = vm["x"].as<string>().c_str();
 	}
@@ -691,7 +696,7 @@ int main(int argc, char **argv)
 		rc = gui(inputFiles, original_path, argc, argv);
 	}
 	else {
-		PRINT("Requested GUI mode but can't open display!\n");
+		PRINT(_("Requested GUI mode but can't open display!\n"));
 		help(argv[0]);
 	}
 

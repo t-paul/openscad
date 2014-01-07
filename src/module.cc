@@ -295,7 +295,7 @@ bool FileModule::handleDependencies()
 		if (!newmodule) {
 			// Only print warning if we're not part of an automatic reload
 			if (!oldmodule && !wasmissing) {
-				PRINTB_NOCACHE("WARNING: Failed to compile library '%s'.", filename);
+				PRINTB_NOCACHE(_("WARNING: Failed to compile library '%s'."), filename);
 			}
 		}
 	}

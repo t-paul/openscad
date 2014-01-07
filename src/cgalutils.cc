@@ -135,7 +135,7 @@ bool createPolyhedronFromPolySet(const PolySet &ps, CGAL_Polyhedron &p)
 		p.delegate(builder);
 	}
 	catch (const CGAL::Assertion_exception &e) {
-		PRINTB("CGAL error in CGAL_Build_PolySet: %s", e.what());
+		PRINTB(_("CGAL error in CGAL_Build_PolySet: %s"), e.what());
 		err = true;
 	}
 	CGAL::set_error_behaviour(old_behaviour);

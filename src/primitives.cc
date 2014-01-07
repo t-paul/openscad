@@ -180,11 +180,11 @@ AbstractNode *PrimitiveModule::instantiate(const Context *ctx, const ModuleInsta
 	node->fa = c.lookup_variable("$fa").toDouble();
 
 	if (node->fs < F_MINIMUM) {
-		PRINTB("WARNING: $fs too small - clamping to %f", F_MINIMUM);
+		PRINTB(_("WARNING: $fs too small - clamping to %f"), F_MINIMUM);
 		node->fs = F_MINIMUM;
 	}
 	if (node->fa < F_MINIMUM) {
-		PRINTB("WARNING: $fa too small - clamping to %f", F_MINIMUM);
+		PRINTB(_("WARNING: $fa too small - clamping to %f"), F_MINIMUM);
 		node->fa = F_MINIMUM;
 	}
 
@@ -533,7 +533,7 @@ sphere_next_r2:
 		for (size_t i=0; i<this->points.toVector().size(); i++) {
 			double x,y;
 			if (!this->points.toVector()[i].getVec2(x, y)) {
-				PRINTB("ERROR: Unable to convert point at index %d to a vec2 of numbers", i);
+				PRINTB(_("ERROR: Unable to convert point at index %d to a vec2 of numbers"), i);
 				delete p;
 				return NULL;
 			}

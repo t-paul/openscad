@@ -167,13 +167,13 @@ void dxf_tesselate(PolySet *ps, DxfData &dxf, double rot, Vector2d scale, bool u
 	}
 
 	if ( duplicate_vertices > 0 ) {
-		PRINT( "WARNING: Duplicate vertices and/or intersecting lines found during DXF Tessellation." );
-		PRINT( "WARNING: Modify the polygon to be a Simple Polygon. Render is incomplete." );
+		PRINT(_("WARNING: Duplicate vertices and/or intersecting lines found during DXF Tessellation.") );
+		PRINT(_("WARNING: Modify the polygon to be a Simple Polygon. Render is incomplete.") );
 	}
 
 	}
 	catch (const CGAL::Assertion_exception &e) {
-		PRINTB("CGAL error in dxf_tesselate(): %s", e.what());
+		PRINTB(_("CGAL error in dxf_tesselate(): %s"), e.what());
 		CGAL::set_error_behaviour(old_behaviour);
 		return;
 	}
