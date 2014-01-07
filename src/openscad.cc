@@ -465,6 +465,7 @@ int cmdline(const char *deps_output_file, const std::string &filename, Camera &c
 
 #ifdef OPENSCAD_QTGUI
 #include "MainWindow.h"
+#include "qsettings.h"
   #ifdef __APPLE__
   #include "EventFilter.h"
   #endif
@@ -537,7 +538,10 @@ int gui(vector<string> &inputFiles, const fs::path &original_path, int argc, cha
 	MainWindow::setExamplesDir(qexamplesdir);
   parser_init(app_path.toLocal8Bit().constData());
 
-	localization_init();
+	QSettings settings;
+	if (settings.value("advanced/localization", false).toBool()) {
+	        localization_init();
+	}
 
 #ifdef Q_WS_MAC
 	installAppleEventHandlers();
