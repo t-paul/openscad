@@ -526,7 +526,7 @@ MainWindow::setFileName(const QString &filename)
 	}
 	else {
 		QFileInfo fileinfo(filename);
-		setWindowTitle(("OpenSCAD - ") + fileinfo.fileName() + _("[*]"));
+		setWindowTitle(_("OpenSCAD - ") + fileinfo.fileName() + _("[*]"));
 
 		// Check that the canonical file path exists - only update recent files
 		// if it does. Should prevent empty list items on initial open etc.
@@ -654,7 +654,7 @@ void MainWindow::compile(bool reload, bool forcedone)
 
 	if (this->root_module) {
 		if (this->root_module->handleDependencies()) {
-			PRINTB("Module cache size: %d modules", ModuleCache::instance()->size());
+			PRINTB(_("Module cache size: %d modules"), ModuleCache::instance()->size());
 			didcompile = true;
 		}
 	}
@@ -1000,7 +1000,7 @@ void MainWindow::actionSave()
 		QFile file(this->fileName);
 		if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text)) {
 			PRINTB(_("Failed to open file for writing: %s (%s)"), this->fileName.toLocal8Bit().constData() % file.errorString().toLocal8Bit().constData());
-			QMessageBox::warning(this, windowTitle(), tr("Failed to open file for writing:\n %1 (%2)")
+			QMessageBox::warning(this, windowTitle(), QString::fromUtf8(_("Failed to open file for writing:\n %1 (%2)"))
 					.arg(this->fileName).arg(file.errorString()));
 		}
 		else {
@@ -1029,7 +1029,7 @@ void MainWindow::actionSaveAs()
 			QFileInfo info(new_filename);
 			if (info.exists()) {
 				if (QMessageBox::warning(this, windowTitle(),
-						 tr(_("%1 already exists.\nDo you want to replace it?")).arg(info.fileName()),
+						 QString::fromUtf8(_("%1 already exists.\nDo you want to replace it?")).arg(info.fileName()),
 						 QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes) {
 					return;
 				}
@@ -1044,13 +1044,13 @@ void MainWindow::actionShowLibraryFolder()
 {
 	std::string path = PlatformUtils::libraryPath();
 	if (!fs::exists(path)) {
-		PRINTB("WARNING: Library path %s doesnt exist. Creating", path);
+		PRINTB(_("WARNING: Library path %s doesn't exist. Creating"), path);
 		if (!PlatformUtils::createLibraryPath()) {
-			PRINTB("ERROR: Cannot create library path: %s",path);
+			PRINTB(_("ERROR: Cannot create library path: %s"), path);
 		}
 	}
 	QString url = QString::fromStdString( path );
-	//PRINTB("Opening file browser for %s", url.toStdString() );
+	//PRINTB(_("Opening file browser for %s", url.toStdString() ));
 	QDesktopServices::openUrl(QUrl::fromLocalFile( url ));
 }
 
@@ -1824,13 +1824,13 @@ MainWindow::helpAbout()
 void
 MainWindow::helpHomepage()
 {
-	QDesktopServices::openUrl(QUrl("http://openscad.org/"));
+	QDesktopServices::openUrl(QUrl(_("http://openscad.org/")));
 }
 
 void
 MainWindow::helpManual()
 {
-	QDesktopServices::openUrl(QUrl("http://www.openscad.org/documentation.html"));
+	QDesktopServices::openUrl(QUrl(_("http://www.openscad.org/documentation.html")));
 }
 
 void MainWindow::helpLibrary()

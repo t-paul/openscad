@@ -177,7 +177,7 @@ AbstractNode *Module::instantiate(const Context *ctx, const ModuleInstantiation 
 {
 	ModRecursionGuard g(*inst);
 	if (g.recursion_detected()) { 
-		PRINTB("ERROR: Recursion detected calling module '%s'", inst->name());
+		PRINTB(_("ERROR: Recursion detected calling module '%s'"), inst->name());
 		return NULL;
 	}
 

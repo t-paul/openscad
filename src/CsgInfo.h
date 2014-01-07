@@ -45,28 +45,28 @@ public:
 		boost::shared_ptr<CSGTerm> root_raw_term = evaluator.evaluateCSGTerm( *root_node, this->highlight_terms, this->background_terms );
 
 		if (!root_raw_term) {
-			PRINT("Error: CSG generation failed! (no top level object found)");
+			PRINT(_("Error: CSG generation failed! (no top level object found)"));
 			call_progress_function();
 			return false;
 		}
 
-		PRINT("Compiling design (CSG Products normalization)...");
+		PRINT(_("Compiling design (CSG Products normalization)..."));
 		call_progress_function();
 		CSGTermNormalizer normalizer( normalizelimit );
 		this->root_norm_term = normalizer.normalize(root_raw_term);
 		if (this->root_norm_term) {
 			this->root_chain = new CSGChain();
 			this->root_chain->import(this->root_norm_term);
-			PRINTB("Normalized CSG tree has %d elements", int(this->root_chain->objects.size()));
+			PRINTB(_("Normalized CSG tree has %d elements"), int(this->root_chain->objects.size()));
 		}
 		else {
 			this->root_chain = NULL;
-			PRINT("WARNING: CSG normalization resulted in an empty tree");
+			PRINT(_("WARNING: CSG normalization resulted in an empty tree"));
 			call_progress_function();
 		}
 
 		if (this->highlight_terms.size() > 0) {
-			PRINTB("Compiling highlights (%i CSG Trees)...", this->highlight_terms.size() );
+			PRINTB(_("Compiling highlights (%i CSG Trees)..."), this->highlight_terms.size() );
 			call_progress_function();
 			this->highlights_chain = new CSGChain();
 			for (unsigned int i = 0; i < this->highlight_terms.size(); i++) {
@@ -76,7 +76,7 @@ public:
 		}
 
 		if (this->background_terms.size() > 0) {
-			PRINTB("Compiling background (%i CSG Trees)...", this->background_terms.size());
+			PRINTB(_("Compiling background (%i CSG Trees)..."), this->background_terms.size());
 			call_progress_function();
 			this->background_chain = new CSGChain();
 			for (unsigned int i = 0; i < this->background_terms.size(); i++) {

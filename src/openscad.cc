@@ -135,7 +135,7 @@ static void info()
 	try {
 		csgInfo.glview = new OffscreenView(512,512);
 	} catch (int error) {
-		PRINTB("Can't create OpenGL OffscreenView. Code: %i. Exiting.\n", error);
+		PRINTB(_("Can't create OpenGL OffscreenView. Code: %i. Exiting.\n"), error);
 		exit(1);
 	}
 
@@ -157,8 +157,8 @@ Camera get_camera( po::variables_map vm )
 				cam_parameters.push_back(lexical_cast<double>(s));
 			camera.setup( cam_parameters );
 		} else {
-			PRINT("Camera setup requires either 7 numbers for Gimbal Camera\n");
-			PRINT("or 6 numbers for Vector Camera\n");
+			PRINT(_("Camera setup requires either 7 numbers for Gimbal Camera\n"));
+			PRINT(_("or 6 numbers for Vector Camera\n"));
 			exit(1);
 		}
 	}
@@ -174,7 +174,7 @@ Camera get_camera( po::variables_map vm )
 		else if (proj=="p" || proj=="perspective")
 			camera.projection = Camera::PERSPECTIVE;
 		else {
-			PRINT("projection needs to be 'o' or 'p' for ortho or perspective\n");
+			PRINT(_("projection needs to be 'o' or 'p' for ortho or perspective\n"));
 			exit(1);
 		}
 	}
@@ -185,7 +185,7 @@ Camera get_camera( po::variables_map vm )
 		vector<string> strs;
 		split(strs, vm["imgsize"].as<string>(), is_any_of(","));
 		if ( strs.size() != 2 ) {
-			PRINT("Need 2 numbers for imgsize\n");
+			PRINT(_("Need 2 numbers for imgsize\n"));
 			exit(1);
 		} else {
 			w = lexical_cast<int>( strs[0] );
@@ -233,7 +233,7 @@ int cmdline(const char *deps_output_file, const std::string &filename, Camera &c
 	else if (suffix == ".term") term_output_file = output_file;
 	else if (suffix == ".echo") echo_output_file = output_file;
 	else {
-		PRINTB("Unknown suffix for output file %s\n", output_file);
+		PRINTB(_("Unknown suffix for output file %s\n"), output_file);
 		return 1;
 	}
 
@@ -257,7 +257,7 @@ int cmdline(const char *deps_output_file, const std::string &filename, Camera &c
 
 	std::ifstream ifs(filename.c_str());
 	if (!ifs.is_open()) {
-		PRINTB("Can't open input file '%s'!\n", filename.c_str());
+		PRINTB(_("Can't open input file '%s'!\n"), filename.c_str());
 		return 1;
 	}
 	std::string text((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
@@ -266,7 +266,7 @@ int cmdline(const char *deps_output_file, const std::string &filename, Camera &c
 	std::string parentpath = boosty::stringy(abspath.parent_path());
 	root_module = parse(text.c_str(), parentpath.c_str(), false);
 	if (!root_module) {
-		PRINTB("Can't parse file '%s'!\n", filename.c_str());
+		PRINTB(_("Can't parse file '%s'!\n"), filename.c_str());
 		return 1;
 	}
 	root_module->handleDependencies();
@@ -289,7 +289,7 @@ int cmdline(const char *deps_output_file, const std::string &filename, Camera &c
 		fs::current_path(original_path);
 		std::ofstream fstream(csg_output_file);
 		if (!fstream.is_open()) {
-			PRINTB("Can't open file \"%s\" for export", csg_output_file);
+			PRINTB(_("Can't open file \"%s\" for export"), csg_output_file);
 		}
 		else {
 			fs::current_path(fparent); // Force exported filenames to be relative to document path
@@ -301,7 +301,7 @@ int cmdline(const char *deps_output_file, const std::string &filename, Camera &c
 		fs::current_path(original_path);
 		std::ofstream fstream(ast_output_file);
 		if (!fstream.is_open()) {
-			PRINTB("Can't open file \"%s\" for export", ast_output_file);
+			PRINTB(_("Can't open file \"%s\" for export"), ast_output_file);
 		}
 		else {
 			fs::current_path(fparent); // Force exported filenames to be relative to document path
@@ -319,7 +319,7 @@ int cmdline(const char *deps_output_file, const std::string &filename, Camera &c
 		fs::current_path(original_path);
 		std::ofstream fstream(term_output_file);
 		if (!fstream.is_open()) {
-			PRINTB("Can't open file \"%s\" for export", term_output_file);
+			PRINTB(_("Can't open file \"%s\" for export"), term_output_file);
 		}
 		else {
 			if (!root_raw_term)
@@ -348,29 +348,29 @@ int cmdline(const char *deps_output_file, const std::string &filename, Camera &c
 			else if ( dxf_output_file ) geom_out = std::string(dxf_output_file);
 			else if ( png_output_file ) geom_out = std::string(png_output_file);
 			else {
-				PRINTB("Output file:%s\n",output_file);
-				PRINT("Sorry, don't know how to write deps for that file type. Exiting\n");
+				PRINTB(_("Output file:%s\n"), output_file);
+				PRINT(_("Sorry, don't know how to write deps for that file type. Exiting\n"));
 				return 1;
 			}
 			int result = write_deps( deps_out, geom_out );
 			if ( !result ) {
-				PRINT("error writing deps");
+				PRINT(_("error writing deps"));
 				return 1;
 			}
 		}
 
 		if (stl_output_file) {
 			if (root_N.dim != 3) {
-				PRINT("Current top level object is not a 3D object.\n");
+				PRINT(_("Current top level object is not a 3D object.\n"));
 				return 1;
 			}
 			if (!root_N.p3->is_simple()) {
-				PRINT("Object isn't a valid 2-manifold! Modify your design.\n");
+				PRINT(_("Object isn't a valid 2-manifold! Modify your design.\n"));
 				return 1;
 			}
 			std::ofstream fstream(stl_output_file);
 			if (!fstream.is_open()) {
-				PRINTB("Can't open file \"%s\" for export", stl_output_file);
+				PRINTB(_("Can't open file \"%s\" for export"), stl_output_file);
 			}
 			else {
 				export_stl(&root_N, fstream);
@@ -380,16 +380,16 @@ int cmdline(const char *deps_output_file, const std::string &filename, Camera &c
 
 		if (off_output_file) {
 			if (root_N.dim != 3) {
-				PRINT("Current top level object is not a 3D object.\n");
+				PRINT(_("Current top level object is not a 3D object.\n"));
 				return 1;
 			}
 			if (!root_N.p3->is_simple()) {
-				PRINT("Object isn't a valid 2-manifold! Modify your design.\n");
+				PRINT(_("Object isn't a valid 2-manifold! Modify your design.\n"));
 				return 1;
 			}
 			std::ofstream fstream(off_output_file);
 			if (!fstream.is_open()) {
-				PRINTB("Can't open file \"%s\" for export", off_output_file);
+				PRINTB(_("Can't open file \"%s\" for export"), off_output_file);
 			}
 			else {
 				export_off(&root_N, fstream);
@@ -399,12 +399,12 @@ int cmdline(const char *deps_output_file, const std::string &filename, Camera &c
 
 		if (dxf_output_file) {
 			if (root_N.dim != 2) {
-				PRINT("Current top level object is not a 2D object.\n");
+				PRINT(_("Current top level object is not a 2D object.\n"));
 				return 1;
 			}
 			std::ofstream fstream(dxf_output_file);
 			if (!fstream.is_open()) {
-				PRINTB("Can't open file \"%s\" for export", dxf_output_file);
+				PRINTB(_("Can't open file \"%s\" for export"), dxf_output_file);
 			}
 			else {
 				export_dxf(&root_N, fstream);
@@ -415,7 +415,7 @@ int cmdline(const char *deps_output_file, const std::string &filename, Camera &c
 		if (png_output_file) {
 			std::ofstream fstream(png_output_file,std::ios::out|std::ios::binary);
 			if (!fstream.is_open()) {
-				PRINTB("Can't open file \"%s\" for export", png_output_file);
+				PRINTB(_("Can't open file \"%s\" for export"), png_output_file);
 			}
 			else {
 				if (renderer==Render::CGAL) {
@@ -582,25 +582,25 @@ int main(int argc, char **argv)
 
 	po::options_description desc(_("Allowed options"));
 	desc.add_options()
-		("help,h", "help message")
-		("version,v", "print the version")
-		("info", "print information about the building process")
-		("render", "if exporting a png image, do a full CGAL render")
-		("preview", po::value<string>(), "if exporting a png image, do an OpenCSG(default) or ThrownTogether preview")
-		("camera", po::value<string>(), "parameters for camera when exporting png")
-	        ("imgsize", po::value<string>(), "=width,height for exporting png")
-		("projection", po::value<string>(), "(o)rtho or (p)erspective when exporting png")
-		("o,o", po::value<string>(), "out-file")
-		("s,s", po::value<string>(), "stl-file")
-		("x,x", po::value<string>(), "dxf-file")
-		("d,d", po::value<string>(), "deps-file")
-		("m,m", po::value<string>(), "makefile")
-		("D,D", po::value<vector<string> >(), "var=val")
-		("enable", po::value<vector<string> >(), "enable experimental features");
+		("help,h", _("help message"))
+		("version,v", _("print the version"))
+		("info", _("print information about the building process"))
+		("render", _("if exporting a png image, do a full CGAL render"))
+		("preview", po::value<string>(), _("if exporting a png image, do an OpenCSG(default) or ThrownTogether preview"))
+		("camera", po::value<string>(), _("parameters for camera when exporting png"))
+	        ("imgsize", po::value<string>(), _("=width,height for exporting png"))
+		("projection", po::value<string>(), _("(o)rtho or (p)erspective when exporting png"))
+		("o,o", po::value<string>(), _("out-file"))
+		("s,s", po::value<string>(), _("stl-file"))
+		("x,x", po::value<string>(), _("dxf-file"))
+		("d,d", po::value<string>(), _("deps-file"))
+		("m,m", po::value<string>(), _("makefile"))
+		("D,D", po::value<vector<string> >(), _("var=val"))
+		("enable", po::value<vector<string> >(), _("enable experimental features"));
 
 	po::options_description hidden(_("Hidden options"));
 	hidden.add_options()
-		("input-file", po::value< vector<string> >(), "input file");
+		("input-file", po::value< vector<string> >(), _("input file"));
 
 	po::positional_options_description p;
 	p.add("input-file", -1);

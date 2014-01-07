@@ -104,7 +104,7 @@ void CGAL_Nef_polyhedron::transform( const Transform3d &matrix )
 			Eigen::Matrix2f testmat;
 			testmat << matrix(0,0), matrix(0,1), matrix(1,0), matrix(1,1);
 			if (testmat.determinant() == 0) {
-				PRINT("Warning: Scaling a 2D object with 0 - removing object");
+				PRINT(_("Warning: Scaling a 2D object with 0 - removing object"));
 				this->reset();
 				return;
 			}
@@ -134,7 +134,7 @@ void CGAL_Nef_polyhedron::transform( const Transform3d &matrix )
 		}
 		else if (this->dim == 3) {
 			if (matrix.matrix().determinant() == 0) {
-				PRINT("Warning: Scaling a 3D object with 0 - removing object");
+				PRINT(_("Warning: Scaling a 3D object with 0 - removing object"));
 				this->reset();
 			}
 			else {

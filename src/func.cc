@@ -588,11 +588,11 @@ Value builtin_parent_module(const Context *, const EvalContext *evalctx)
 			return Value();
 	n=trunc(d);
 	if (n < 0) {
-		PRINTB("WARNING: Negative parent module index (%d) not allowed", n);
+		PRINTB(_("WARNING: Negative parent module index (%d) not allowed"), n);
 		return Value();
 	}
 	if (n >= s) {
-		PRINTB("WARNING: Parent module index (%d) greater than the number of modules on the stack", n);
+		PRINTB(_("WARNING: Parent module index (%d) greater than the number of modules on the stack"), n);
 		return Value();
 	}
 	return Value(Module::stack_element(s - 1 - n));

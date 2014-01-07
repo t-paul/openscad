@@ -13,10 +13,10 @@ bool PlatformUtils::createLibraryPath()
 			OK = fs::create_directories( path );
 		}
 		if (!OK) {
-			PRINTB("ERROR: Cannot create %s", path );
+			PRINTB(_("ERROR: Cannot create %s"), path );
 		}
 	} catch (const fs::filesystem_error& ex) {
-		PRINTB("ERROR: %s",ex.what());
+		PRINTB(_("ERROR: %s"), ex.what());
 	}
 	return OK;
 }

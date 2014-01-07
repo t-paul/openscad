@@ -169,7 +169,7 @@ CGAL_Nef_polyhedron CGALEvaluator::applyHull(const CgaladvNode &node)
 					errmsg = std::string(e.what());
 				}
 				if (err) {
-					PRINTB("ERROR: CGAL NefPolyhedron->Polyhedron conversion failed. %s", errmsg);
+					PRINTB(_("ERROR: CGAL NefPolyhedron->Polyhedron conversion failed. %s"), errmsg);
 				} else {
 					std::transform(P.vertices_begin(), P.vertices_end(), std::back_inserter(points3d), 
 										 boost::bind(static_cast<const CGAL_Polyhedron::Vertex::Point_3&(CGAL_Polyhedron::Vertex::*)() const>(&CGAL_Polyhedron::Vertex::point), _1));
@@ -204,7 +204,7 @@ CGAL_Nef_polyhedron CGALEvaluator::applyResize(const CgaladvNode &node)
 
 	for (int i=0;i<3;i++) {
 		if (node.newsize[i]<0) {
-			PRINT("WARNING: Cannot resize to sizes less than 0.");
+			PRINT(_("WARNING: Cannot resize to sizes less than 0."));
 			return N;
 		}
 	}
@@ -231,7 +231,7 @@ CGAL_Nef_polyhedron CGALEvaluator::applyResize(const CgaladvNode &node)
 	for (int i=0;i<N.dim;i++) {
 		if (node.newsize[i]) {
 			if (bbox_size[i]==NT3(0)) {
-				PRINT("WARNING: Resize in direction normal to flat object is not implemented");
+				PRINT(_("WARNING: Resize in direction normal to flat object is not implemented"));
 				return N;
 			}
 			else {
@@ -690,11 +690,11 @@ CGAL_Nef_polyhedron CGALEvaluator::evaluateCGALMesh(const PolySet &ps)
 		catch (const CGAL::Assertion_exception &e) {
 			if (std::string(e.what()).find("Plane_constructor")!=std::string::npos) {
 				if (std::string(e.what()).find("has_on")!=std::string::npos) {
-					PRINT("PolySet has nonplanar faces. Attempting alternate construction");
+					PRINT(_("PolySet has nonplanar faces. Attempting alternate construction"));
 					plane_error=true;
 				}
 			} else {
-				PRINTB("CGAL error in CGAL_Nef_polyhedron3(): %s", e.what());
+				PRINTB(_("CGAL error in CGAL_Nef_polyhedron3(): %s"), e.what());
 			}
 		}
 		if (plane_error) try {

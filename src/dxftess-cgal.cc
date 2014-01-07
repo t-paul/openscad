@@ -472,7 +472,7 @@ bool triangulate_polygon( const PolySet::Polygon &pgon, std::vector<PolySet::Pol
 		}
 	}
 	} catch (const CGAL::Failure_exception &e) {
-		PRINTB("CGAL error in dxftess triangulate_polygon: %s", e.what());
+		PRINTB(_("CGAL error in dxftess triangulate_polygon: %s"), e.what());
 		err = true;
 	}
 	CGAL::set_error_behaviour(old_behaviour);
@@ -488,12 +488,12 @@ void tessellate_3d_faces( const PolySet &inps, PolySet &outps ) {
         for (size_t i = 0; i < inps.polygons.size(); i++) {
 		const PolySet::Polygon pgon = inps.polygons[i];
 		if (pgon.size()<3) {
-			PRINT("WARNING: PolySet has polygon with <3 points");
+			PRINT(_("WARNING: PolySet has polygon with <3 points"));
 			continue;
 		}
 		projection_t goodproj = find_good_projection( pgon );
 		if (goodproj==NONE) {
-			PRINT("WARNING: PolySet has degenerate polygon");
+			PRINT(_("WARNING: PolySet has degenerate polygon"));
 			continue;
 		}
 		std::vector<PolySet::Polygon> triangles;

@@ -80,7 +80,7 @@ void ControlModule::for_eval(AbstractNode &node, const ModuleInstantiation &inst
 			Value::RangeType range = it_values.toRange();
                         uint32_t steps = range.nbsteps();
                         if (steps >= 10000) {
-                                PRINTB("WARNING: Bad range parameter in for statement: too many elements (%lu).", steps);
+                                PRINTB(_("WARNING: Bad range parameter in for statement: too many elements (%lu)."), steps);
                         } else {
                             for (Value::RangeType::iterator it = range.begin();it != range.end();it++) {
                                 c.set_variable(it_name, Value(*it));
@@ -130,24 +130,24 @@ AbstractNode* ControlModule::getChild(const Value& value, const EvalContext* mod
 	if (value.type()!=Value::NUMBER) {
 		// Invalid parameter
 		// (e.g. first child of difference is invalid)
-		PRINTB("WARNING: Bad parameter type (%s) for children, only accept: empty, number, vector, range.", value.toString());
+		PRINTB(_("WARNING: Bad parameter type (%s) for children, only accept: empty, number, vector, range."), value.toString());
 		return NULL;
 	}
 	double v;
 	if (!value.getDouble(v)) {
-		PRINTB("WARNING: Bad parameter type (%s) for children, only accept: empty, number, vector, range.", value.toString());
+		PRINTB(_("WARNING: Bad parameter type (%s) for children, only accept: empty, number, vector, range."), value.toString());
 		return NULL;
 	}
 		
 	int n = trunc(v);
 	if (n < 0) {
-		PRINTB("WARNING: Negative children index (%d) not allowed", n);
+		PRINTB(_("WARNING: Negative children index (%d) not allowed"), n);
 		return NULL; // Disallow negative child indices
 	}
 	if (n>=(int)modulectx->numChildren()) {
 		// How to deal with negative objects in this case?
 		// (e.g. first child of difference is invalid)
-		PRINTB("WARNING: Children index (%d) out of bounds (%d children)"
+		PRINTB(_("WARNING: Children index (%d) out of bounds (%d children)")
 			, n % modulectx->numChildren());
 		return NULL;
 	}
@@ -167,7 +167,7 @@ AbstractNode *ControlModule::instantiate(const Context* /*ctx*/, const ModuleIns
 			if (evalctx->getArgValue(0).getDouble(v)) {
 				n = trunc(v);
 				if (n < 0) {
-					PRINTB("WARNING: Negative child index (%d) not allowed", n);
+					PRINTB(_("WARNING: Negative child index (%d) not allowed"), n);
 					return NULL; // Disallow negative child indices
 				}
 			}
@@ -186,7 +186,7 @@ AbstractNode *ControlModule::instantiate(const Context* /*ctx*/, const ModuleIns
 		else {
 			// How to deal with negative objects in this case?
             // (e.g. first child of difference is invalid)
-			PRINTB("WARNING: Child index (%d) out of bounds (%d children)", 
+			PRINTB(_("WARNING: Child index (%d) out of bounds (%d children)"), 
 				   n % modulectx->numChildren());
 		}
 		return node;
@@ -231,7 +231,7 @@ AbstractNode *ControlModule::instantiate(const Context* /*ctx*/, const ModuleIns
 				Value::RangeType range = value.toRange();
                                 uint32_t steps = range.nbsteps();
 				if (steps >= 10000) {
-					PRINTB("WARNING: Bad range parameter for children: too many elements (%lu).", steps);
+					PRINTB(_("WARNING: Bad range parameter for children: too many elements (%lu)."), steps);
 					return NULL;
 				}
                                 for (Value::RangeType::iterator it = range.begin();it != range.end();it++) {
@@ -244,7 +244,7 @@ AbstractNode *ControlModule::instantiate(const Context* /*ctx*/, const ModuleIns
 			else {
 				// Invalid parameter
 				// (e.g. first child of difference is invalid)
-				PRINTB("WARNING: Bad parameter type (%s) for children, only accept: empty, number, vector, range.", value.toString());
+				PRINTB(_("WARNING: Bad parameter type (%s) for children, only accept: empty, number, vector, range."), value.toString());
 				return NULL;
 			}
 		}

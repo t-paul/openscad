@@ -153,21 +153,21 @@ std::string Context::getAbsolutePath(const std::string &filename) const
 void Context::dump(const AbstractModule *mod, const ModuleInstantiation *inst)
 {
 	if (inst) 
-		PRINTB("ModuleContext %p (%p) for %s inst (%p)", this % this->parent % inst->name() % inst);
+		PRINTB(_("ModuleContext %p (%p) for %s inst (%p)"), this % this->parent % inst->name() % inst);
 	else 
-		PRINTB("Context: %p (%p)", this % this->parent);
-	PRINTB("  document path: %s", this->document_path);
+		PRINTB(_("Context: %p (%p)"), this % this->parent);
+	PRINTB(_("  document path: %s"), this->document_path);
 	if (mod) {
 		const Module *m = dynamic_cast<const Module*>(mod);
 		if (m) {
-			PRINT("  module args:");
+			PRINT(_("  module args:"));
 			BOOST_FOREACH(const Assignment &arg, m->definition_arguments) {
 				PRINTB("    %s = %s", arg.first % variables[arg.first]);
 			}
 		}
 	}
 	typedef std::pair<std::string, Value> ValueMapType;
-	PRINT("  vars:");
+	PRINT(_("  vars:"));
   BOOST_FOREACH(const ValueMapType &v, constants) {
 	  PRINTB("    %s = %s", v.first % v.second);
 	}		

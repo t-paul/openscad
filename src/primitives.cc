@@ -127,7 +127,7 @@ Value PrimitiveModule::lookup_radius(const Context &ctx, const std::string &diam
 	
 	if (d.type() == Value::NUMBER) {
 		if (r_defined) {
-			PRINTB("WARNING: Ignoring radius variable '%s' as diameter '%s' is defined too.", radius_var % diameter_var);
+			PRINTB(_("WARNING: Ignoring radius variable '%s' as diameter '%s' is defined too."), radius_var % diameter_var);
 		}
 		return Value(d.toDouble() / 2.0);
 	} else if (r_defined) {
@@ -241,7 +241,7 @@ AbstractNode *PrimitiveModule::instantiate(const Context *ctx, const ModuleInsta
 			// backwards compatable
 			node->faces = c.lookup_variable("triangles");
 			if (node->faces.type() != Value::UNDEFINED) {
-				PRINT("DEPRECATED: polyhedron(triangles=[]) will be removed in future releases. Use polyhedron(faces=[]) instead.");
+				PRINT(_("DEPRECATED: polyhedron(triangles=[]) will be removed in future releases. Use polyhedron(faces=[]) instead."));
 			}
 		}
 	}

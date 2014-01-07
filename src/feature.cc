@@ -18,7 +18,7 @@ Feature::list_t Feature::feature_list;
  * argument to enable the option and for saving the option value in GUI
  * context.
  */
-const Feature Feature::ExperimentalConcatFunction("concat", "Enable the <code>concat()</code> function.");
+const Feature Feature::ExperimentalConcatFunction("concat", _("Enable the <code>concat()</code> function."));
 
 Feature::Feature(const std::string &name, const std::string &description)
 	: enabled(false), name(name), description(description)
@@ -57,7 +57,7 @@ void Feature::enable_feature(const std::string &feature_name, bool status)
 	if (it != feature_map.end()) {
 		it->second->enable(status);
 	} else {
-		PRINTB("WARNING: Ignoring request to enable unknown feature '%s'.", feature_name);
+		PRINTB(_("WARNING: Ignoring request to enable unknown feature '%s'."), feature_name);
 	}
 }
 

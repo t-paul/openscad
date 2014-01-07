@@ -463,7 +463,7 @@ PolySet *PolySetCGALEvaluator::rotateDxfData(const RotateExtrudeNode &node, DxfD
 			max_x = fmax(max_x, point_x);
 
 			if ((max_x - min_x) > max_x && (max_x - min_x) > fabs(min_x)) {
-				PRINTB("ERROR: all points for rotate_extrude() must have the same X coordinate sign (range is %.2f -> %.2f)", min_x % max_x);
+				PRINTB(_("ERROR: all points for rotate_extrude() must have the same X coordinate sign (range is %.2f -> %.2f)"), min_x % max_x);
 				delete ps;
 				return NULL;
 			}

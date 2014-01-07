@@ -95,7 +95,7 @@ AbstractNode *ImportModule::instantiate(const Context *ctx, const ModuleInstanti
 	if (v.isUndefined()) {
 		v = c.lookup_variable("filename");
 		if (!v.isUndefined()) {
-			PRINT("DEPRECATED: filename= is deprecated. Please use file=");
+			PRINT(_("DEPRECATED: filename= is deprecated. Please use file="));
 		}
 	}
 	std::string filename = lookup_file(v.isUndefined() ? "" : v.toString(), inst->path(), ctx->documentPath());
@@ -119,7 +119,7 @@ AbstractNode *ImportModule::instantiate(const Context *ctx, const ModuleInstanti
 	if (layerval.isUndefined()) {
 		layerval = c.lookup_variable("layername");
 		if (!layerval.isUndefined()) {
-			PRINT("DEPRECATED: layername= is deprecated. Please use layer=");
+			PRINT(_("DEPRECATED: layername= is deprecated. Please use layer="));
 		}
 	}
 	node->layername = layerval.isUndefined() ? ""  : layerval.toString();
@@ -278,7 +278,7 @@ PolySet *ImportNode::evaluate_polyset(class PolySetEvaluator *) const
 		CGAL_Polyhedron poly;
 		std::ifstream file(this->filename.c_str(), std::ios::in | std::ios::binary);
 		if (!file.good()) {
-			PRINTB("WARNING: Can't open import file '%s'.", this->filename);
+			PRINTB(_("WARNING: Can't open import file '%s'."), this->filename);
 		}
 		else {
 			file >> poly;
