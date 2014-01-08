@@ -27,7 +27,6 @@ Some actions (showCrossHairs) only work properly on Gimbal Camera.
 #include <iostream>
 #include "renderer.h"
 #include "Camera.h"
-#include "qtgettext.h"
 
 class GLView
 {

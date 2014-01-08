@@ -22,6 +22,9 @@ fs::path get_resource_dir(const std::string &resource_folder)
 	}
 
 	fs::path basepath(applicationdir);
+#ifdef OPENSCAD_TESTING
+	basepath = "..";
+#endif
 #ifdef __APPLE__
         fs::path bundlepath = basepath.parent_path().parent_path();
         if (bundlepath.filename().string() == "OpenSCAD.app") {
@@ -128,7 +131,9 @@ void parser_init(const std::string &applicationpath)
 	}
 
 	// This is the built-in user-writable library path
-#ifndef OPENSCAD_TESTING
+#ifdef OPENSCAD_TESTING
+	add_librarydir(boosty::stringy(fs::path(applicationpath) / "../libraries"));
+#else
   // This will resolve to ~/Documents on Mac, "My Documents" on Windows and
   // ~/.local/share on Linux
 	fs::path docdir(PlatformUtils::documentsPath());
