@@ -144,6 +144,23 @@ static void info()
 	exit(0);
 }
 
+/**
+ * Initialize gettext. This must be called after the appliation path was
+ * determined so we can lookup the resource path for the language translation
+ * files.
+ */
+void localization_init() {
+	fs::path po_dir = get_resource_dir("po");
+	if (fs::is_directory(po_dir)) {
+		setlocale(LC_ALL,"");
+		bindtextdomain("openscad", po_dir.string().c_str());
+		bind_textdomain_codeset("openscad", "UTF-8");
+		textdomain("openscad");
+	} else {
+		PRINT("Could not initialize localization.");
+	}
+}
+
 Camera get_camera( po::variables_map vm )
 {
 	Camera camera;
@@ -207,6 +224,8 @@ int cmdline(const char *deps_output_file, const std::string &filename, Camera &c
 	const std::string application_path = boosty::stringy(boosty::absolute(boost::filesystem::path(argv[0]).parent_path()));
 #endif
 	parser_init(application_path);
+	localization_init();
+
 	Tree tree;
 #ifdef ENABLE_CGAL
 	CGALEvaluator cgalevaluator(tree);
@@ -518,6 +537,8 @@ int gui(vector<string> &inputFiles, const fs::path &original_path, int argc, cha
 	MainWindow::setExamplesDir(qexamplesdir);
   parser_init(app_path.toLocal8Bit().constData());
 
+	localization_init();
+
 #ifdef Q_WS_MAC
 	installAppleEventHandlers();
 #endif
@@ -559,11 +580,6 @@ int gui(const vector<string> &inputFiles, const fs::path &original_path, int arg
 int main(int argc, char **argv)
 {
 	int rc = 0;
-
-	setlocale(LC_ALL,"");
-	bindtextdomain("openscad","./po");
-	bind_textdomain_codeset("openscad", "UTF-8");
-	textdomain("openscad");
 
 #ifdef Q_WS_MAC
 	set_output_handler(CocoaUtils::nslog, NULL);
