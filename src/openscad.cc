@@ -515,28 +515,10 @@ int gui(vector<string> &inputFiles, const fs::path &original_path, int argc, cha
 	QCoreApplication::setApplicationVersion(TOSTRING(OPENSCAD_VERSION));
 	
 	const QString &app_path = app.applicationDirPath();
+	parser_init(app_path.toLocal8Bit().constData());
 
-	QDir exdir(app_path);
-	QString qexamplesdir;
-#ifdef Q_WS_MAC
-	exdir.cd("../Resources"); // Examples can be bundled
-	if (!exdir.exists("examples")) exdir.cd("../../..");
-#elif defined(Q_OS_UNIX)
-	if (exdir.cd("../share/openscad/examples")) {
-		qexamplesdir = exdir.path();
-	} else
-		if (exdir.cd("../../share/openscad/examples")) {
-			qexamplesdir = exdir.path();
-		} else
-			if (exdir.cd("../../examples")) {
-				qexamplesdir = exdir.path();
-			} else
-#endif
-				if (exdir.cd("examples")) {
-					qexamplesdir = exdir.path();
-				}
-	MainWindow::setExamplesDir(qexamplesdir);
-  parser_init(app_path.toLocal8Bit().constData());
+	fs::path examplePath = get_resource_dir("examples");
+	MainWindow::setExamplesDir(QString::fromStdString(examplePath.string()));
 
 	QSettings settings;
 	if (settings.value("advanced/localization", false).toBool()) {
