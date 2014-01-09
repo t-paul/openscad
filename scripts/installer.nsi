@@ -12,7 +12,7 @@ File openscad.exe
 File openscad.com
 File /r /x mingw-cross-env examples
 File /r /x mingw-cross-env libraries
-File /r /x mingw-cross-env po
+File /r /x mingw-cross-env locale
 ${registerExtension} "$INSTDIR\openscad.exe" ".scad" "OpenSCAD_File"
 CreateShortCut $SMPROGRAMS\OpenSCAD.lnk $INSTDIR\openscad.exe
 WriteUninstaller $INSTDIR\Uninstall.exe
@@ -28,7 +28,7 @@ Delete $SMPROGRAMS\OpenSCAD.lnk
 DeleteRegKey HKEY_LOCAL_MACHINE "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\OpenSCAD"
 RMDir /r $INSTDIR\examples
 RMDir /r $INSTDIR\libraries\mcad
-RMDir /r $INSTDIR\po
+RMDir /r $INSTDIR\locale
 Delete $INSTDIR\libraries\boxes.scad
 Delete $INSTDIR\libraries\shapes.scad
 RMDir $INSTDIR\libraries
