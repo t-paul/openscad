@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OpenSCAD 2014.01.05\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-01-09 18:17+0100\n"
+"POT-Creation-Date: 2014-01-09 18:45+0400\n"
 "PO-Revision-Date: 2013-02-24 17:50+0100\n"
 "Last-Translator:  <hugh.m.bright@gmail.com>\n"
 "Language-Team: Russian\n"
@@ -20,6 +20,44 @@ msgstr ""
 
 #: objects/ui_AboutDialog.h:51
 msgid "About OpenSCAD"
+msgstr "О программе OpenSCAD"
+
+#: objects/ui_OpenCSGWarningDialog.h:86
+msgid "OpenGL Warning"
+msgstr ""
+
+#: objects/ui_OpenCSGWarningDialog.h:87
+msgid ""
+"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/"
+"REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css"
+"\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"</style></head><body style=\" font-family:'Lucida Grande'; font-size:13pt; "
+"font-weight:400; font-style:normal;\">\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; "
+"margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"></"
+"p></body></html>"
+msgstr ""
+
+#: objects/ui_OpenCSGWarningDialog.h:92
+msgid "Enable OpenCSG"
+msgstr ""
+
+#: objects/ui_OpenCSGWarningDialog.h:93
+msgid "Show this message again"
+msgstr ""
+
+#: objects/ui_OpenCSGWarningDialog.h:94 objects/ui_MainWindow.h:558
+msgid "Close"
+msgstr "Закрыть"
+
+#: objects/ui_ProgressWidget.h:72
+msgid "Form"
+msgstr ""
+
+#: objects/ui_ProgressWidget.h:73
+msgid "%v / %m"
 msgstr ""
 
 #: objects/ui_MainWindow.h:470
@@ -60,7 +98,7 @@ msgstr ""
 
 #: objects/ui_MainWindow.h:479
 msgid "&Reload"
-msgstr ""
+msgstr "&Обновить"
 
 #: objects/ui_MainWindow.h:480
 msgid "Ctrl+R"
@@ -84,7 +122,7 @@ msgstr ""
 
 #: objects/ui_MainWindow.h:485
 msgid "&Redo"
-msgstr ""
+msgstr "&Повторить"
 
 #: objects/ui_MainWindow.h:486
 msgid "Ctrl+Shift+Z"
@@ -92,7 +130,7 @@ msgstr ""
 
 #: objects/ui_MainWindow.h:487
 msgid "Cu&t"
-msgstr ""
+msgstr "Вы&резать"
 
 #: objects/ui_MainWindow.h:488
 msgid "Ctrl+X"
@@ -100,7 +138,7 @@ msgstr ""
 
 #: objects/ui_MainWindow.h:489
 msgid "&Copy"
-msgstr ""
+msgstr "&Копировать"
 
 #: objects/ui_MainWindow.h:490
 msgid "Ctrl+C"
@@ -108,7 +146,7 @@ msgstr ""
 
 #: objects/ui_MainWindow.h:491
 msgid "&Paste"
-msgstr ""
+msgstr "&Вставить"
 
 #: objects/ui_MainWindow.h:492
 msgid "Ctrl+V"
@@ -116,7 +154,7 @@ msgstr ""
 
 #: objects/ui_MainWindow.h:493
 msgid "&Indent"
-msgstr ""
+msgstr "&Добавить отступ"
 
 #: objects/ui_MainWindow.h:494
 msgid "Ctrl+I"
@@ -124,7 +162,7 @@ msgstr ""
 
 #: objects/ui_MainWindow.h:495
 msgid "U&nindent"
-msgstr ""
+msgstr "У&брать отступ"
 
 #: objects/ui_MainWindow.h:496
 msgid "Ctrl+Shift+I"
@@ -132,7 +170,7 @@ msgstr ""
 
 #: objects/ui_MainWindow.h:497
 msgid "C&omment"
-msgstr ""
+msgstr "Зако&мментировать"
 
 #: objects/ui_MainWindow.h:498
 msgid "Ctrl+D"
@@ -140,7 +178,7 @@ msgstr ""
 
 #: objects/ui_MainWindow.h:499
 msgid "Unco&mment"
-msgstr ""
+msgstr "Р&аскомментировать"
 
 #: objects/ui_MainWindow.h:500
 msgid "Ctrl+Shift+D"
@@ -148,7 +186,7 @@ msgstr ""
 
 #: objects/ui_MainWindow.h:501
 msgid "Paste viewport translation"
-msgstr ""
+msgstr "Вставить смещение точки обзора"
 
 #: objects/ui_MainWindow.h:502
 msgid "Ctrl+T"
@@ -156,11 +194,11 @@ msgstr ""
 
 #: objects/ui_MainWindow.h:503
 msgid "Paste viewport rotation"
-msgstr ""
+msgstr "Вставить поворот точки обзора"
 
 #: objects/ui_MainWindow.h:504
 msgid "Zoom In"
-msgstr ""
+msgstr "Увеличить масштаб"
 
 #: objects/ui_MainWindow.h:505
 msgid "Ctrl++"
@@ -168,7 +206,7 @@ msgstr ""
 
 #: objects/ui_MainWindow.h:506
 msgid "Zoom Out"
-msgstr ""
+msgstr "Уменьшить масштаб"
 
 #: objects/ui_MainWindow.h:507
 msgid "Ctrl+-"
@@ -176,11 +214,11 @@ msgstr ""
 
 #: objects/ui_MainWindow.h:508
 msgid "Hide editor"
-msgstr ""
+msgstr "Скрыть редактор"
 
 #: objects/ui_MainWindow.h:509
 msgid "&Reload and Compile"
-msgstr ""
+msgstr "&Обновить и компилировать"
 
 #: objects/ui_MainWindow.h:510
 msgid "F4"
@@ -188,7 +226,7 @@ msgstr ""
 
 #: objects/ui_MainWindow.h:511
 msgid "&Compile"
-msgstr ""
+msgstr "&Компилировать"
 
 #: objects/ui_MainWindow.h:512
 msgid "F5"
@@ -196,7 +234,7 @@ msgstr ""
 
 #: objects/ui_MainWindow.h:513
 msgid "Compile and &Render (CGAL)"
-msgstr ""
+msgstr "Компилировать и &отрисовать (CGAL)"
 
 #: objects/ui_MainWindow.h:514
 msgid "F6"
@@ -204,23 +242,23 @@ msgstr ""
 
 #: objects/ui_MainWindow.h:515
 msgid "Display &AST..."
-msgstr ""
+msgstr "Показать &AST..."
 
 #: objects/ui_MainWindow.h:516
 msgid "Display CSG &Tree..."
-msgstr ""
+msgstr "Показать &дерево CSG..."
 
 #: objects/ui_MainWindow.h:517
 msgid "Display CSG &Products..."
-msgstr ""
+msgstr "Показать &результаты CSG..."
 
 #: objects/ui_MainWindow.h:518
 msgid "Export as &STL..."
-msgstr ""
+msgstr "Экспортировать в &STL..."
 
 #: objects/ui_MainWindow.h:519
 msgid "Export as &OFF..."
-msgstr ""
+msgstr "Экспортировать в &OFF..."
 
 #: objects/ui_MainWindow.h:520 objects/ui_Preferences.h:548
 msgid "OpenCSG"
@@ -232,7 +270,7 @@ msgstr ""
 
 #: objects/ui_MainWindow.h:522
 msgid "CGAL Surfaces"
-msgstr ""
+msgstr "Поверхности CGAL"
 
 #: objects/ui_MainWindow.h:523
 msgid "F10"
@@ -240,7 +278,7 @@ msgstr ""
 
 #: objects/ui_MainWindow.h:524
 msgid "CGAL Grid Only"
-msgstr ""
+msgstr "Только сетка CGAL"
 
 #: objects/ui_MainWindow.h:525
 msgid "F11"
@@ -248,7 +286,7 @@ msgstr ""
 
 #: objects/ui_MainWindow.h:526
 msgid "Thrown Together"
-msgstr ""
+msgstr "Всё вместе"
 
 #: objects/ui_MainWindow.h:527
 msgid "F12"
@@ -256,7 +294,7 @@ msgstr ""
 
 #: objects/ui_MainWindow.h:528
 msgid "Show Edges"
-msgstr ""
+msgstr "Показывать рёбра"
 
 #: objects/ui_MainWindow.h:529
 msgid "Ctrl+1"
@@ -264,7 +302,7 @@ msgstr ""
 
 #: objects/ui_MainWindow.h:530
 msgid "Show Axes"
-msgstr ""
+msgstr "Показывать оси"
 
 #: objects/ui_MainWindow.h:531
 msgid "Ctrl+2"
@@ -272,7 +310,7 @@ msgstr ""
 
 #: objects/ui_MainWindow.h:532
 msgid "Show Crosshairs"
-msgstr ""
+msgstr "Показывать перекрестия"
 
 #: objects/ui_MainWindow.h:533
 msgid "Ctrl+3"
@@ -280,11 +318,11 @@ msgstr ""
 
 #: objects/ui_MainWindow.h:534
 msgid "Animate"
-msgstr ""
+msgstr "Анимация"
 
 #: objects/ui_MainWindow.h:535
 msgid "Top"
-msgstr ""
+msgstr "Сверху"
 
 #: objects/ui_MainWindow.h:536
 msgid "Ctrl+4"
@@ -292,7 +330,7 @@ msgstr ""
 
 #: objects/ui_MainWindow.h:537
 msgid "Bottom"
-msgstr ""
+msgstr "Снизу"
 
 #: objects/ui_MainWindow.h:538
 msgid "Ctrl+5"
@@ -300,7 +338,7 @@ msgstr ""
 
 #: objects/ui_MainWindow.h:539
 msgid "Left"
-msgstr ""
+msgstr "Слева"
 
 #: objects/ui_MainWindow.h:540
 msgid "Ctrl+6"
@@ -308,7 +346,7 @@ msgstr ""
 
 #: objects/ui_MainWindow.h:541
 msgid "Right"
-msgstr ""
+msgstr "Справа"
 
 #: objects/ui_MainWindow.h:542
 msgid "Ctrl+7"
@@ -316,7 +354,7 @@ msgstr ""
 
 #: objects/ui_MainWindow.h:543
 msgid "Front"
-msgstr ""
+msgstr "Спереди"
 
 #: objects/ui_MainWindow.h:544
 msgid "Ctrl+8"
@@ -324,7 +362,7 @@ msgstr ""
 
 #: objects/ui_MainWindow.h:545
 msgid "Back"
-msgstr ""
+msgstr "Сзади"
 
 #: objects/ui_MainWindow.h:546
 msgid "Ctrl+9"
@@ -332,7 +370,7 @@ msgstr ""
 
 #: objects/ui_MainWindow.h:547
 msgid "Diagonal"
-msgstr ""
+msgstr "Аксонометрический"
 
 #: objects/ui_MainWindow.h:548
 msgid "Ctrl+0"
@@ -340,7 +378,7 @@ msgstr ""
 
 #: objects/ui_MainWindow.h:549
 msgid "Center"
-msgstr ""
+msgstr "По центру"
 
 #: objects/ui_MainWindow.h:550
 msgid "Ctrl+P"
@@ -348,35 +386,31 @@ msgstr ""
 
 #: objects/ui_MainWindow.h:551
 msgid "Perspective"
-msgstr ""
+msgstr "Перспектива"
 
 #: objects/ui_MainWindow.h:552
 msgid "Orthogonal"
-msgstr ""
+msgstr "Прямоугольная проекция"
 
 #: objects/ui_MainWindow.h:553
 msgid "Hide console"
-msgstr ""
+msgstr "Скрыть консоль"
 
 #: objects/ui_MainWindow.h:554
 msgid "About"
-msgstr ""
+msgstr "О программе"
 
 #: objects/ui_MainWindow.h:555
 msgid "Documentation"
-msgstr ""
+msgstr "Документация"
 
 #: objects/ui_MainWindow.h:556
 msgid "Clear Recent"
-msgstr ""
+msgstr "Очистить список"
 
 #: objects/ui_MainWindow.h:557
 msgid "Export as DXF..."
-msgstr ""
-
-#: objects/ui_MainWindow.h:558 objects/ui_OpenCSGWarningDialog.h:94
-msgid "Close"
-msgstr ""
+msgstr "Экспортировать в DXF..."
 
 #: objects/ui_MainWindow.h:559
 msgid "Ctrl+W"
@@ -384,47 +418,47 @@ msgstr ""
 
 #: objects/ui_MainWindow.h:560 objects/ui_Preferences.h:514
 msgid "Preferences"
-msgstr ""
+msgstr "Настройки"
 
 #: objects/ui_MainWindow.h:561
 msgid "Flush Caches"
-msgstr ""
+msgstr "Очистить кэш"
 
 #: objects/ui_MainWindow.h:562
 msgid "OpenSCAD Homepage"
-msgstr ""
+msgstr "Домашняя страница OpenSCAD"
 
 #: objects/ui_MainWindow.h:563
 msgid "Automatic Reload and Compile"
-msgstr ""
+msgstr "Автоматически обновлять и комилировать"
 
 #: objects/ui_MainWindow.h:564
 msgid "Export as Image..."
-msgstr ""
+msgstr "Экспортировать в растр..."
 
 #: objects/ui_MainWindow.h:565
 msgid "Export as CSG..."
-msgstr ""
+msgstr "Экспортировать в CSG..."
 
 #: objects/ui_MainWindow.h:566
 msgid "Library info"
-msgstr ""
+msgstr "Информация о библиотеках"
 
 #: objects/ui_MainWindow.h:567
 msgid "Check for Update.."
-msgstr ""
+msgstr "Проверить обновления..."
 
 #: objects/ui_MainWindow.h:568
 msgid "Show Library Folder..."
-msgstr ""
+msgstr "Открыть каталог библиотек..."
 
 #: objects/ui_MainWindow.h:569
 msgid "Reset View"
-msgstr ""
+msgstr "Сбросить настройки вида"
 
 #: objects/ui_MainWindow.h:571 objects/ui_Preferences.h:517
 msgid "Editor"
-msgstr ""
+msgstr "Редактор"
 
 #: objects/ui_MainWindow.h:574
 msgid "Editor for SCAD code"
@@ -440,19 +474,19 @@ msgstr ""
 
 #: objects/ui_MainWindow.h:582
 msgid "Time:"
-msgstr ""
+msgstr "Время:"
 
 #: objects/ui_MainWindow.h:583
 msgid "FPS:"
-msgstr ""
+msgstr "Кадров в секунду:"
 
 #: objects/ui_MainWindow.h:584
 msgid "Steps:"
-msgstr ""
+msgstr "Шагов:"
 
 #: objects/ui_MainWindow.h:585
 msgid "Dump Pictures"
-msgstr ""
+msgstr "Сохранять кадры"
 
 #: objects/ui_MainWindow.h:586
 msgid "&File"
@@ -460,11 +494,11 @@ msgstr "&Файл"
 
 #: objects/ui_MainWindow.h:587
 msgid "Open Recent"
-msgstr ""
+msgstr "Открыть недавние"
 
 #: objects/ui_MainWindow.h:588
 msgid "Examples"
-msgstr ""
+msgstr "Примеры"
 
 #: objects/ui_MainWindow.h:589
 msgid "&Edit"
@@ -472,57 +506,31 @@ msgstr "&Правка"
 
 #: objects/ui_MainWindow.h:590
 msgid "&Design"
-msgstr ""
+msgstr "&Модель"
 
 #: objects/ui_MainWindow.h:591
 msgid "&View"
-msgstr ""
+msgstr "&Вид"
 
 #: objects/ui_MainWindow.h:592
 msgid "&Help"
 msgstr "&Справка"
 
-#: objects/ui_OpenCSGWarningDialog.h:86
-msgid "OpenGL Warning"
-msgstr ""
-
-#: objects/ui_OpenCSGWarningDialog.h:87
-msgid ""
-"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/"
-"REC-html40/strict.dtd\">\n"
-"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css"
-"\">\n"
-"p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:'Lucida Grande'; font-size:13pt; "
-"font-weight:400; font-style:normal;\">\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; "
-"margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"></"
-"p></body></html>"
-msgstr ""
-
-#: objects/ui_OpenCSGWarningDialog.h:92
-msgid "Enable OpenCSG"
-msgstr ""
-
-#: objects/ui_OpenCSGWarningDialog.h:93
-msgid "Show this message again"
-msgstr ""
-
 #: objects/ui_Preferences.h:515
 msgid "3D View"
-msgstr ""
+msgstr "3D Вид"
 
 #: objects/ui_Preferences.h:516
 msgid "Advanced"
-msgstr ""
+msgstr "Дополнительные"
 
 #: objects/ui_Preferences.h:518
 msgid "Update"
-msgstr ""
+msgstr "Обновления"
 
 #: objects/ui_Preferences.h:519 objects/ui_Preferences.h:547
 msgid "Features"
-msgstr ""
+msgstr "Функции"
 
 #: objects/ui_Preferences.h:521
 msgid "Enable/Disable experimental features"
@@ -530,7 +538,7 @@ msgstr ""
 
 #: objects/ui_Preferences.h:523
 msgid "Color scheme:"
-msgstr ""
+msgstr "Цветовая схема:"
 
 #: objects/ui_Preferences.h:528
 msgid "Cornfield"
@@ -546,121 +554,74 @@ msgstr ""
 
 #: objects/ui_Preferences.h:535
 msgid "Font"
-msgstr ""
+msgstr "Шрифт"
 
 #: objects/ui_Preferences.h:536
 msgid "Color syntax highlighting"
-msgstr ""
+msgstr "Подсветка синтаксиса"
 
 #: objects/ui_Preferences.h:539
 msgid "For Light Background"
-msgstr ""
+msgstr "Для светлого фона"
 
 #: objects/ui_Preferences.h:540
 msgid "For Dark Background"
-msgstr ""
+msgstr "Для тёмного фона"
 
 #: objects/ui_Preferences.h:541
 msgid "Off"
-msgstr ""
+msgstr "Выключить"
 
 #: objects/ui_Preferences.h:543
 msgid "Automatically check for updates"
-msgstr ""
+msgstr "Автоматически проверять обновления"
 
 #: objects/ui_Preferences.h:544
 msgid "Include development snapshots"
-msgstr ""
+msgstr "Включая рабочие сборки"
 
 #: objects/ui_Preferences.h:545
 msgid "Check Now"
-msgstr ""
+msgstr "Проверить сейчас"
 
 #: objects/ui_Preferences.h:546
 msgid "Last checked: "
-msgstr ""
+msgstr "Последняя проверка: "
 
 #: objects/ui_Preferences.h:549
 msgid "Show capability warning"
-msgstr ""
+msgstr "Показывать предупреждение о возможностях"
 
 #: objects/ui_Preferences.h:550
 msgid "Enable for OpenGL 1.x"
-msgstr ""
+msgstr "Включить для OpenGL 1.x"
 
 #: objects/ui_Preferences.h:551
 msgid "Turn off rendering at "
-msgstr ""
+msgstr "Отключать отрисовку на "
 
 #: objects/ui_Preferences.h:552
 msgid "elements"
-msgstr ""
+msgstr "элементах"
 
 #: objects/ui_Preferences.h:553
 msgid "Force Goldfeather"
-msgstr ""
+msgstr "Принудительно использовать алгоритм Goldfeather («Золотое перо»)"
 
 #: objects/ui_Preferences.h:554
 msgid "CGAL Cache size"
-msgstr ""
+msgstr "Размер кэша CGAL"
 
 #: objects/ui_Preferences.h:555 objects/ui_Preferences.h:557
 msgid "bytes"
-msgstr ""
+msgstr "байт"
 
 #: objects/ui_Preferences.h:556
 msgid "PolySet Cache size"
-msgstr ""
+msgstr "Размер кэша PolySet"
 
 #: objects/ui_Preferences.h:558
 msgid "toolBar"
-msgstr ""
-
-#: objects/ui_ProgressWidget.h:72
-msgid "Form"
-msgstr ""
-
-#: objects/ui_ProgressWidget.h:73
-msgid "%v / %m"
-msgstr ""
-
-#: src/AboutDialog.h:16
-msgid "About OpenSCAD "
-msgstr ""
-
-#: src/cache.h:181
-msgid "Trimming cache: %1% (%2% bytes)"
-msgstr ""
-
-#: src/CGAL_Nef3_workaround.h:255
-msgid "ERROR: CGAL NefPolyhedron Triangulation failed"
-msgstr ""
-
-#: src/CsgInfo.h:48
-msgid "Error: CSG generation failed! (no top level object found)"
-msgstr ""
-
-#: src/CsgInfo.h:53 src/mainwin.cc:821
-msgid "Compiling design (CSG Products normalization)..."
-msgstr ""
-
-#: src/CsgInfo.h:60 src/mainwin.cc:868
-#, c-format
-msgid "Normalized CSG tree has %d elements"
-msgstr ""
-
-#: src/CsgInfo.h:64 src/mainwin.cc:833
-msgid "WARNING: CSG normalization resulted in an empty tree"
-msgstr ""
-
-#: src/CsgInfo.h:69
-#, c-format
-msgid "Compiling highlights (%i CSG Trees)..."
-msgstr ""
-
-#: src/CsgInfo.h:79
-#, c-format
-msgid "Compiling background (%i CSG Trees)..."
 msgstr ""
 
 #: src/cgaladv_minkowski2.cc:43
@@ -785,7 +746,7 @@ msgstr ""
 msgid "ERROR: CGAL NefPolyhedron->Polyhedron conversion failed."
 msgstr ""
 
-#: src/CGAL_Nef_polyhedron.cc:114 src/PlatformUtils.cc:19
+#: src/CGAL_Nef_polyhedron.cc:114
 #, c-format
 msgid "ERROR: %s"
 msgstr ""
@@ -848,21 +809,21 @@ msgstr ""
 msgid "ModuleContext %p (%p) for %s inst (%p)"
 msgstr ""
 
-#: src/context.cc:158 src/evalcontext.cc:40
+#: src/context.cc:158
 #, c-format
 msgid "Context: %p (%p)"
 msgstr ""
 
-#: src/context.cc:159 src/evalcontext.cc:41 src/modcontext.cc:148
+#: src/context.cc:159
 #, c-format
 msgid "  document path: %s"
 msgstr ""
 
-#: src/context.cc:163 src/evalcontext.cc:57 src/modcontext.cc:152
+#: src/context.cc:163
 msgid "  module args:"
 msgstr ""
 
-#: src/context.cc:170 src/modcontext.cc:159
+#: src/context.cc:170
 msgid "  vars:"
 msgstr ""
 
@@ -984,19 +945,6 @@ msgstr ""
 msgid "GLU tesselation error %s"
 msgstr ""
 
-#: src/evalcontext.cc:38
-#, c-format
-msgid "EvalContext %p (%p) for %s inst (%p)"
-msgstr ""
-
-#: src/evalcontext.cc:43
-msgid "  eval args:"
-msgstr ""
-
-#: src/evalcontext.cc:48
-msgid "    children:"
-msgstr ""
-
 #: src/export.cc:48
 msgid "ERROR: CGAL NefPolyhedron->Polyhedron conversion failed"
 msgstr ""
@@ -1008,22 +956,6 @@ msgstr ""
 
 #: src/export.cc:123
 msgid "CGAL unknown error in CGAL_Nef_polyhedron3::convert_to_Polyhedron()"
-msgstr ""
-
-#: src/feature.cc:21
-msgid "Enable the <code>concat()</code> function."
-msgstr ""
-
-#: src/feature.cc:60
-#, c-format
-msgid "WARNING: Ignoring request to enable unknown feature '%s'."
-msgstr ""
-
-#: src/fileutils.cc:25
-#, c-format
-msgid ""
-"WARNING: Imported file (%s) found in document root instead of relative to "
-"the importing module. This behavior is deprecated"
 msgstr ""
 
 #: src/func.cc:503 src/func.cc:536
@@ -1108,7 +1040,7 @@ msgstr ""
 
 #: src/mainwin.cc:525
 msgid "OpenSCAD - New Document[*]"
-msgstr ""
+msgstr "OpenSCAD - Новый документ[*]"
 
 #: src/mainwin.cc:529
 msgid "OpenSCAD - "
@@ -1157,6 +1089,14 @@ msgstr ""
 msgid "CSG generation cancelled."
 msgstr ""
 
+#: src/mainwin.cc:821
+msgid "Compiling design (CSG Products normalization)..."
+msgstr ""
+
+#: src/mainwin.cc:833
+msgid "WARNING: CSG normalization resulted in an empty tree"
+msgstr ""
+
 #: src/mainwin.cc:839
 #, c-format
 msgid "Compiling highlights (%d CSG Trees)..."
@@ -1176,6 +1116,11 @@ msgstr ""
 msgid "WARNING: OpenCSG rendering has been disabled."
 msgstr ""
 
+#: src/mainwin.cc:868
+#, c-format
+msgid "Normalized CSG tree has %d elements"
+msgstr ""
+
 #: src/mainwin.cc:878
 msgid "CSG generation finished."
 msgstr ""
@@ -1191,7 +1136,7 @@ msgstr "Открыть файл"
 
 #: src/mainwin.cc:908
 msgid "OpenSCAD Designs (*.scad *.csg)"
-msgstr ""
+msgstr "Модели OpenSCAD (*.scad *.csg)"
 
 #: src/mainwin.cc:1002
 #, c-format
@@ -1215,11 +1160,11 @@ msgstr "Сохранить файл"
 
 #: src/mainwin.cc:1021
 msgid "Untitled.scad"
-msgstr ""
+msgstr "Безымянный.scad"
 
 #: src/mainwin.cc:1022
 msgid "OpenSCAD Designs (*.scad)"
-msgstr ""
+msgstr "Модели OpenSCAD (*.scad)"
 
 #: src/mainwin.cc:1032
 msgid ""
@@ -1430,9 +1375,9 @@ msgid "No filename specified. %s export aborted."
 msgstr ""
 
 #: src/mainwin.cc:1471 src/mainwin.cc:1524 src/mainwin.cc:1557
-#: src/openscad.cc:316 src/openscad.cc:328 src/openscad.cc:346
-#: src/openscad.cc:397 src/openscad.cc:416 src/openscad.cc:431
-#: src/openscad.cc:442
+#: src/openscad.cc:292 src/openscad.cc:304 src/openscad.cc:322
+#: src/openscad.cc:373 src/openscad.cc:392 src/openscad.cc:407
+#: src/openscad.cc:418
 #, c-format
 msgid "Can't open file \"%s\" for export"
 msgstr ""
@@ -1512,44 +1457,18 @@ msgstr ""
 
 #: src/mainwin.cc:1842
 msgid "OpenGL Info"
-msgstr ""
+msgstr "Информация об OpenGL"
 
 #: src/mainwin.cc:1842
 msgid "OpenSCAD Detailed Library and Build Information"
-msgstr ""
-
+msgstr "Подробная информация о библиотеках и сборке OpenSCAD"
+ 
 #: src/mainwin.cc:1858
 msgid ""
 "The document has been modified.\n"
 "Do you want to save your changes?"
-msgstr ""
-
-#: src/modcontext.cc:100
-#, c-format
-msgid "WARNING: Experimental builtin function '%s' is not enabled."
-msgstr ""
-
-#: src/modcontext.cc:113
-#, c-format
-msgid "WARNING: Experimental builtin module '%s' is not enabled."
-msgstr ""
-
-#: src/modcontext.cc:118
-#, c-format
-msgid ""
-"DEPRECATED: The %s() module will be removed in future releases. Use %s() "
-"instead."
-msgstr ""
-
-#: src/modcontext.cc:145
-#, c-format
-msgid "ModuleContext %p (%p) for %s inst (%p) "
-msgstr ""
-
-#: src/modcontext.cc:147
-#, c-format
-msgid "ModuleContext: %p (%p)"
-msgstr ""
+msgstr "Документ был изменен.\n"
+"Сохранить изменения?"
 
 #: src/ModuleCache.cc:70
 #, c-format
@@ -1604,150 +1523,145 @@ msgstr ""
 msgid "Can't create OpenGL OffscreenView. Code: %i. Exiting.\n"
 msgstr ""
 
-#: src/openscad.cc:182
+#: src/openscad.cc:160
 msgid "Camera setup requires either 7 numbers for Gimbal Camera\n"
 msgstr ""
 
-#: src/openscad.cc:183
+#: src/openscad.cc:161
 msgid "or 6 numbers for Vector Camera\n"
 msgstr ""
 
-#: src/openscad.cc:199
+#: src/openscad.cc:177
 msgid "projection needs to be 'o' or 'p' for ortho or perspective\n"
 msgstr ""
 
-#: src/openscad.cc:210
+#: src/openscad.cc:188
 msgid "Need 2 numbers for imgsize\n"
 msgstr ""
 
-#: src/openscad.cc:260
+#: src/openscad.cc:236
 #, c-format
 msgid "Unknown suffix for output file %s\n"
 msgstr ""
 
-#: src/openscad.cc:284
+#: src/openscad.cc:260
 #, c-format
 msgid "Can't open input file '%s'!\n"
 msgstr ""
 
-#: src/openscad.cc:293
+#: src/openscad.cc:269
 #, c-format
 msgid "Can't parse file '%s'!\n"
 msgstr ""
 
-#: src/openscad.cc:375
+#: src/openscad.cc:351
 #, c-format
 msgid "Output file:%s\n"
 msgstr ""
 
-#: src/openscad.cc:376
+#: src/openscad.cc:352
 msgid "Sorry, don't know how to write deps for that file type. Exiting\n"
 msgstr ""
 
-#: src/openscad.cc:381
+#: src/openscad.cc:357
 msgid "error writing deps"
 msgstr ""
 
-#: src/openscad.cc:388 src/openscad.cc:407
+#: src/openscad.cc:364 src/openscad.cc:383
 msgid "Current top level object is not a 3D object.\n"
 msgstr ""
 
-#: src/openscad.cc:392 src/openscad.cc:411
+#: src/openscad.cc:368 src/openscad.cc:387
 msgid "Object isn't a valid 2-manifold! Modify your design.\n"
 msgstr ""
 
-#: src/openscad.cc:426
+#: src/openscad.cc:402
 msgid "Current top level object is not a 2D object.\n"
 msgstr ""
 
-#: src/openscad.cc:591
+#: src/openscad.cc:584
 msgid "Allowed options"
 msgstr ""
 
-#: src/openscad.cc:593
+#: src/openscad.cc:586
 msgid "help message"
 msgstr ""
 
-#: src/openscad.cc:594
+#: src/openscad.cc:587
 msgid "print the version"
 msgstr ""
 
-#: src/openscad.cc:595
+#: src/openscad.cc:588
 msgid "print information about the building process"
 msgstr ""
 
-#: src/openscad.cc:596
+#: src/openscad.cc:589
 msgid "if exporting a png image, do a full CGAL render"
 msgstr ""
 
-#: src/openscad.cc:597
+#: src/openscad.cc:590
 msgid ""
 "if exporting a png image, do an OpenCSG(default) or ThrownTogether preview"
 msgstr ""
 
-#: src/openscad.cc:598
+#: src/openscad.cc:591
 msgid "parameters for camera when exporting png"
 msgstr ""
 
-#: src/openscad.cc:599
+#: src/openscad.cc:592
 msgid "=width,height for exporting png"
 msgstr ""
 
-#: src/openscad.cc:600
+#: src/openscad.cc:593
 msgid "(o)rtho or (p)erspective when exporting png"
 msgstr ""
 
-#: src/openscad.cc:601
+#: src/openscad.cc:594
 msgid "out-file"
 msgstr ""
 
-#: src/openscad.cc:602
+#: src/openscad.cc:595
 msgid "stl-file"
 msgstr ""
 
-#: src/openscad.cc:603
+#: src/openscad.cc:596
 msgid "dxf-file"
 msgstr ""
 
-#: src/openscad.cc:604
+#: src/openscad.cc:597
 msgid "deps-file"
 msgstr ""
 
-#: src/openscad.cc:605
+#: src/openscad.cc:598
 msgid "makefile"
 msgstr ""
 
-#: src/openscad.cc:606
+#: src/openscad.cc:599
 msgid "var=val"
 msgstr ""
 
-#: src/openscad.cc:607
+#: src/openscad.cc:600
 msgid "enable experimental features"
 msgstr ""
 
-#: src/openscad.cc:609
+#: src/openscad.cc:602
 msgid "Hidden options"
 msgstr ""
 
-#: src/openscad.cc:611
+#: src/openscad.cc:604
 msgid "input file"
 msgstr ""
 
-#: src/openscad.cc:645
+#: src/openscad.cc:638
 msgid "DEPRECATED: The -s option is deprecated. Use -o instead.\n"
 msgstr ""
 
-#: src/openscad.cc:650
+#: src/openscad.cc:643
 msgid "DEPRECATED: The -x option is deprecated. Use -o instead.\n"
 msgstr ""
 
-#: src/openscad.cc:707
+#: src/openscad.cc:700
 msgid "Requested GUI mode but can't open display!\n"
-msgstr ""
-
-#: src/PlatformUtils.cc:16
-#, c-format
-msgid "ERROR: Cannot create %s"
 msgstr ""
 
 #: src/PolySetCache.cc:24
@@ -1902,48 +1816,6 @@ msgstr ""
 #: src/primitives.cc:536
 #, c-format
 msgid "ERROR: Unable to convert point at index %d to a vec2 of numbers"
-msgstr ""
-
-#: src/QGLView.cc:105
-msgid ""
-"\n"
-"Using QGLWidget\n"
-"\n"
-msgstr ""
-
-#: src/QGLView.cc:122
-msgid ""
-"Warning: You may experience OpenCSG rendering errors.\n"
-"\n"
-msgstr ""
-
-#: src/QGLView.cc:125
-msgid ""
-"Warning: Missing OpenGL capabilities for OpenCSG - OpenCSG has been "
-"disabled.\n"
-"\n"
-msgstr ""
-
-#: src/QGLView.cc:128
-msgid ""
-"It is highly recommended to use OpenSCAD on a system with OpenGL 2.0 or "
-"later.\n"
-"Your renderer information is as follows:\n"
-msgstr ""
-
-#: src/QGLView.cc:132
-#, c-format
-msgid ""
-"GLEW version %s\n"
-"%s (%s)\n"
-"OpenGL version %s\n"
-msgstr ""
-
-#: src/QGLView.cc:163
-#, c-format
-msgid ""
-"Viewport: translate = [ %.2f %.2f %.2f ], rotate = [ %.2f %.2f %.2f ], "
-"distance = %.2f"
 msgstr ""
 
 #: src/rotateextrude.cc:72
