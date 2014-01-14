@@ -526,7 +526,7 @@ msgstr "Функции"
 
 #: objects/ui_Preferences.h:521
 msgid "Enable/Disable experimental features"
-msgstr ""
+msgstr "Включить/выключить экспериментальные функции"
 
 #: objects/ui_Preferences.h:523
 msgid "Color scheme:"
@@ -1108,7 +1108,7 @@ msgstr ""
 
 #: src/mainwin.cc:525
 msgid "OpenSCAD - New Document[*]"
-msgstr ""
+msgstr "OpenSCAD - Новый документ[*]"
 
 #: src/mainwin.cc:529
 msgid "OpenSCAD - "
