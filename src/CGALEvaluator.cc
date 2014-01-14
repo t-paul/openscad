@@ -86,7 +86,7 @@ void CGALEvaluator::process(CGAL_Nef_polyhedron &target, const CGAL_Nef_polyhedr
 	catch (const CGAL::Failure_exception &e) {
 		// union && difference assert triggered by testdata/scad/bugs/rotate-diff-nonmanifold-crash.scad and testdata/scad/bugs/issue204.scad
 		std::string opstr = op == CGE_UNION ? "union" : op == CGE_INTERSECTION ? "intersection" : op == CGE_DIFFERENCE ? "difference" : op == CGE_MINKOWSKI ? "minkowski" : "UNKNOWN";
-		PRINTB("CGAL error in CGAL_Nef_polyhedron's %s operator: %s", opstr % e.what());
+		PRINTB(_("CGAL error in CGAL_Nef_polyhedron's %s operator: %s"), opstr % e.what());
 
 		// Errors can result in corrupt polyhedrons, so put back the old one
 		target = src;
@@ -138,7 +138,7 @@ CGAL_Nef_polyhedron CGALEvaluator::applyHull(const CgaladvNode &node)
 			dim = chN.dim;
 		}
 		else if (dim != chN.dim) {
-			PRINT("WARNING: hull() does not support mixing 2D and 3D objects.");
+			PRINT(_("WARNING: hull() does not support mixing 2D and 3D objects."));
 			continue;
 		}
 		if (chN.isNull()) { // If one of the children evaluated to a null object
@@ -156,7 +156,7 @@ CGAL_Nef_polyhedron CGALEvaluator::applyHull(const CgaladvNode &node)
 		else if (dim == 3) {
 			CGAL_Polyhedron P;
 			if (!chN.p3->is_simple()) {
-				PRINT("Hull() currently requires a valid 2-manifold. Please modify your design. See http://en.wikibooks.org/wiki/OpenSCAD_User_Manual/STL_Import_and_Export");
+				PRINT(_("Hull() currently requires a valid 2-manifold. Please modify your design. See http://en.wikibooks.org/wiki/OpenSCAD_User_Manual/STL_Import_and_Export"));
 			}
 			else {
 				bool err = false;
@@ -169,7 +169,7 @@ CGAL_Nef_polyhedron CGALEvaluator::applyHull(const CgaladvNode &node)
 					errmsg = std::string(e.what());
 				}
 				if (err) {
-					PRINTB("ERROR: CGAL NefPolyhedron->Polyhedron conversion failed. %s", errmsg);
+					PRINTB(_("ERROR: CGAL NefPolyhedron->Polyhedron conversion failed. %s"), errmsg);
 				} else {
 					std::transform(P.vertices_begin(), P.vertices_end(), std::back_inserter(points3d), 
 										 boost::bind(static_cast<const CGAL_Polyhedron::Vertex::Point_3&(CGAL_Polyhedron::Vertex::*)() const>(&CGAL_Polyhedron::Vertex::point), _1));
@@ -204,7 +204,7 @@ CGAL_Nef_polyhedron CGALEvaluator::applyResize(const CgaladvNode &node)
 
 	for (int i=0;i<3;i++) {
 		if (node.newsize[i]<0) {
-			PRINT("WARNING: Cannot resize to sizes less than 0.");
+			PRINT(_("WARNING: Cannot resize to sizes less than 0."));
 			return N;
 		}
 	}
@@ -231,7 +231,7 @@ CGAL_Nef_polyhedron CGALEvaluator::applyResize(const CgaladvNode &node)
 	for (int i=0;i<N.dim;i++) {
 		if (node.newsize[i]) {
 			if (bbox_size[i]==NT3(0)) {
-				PRINT("WARNING: Resize in direction normal to flat object is not implemented");
+				PRINT(_("WARNING: Resize in direction normal to flat object is not implemented"));
 				return N;
 			}
 			else {
@@ -333,7 +333,7 @@ Response CGALEvaluator::visit(State &state, const TransformNode &node)
 			N = applyToChildren(node, CGE_UNION);
 			if ( matrix_contains_infinity( node.matrix ) || matrix_contains_nan( node.matrix ) ) {
 				// due to the way parse/eval works we can't currently distinguish between NaN and Inf
-				PRINT("Warning: Transformation matrix contains Not-a-Number and/or Infinity - removing object.");
+				PRINT(_("Warning: Transformation matrix contains Not-a-Number and/or Infinity - removing object."));
 				N.reset();
 			}
 			N.transform( node.matrix );
@@ -381,11 +381,11 @@ Response CGALEvaluator::visit(State &state, const CgaladvNode &node)
 				N = applyToChildren(node, op);
 				break;
 			case GLIDE:
-				PRINT("WARNING: glide() is not implemented yet!");
+				PRINT(_("WARNING: glide() is not implemented yet!"));
 				return PruneTraversal;
 				break;
 			case SUBDIV:
-				PRINT("WARNING: subdiv() is not implemented yet!");
+				PRINT(_("WARNING: subdiv() is not implemented yet!"));
 				return PruneTraversal;
 				break;
 			case HULL:
@@ -419,7 +419,7 @@ void CGALEvaluator::addToParent(const State &state, const AbstractNode &node, co
 		// Root node, insert into cache
 		if (!isCached(node)) {
 			if (!CGALCache::instance()->insert(this->tree.getIdString(node), N)) {
-				PRINT("WARNING: CGAL Evaluator: Root node didn't fit into cache");
+				PRINT(_("WARNING: CGAL Evaluator: Root node didn't fit into cache"));
 			}
 		}
 		this->root = N;
@@ -690,11 +690,11 @@ CGAL_Nef_polyhedron CGALEvaluator::evaluateCGALMesh(const PolySet &ps)
 		catch (const CGAL::Assertion_exception &e) {
 			if (std::string(e.what()).find("Plane_constructor")!=std::string::npos) {
 				if (std::string(e.what()).find("has_on")!=std::string::npos) {
-					PRINT("PolySet has nonplanar faces. Attempting alternate construction");
+					PRINT(_("PolySet has nonplanar faces. Attempting alternate construction"));
 					plane_error=true;
 				}
 			} else {
-				PRINTB("CGAL error in CGAL_Nef_polyhedron3(): %s", e.what());
+				PRINTB(_("CGAL error in CGAL_Nef_polyhedron3(): %s"), e.what());
 			}
 		}
 		if (plane_error) try {
@@ -705,7 +705,7 @@ CGAL_Nef_polyhedron CGALEvaluator::evaluateCGALMesh(const PolySet &ps)
 			if (!err) N = new CGAL_Nef_polyhedron3(P);
 		}
 		catch (const CGAL::Assertion_exception &e) {
-			PRINTB("Alternate construction failed. CGAL error in CGAL_Nef_polyhedron3(): %s", e.what());
+			PRINTB(_("Alternate construction failed. CGAL error in CGAL_Nef_polyhedron3(): %s"), e.what());
 		}
 		CGAL::set_error_behaviour(old_behaviour);
 		if (N) return CGAL_Nef_polyhedron(N);

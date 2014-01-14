@@ -90,6 +90,7 @@ Preferences::Preferences(QWidget *parent) : QMainWindow(parent)
 #endif
 	this->defaultmap["advanced/openCSGLimit"] = RenderSettings::inst()->openCSGTermLimit;
 	this->defaultmap["advanced/forceGoldfeather"] = false;
+	this->defaultmap["advanced/localization"] = false;
 
 	// Toolbar
 	QActionGroup *group = new QActionGroup(this);

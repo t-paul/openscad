@@ -94,7 +94,7 @@ void Context::set_variable(const std::string &name, const Value &value)
 void Context::set_constant(const std::string &name, const Value &value)
 {
 	if (this->constants.find(name) != this->constants.end()) {
-		PRINTB("WARNING: Attempt to modify constant '%s'.", name);
+		PRINTB(_("WARNING: Attempt to modify constant '%s'."), name);
 	}
 	else {
 		this->constants[name] = value;
@@ -118,21 +118,21 @@ Value Context::lookup_variable(const std::string &name, bool silent) const
 	if (this->parent)
 		return this->parent->lookup_variable(name, silent);
 	if (!silent)
-		PRINTB("WARNING: Ignoring unknown variable '%s'.", name);
+		PRINTB(_("WARNING: Ignoring unknown variable '%s'."), name);
 	return Value();
 }
 
 Value Context::evaluate_function(const std::string &name, const EvalContext *evalctx) const
 {
 	if (this->parent) return this->parent->evaluate_function(name, evalctx);
-	PRINTB("WARNING: Ignoring unknown function '%s'.", name);
+	PRINTB(_("WARNING: Ignoring unknown function '%s'."), name);
 	return Value();
 }
 
 AbstractNode *Context::instantiate_module(const ModuleInstantiation &inst, const EvalContext *evalctx) const
 {
 	if (this->parent) return this->parent->instantiate_module(inst, evalctx);
-	PRINTB("WARNING: Ignoring unknown module '%s'.", inst.name());
+	PRINTB(_("WARNING: Ignoring unknown module '%s'."), inst.name());
 	return NULL;
 }
 
@@ -153,21 +153,21 @@ std::string Context::getAbsolutePath(const std::string &filename) const
 void Context::dump(const AbstractModule *mod, const ModuleInstantiation *inst)
 {
 	if (inst) 
-		PRINTB("ModuleContext %p (%p) for %s inst (%p)", this % this->parent % inst->name() % inst);
+		PRINTB(_("ModuleContext %p (%p) for %s inst (%p)"), this % this->parent % inst->name() % inst);
 	else 
-		PRINTB("Context: %p (%p)", this % this->parent);
-	PRINTB("  document path: %s", this->document_path);
+		PRINTB(_("Context: %p (%p)"), this % this->parent);
+	PRINTB(_("  document path: %s"), this->document_path);
 	if (mod) {
 		const Module *m = dynamic_cast<const Module*>(mod);
 		if (m) {
-			PRINT("  module args:");
+			PRINT(_("  module args:"));
 			BOOST_FOREACH(const Assignment &arg, m->definition_arguments) {
 				PRINTB("    %s = %s", arg.first % variables[arg.first]);
 			}
 		}
 	}
 	typedef std::pair<std::string, Value> ValueMapType;
-	PRINT("  vars:");
+	PRINT(_("  vars:"));
   BOOST_FOREACH(const ValueMapType &v, constants) {
 	  PRINTB("    %s = %s", v.first % v.second);
 	}		

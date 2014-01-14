@@ -97,7 +97,7 @@ const AbstractFunction *ModuleContext::findLocalFunction(const std::string &name
 	if (this->functions_p && this->functions_p->find(name) != this->functions_p->end()) {
 		AbstractFunction *f = this->functions_p->find(name)->second;
 		if (!f->is_enabled()) {
-			PRINTB("WARNING: Experimental builtin function '%s' is not enabled.", name);
+			PRINTB(_("WARNING: Experimental builtin function '%s' is not enabled."), name);
 			return NULL;
 		}
 		return f;
@@ -110,12 +110,12 @@ const AbstractModule *ModuleContext::findLocalModule(const std::string &name) co
 	if (this->modules_p && this->modules_p->find(name) != this->modules_p->end()) {
 		AbstractModule *m = this->modules_p->find(name)->second;
 		if (!m->is_enabled()) {
-			PRINTB("WARNING: Experimental builtin module '%s' is not enabled.", name);
+			PRINTB(_("WARNING: Experimental builtin module '%s' is not enabled."), name);
 			return NULL;
 		}
 		std::string replacement = Builtins::instance()->isDeprecated(name);
 		if (!replacement.empty()) {
-			PRINTB("DEPRECATED: The %s() module will be removed in future releases. Use %s() instead.", name % replacement);
+			PRINTB(_("DEPRECATED: The %s() module will be removed in future releases. Use %s() instead."), name % replacement);
 		}
 		return m;
 	}
@@ -142,21 +142,21 @@ AbstractNode *ModuleContext::instantiate_module(const ModuleInstantiation &inst,
 void ModuleContext::dump(const AbstractModule *mod, const ModuleInstantiation *inst)
 {
 	if (inst) 
-		PRINTB("ModuleContext %p (%p) for %s inst (%p) ", this % this->parent % inst->name() % inst);
+		PRINTB(_("ModuleContext %p (%p) for %s inst (%p) "), this % this->parent % inst->name() % inst);
 	else 
-		PRINTB("ModuleContext: %p (%p)", this % this->parent);
-	PRINTB("  document path: %s", this->document_path);
+		PRINTB(_("ModuleContext: %p (%p)"), this % this->parent);
+	PRINTB(_("  document path: %s"), this->document_path);
 	if (mod) {
 		const Module *m = dynamic_cast<const Module*>(mod);
 		if (m) {
-			PRINT("  module args:");
+			PRINT(_("  module args:"));
 			BOOST_FOREACH(const Assignment &arg, m->definition_arguments) {
 				PRINTB("    %s = %s", arg.first % variables[arg.first]);
 			}
 		}
 	}
 	typedef std::pair<std::string, Value> ValueMapType;
-	PRINT("  vars:");
+	PRINT(_("  vars:"));
   BOOST_FOREACH(const ValueMapType &v, constants) {
 	  PRINTB("    %s = %s", v.first % v.second);
 	}		

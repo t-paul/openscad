@@ -90,7 +90,7 @@ std::string CGAL_Nef_polyhedron::dump() const
 	else if (this->dim==3)
 		return OpenSCAD::dump_svg( *this->p3 );
 	else
-		return std::string("Nef Polyhedron with dimension != 2 or 3");
+		return std::string("Nef Polyhedron, dim != 2 && dim != 3");
 }
 
 
@@ -104,7 +104,7 @@ void CGAL_Nef_polyhedron::transform( const Transform3d &matrix )
 			Eigen::Matrix2f testmat;
 			testmat << matrix(0,0), matrix(0,1), matrix(1,0), matrix(1,1);
 			if (testmat.determinant() == 0) {
-				PRINT("Warning: Scaling a 2D object with 0 - removing object");
+				PRINT(_("Warning: Scaling a 2D object with 0 - removing object"));
 				this->reset();
 				return;
 			}
@@ -134,7 +134,7 @@ void CGAL_Nef_polyhedron::transform( const Transform3d &matrix )
 		}
 		else if (this->dim == 3) {
 			if (matrix.matrix().determinant() == 0) {
-				PRINT("Warning: Scaling a 3D object with 0 - removing object");
+				PRINT(_("Warning: Scaling a 3D object with 0 - removing object"));
 				this->reset();
 			}
 			else {

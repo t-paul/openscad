@@ -127,7 +127,7 @@ Value PrimitiveModule::lookup_radius(const Context &ctx, const std::string &diam
 	
 	if (d.type() == Value::NUMBER) {
 		if (r_defined) {
-			PRINTB("WARNING: Ignoring radius variable '%s' as diameter '%s' is defined too.", radius_var % diameter_var);
+			PRINTB(_("WARNING: Ignoring radius variable '%s' as diameter '%s' is defined too."), radius_var % diameter_var);
 		}
 		return Value(d.toDouble() / 2.0);
 	} else if (r_defined) {
@@ -180,11 +180,11 @@ AbstractNode *PrimitiveModule::instantiate(const Context *ctx, const ModuleInsta
 	node->fa = c.lookup_variable("$fa").toDouble();
 
 	if (node->fs < F_MINIMUM) {
-		PRINTB("WARNING: $fs too small - clamping to %f", F_MINIMUM);
+		PRINTB(_("WARNING: $fs too small - clamping to %f"), F_MINIMUM);
 		node->fs = F_MINIMUM;
 	}
 	if (node->fa < F_MINIMUM) {
-		PRINTB("WARNING: $fa too small - clamping to %f", F_MINIMUM);
+		PRINTB(_("WARNING: $fa too small - clamping to %f"), F_MINIMUM);
 		node->fa = F_MINIMUM;
 	}
 
@@ -241,7 +241,7 @@ AbstractNode *PrimitiveModule::instantiate(const Context *ctx, const ModuleInsta
 			// backwards compatable
 			node->faces = c.lookup_variable("triangles");
 			if (node->faces.type() != Value::UNDEFINED) {
-				PRINT("DEPRECATED: polyhedron(triangles=[]) will be removed in future releases. Use polyhedron(faces=[]) instead.");
+				PRINT(_("DEPRECATED: polyhedron(triangles=[]) will be removed in future releases. Use polyhedron(faces=[]) instead."));
 			}
 		}
 	}
@@ -533,7 +533,7 @@ sphere_next_r2:
 		for (size_t i=0; i<this->points.toVector().size(); i++) {
 			double x,y;
 			if (!this->points.toVector()[i].getVec2(x, y)) {
-				PRINTB("ERROR: Unable to convert point at index %d to a vec2 of numbers", i);
+				PRINTB(_("ERROR: Unable to convert point at index %d to a vec2 of numbers"), i);
 				delete p;
 				return NULL;
 			}

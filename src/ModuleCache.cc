@@ -67,10 +67,10 @@ FileModule *ModuleCache::evaluate(const std::string &filename)
 	if (shouldCompile) {
 #ifdef DEBUG
 		if (this->entries.find(filename) != this->entries.end()) {
-			PRINTB("Recompiling cached library: %s (%s)", filename % cache_id);
+			PRINTB(_("Recompiling cached library: %s (%s)"), filename % cache_id);
 		}
 		else {
-			PRINTB("Compiling library '%s'.", filename);
+			PRINTB(_("Compiling library '%s'."), filename);
 		}
 #endif
 
@@ -78,7 +78,7 @@ FileModule *ModuleCache::evaluate(const std::string &filename)
 		{
 			std::ifstream ifs(filename.c_str());
 			if (!ifs.is_open()) {
-				PRINTB("WARNING: Can't open library file '%s'\n", filename);
+				PRINTB(_("WARNING: Can't open library file '%s'\n"), filename);
 				return NULL;
 			}
 			textbuf << ifs.rdbuf();
@@ -96,7 +96,7 @@ FileModule *ModuleCache::evaluate(const std::string &filename)
 		
 		std::string pathname = boosty::stringy(fs::path(filename).parent_path());
 		lib_mod = dynamic_cast<FileModule*>(parse(textbuf.str().c_str(), pathname.c_str(), false));
-		PRINTB_NOCACHE("  compiled module: %p", lib_mod);
+		PRINTB_NOCACHE(_("  compiled module: %p"), lib_mod);
 		
 		if (lib_mod) {
 			// We defer deletion so we can ensure that the new module won't

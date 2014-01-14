@@ -177,7 +177,7 @@ AbstractNode *Module::instantiate(const Context *ctx, const ModuleInstantiation 
 {
 	ModRecursionGuard g(*inst);
 	if (g.recursion_detected()) { 
-		PRINTB("ERROR: Recursion detected calling module '%s'", inst->name());
+		PRINTB(_("ERROR: Recursion detected calling module '%s'"), inst->name());
 		return NULL;
 	}
 
@@ -295,7 +295,7 @@ bool FileModule::handleDependencies()
 		if (!newmodule) {
 			// Only print warning if we're not part of an automatic reload
 			if (!oldmodule && !wasmissing) {
-				PRINTB_NOCACHE("WARNING: Failed to compile library '%s'.", filename);
+				PRINTB_NOCACHE(_("WARNING: Failed to compile library '%s'."), filename);
 			}
 		}
 	}

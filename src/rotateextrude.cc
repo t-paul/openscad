@@ -69,7 +69,7 @@ AbstractNode *RotateExtrudeModule::instantiate(const Context *ctx, const ModuleI
 	Value scale = c.lookup_variable("scale", true);
 
 	if (!file.isUndefined()) {
-		PRINT("DEPRECATED: Support for reading files in rotate_extrude will be removed in future releases. Use a child import() instead.");
+		PRINT(_("DEPRECATED: Support for reading files in rotate_extrude will be removed in future releases. Use a child import() instead."));
 		node->filename = lookup_file(file.toString(), inst->path(), c.documentPath());
 	}
 
@@ -95,7 +95,7 @@ AbstractNode *RotateExtrudeModule::instantiate(const Context *ctx, const ModuleI
 PolySet *RotateExtrudeNode::evaluate_polyset(PolySetEvaluator *evaluator) const
 {
 	if (!evaluator) {
-		PRINTB("WARNING: No suitable PolySetEvaluator found for %s module!", this->name());
+		PRINTB(_("WARNING: No suitable PolySetEvaluator found for %s module!"), this->name());
 		return NULL;
 	}
 

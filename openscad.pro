@@ -8,6 +8,18 @@
 #   OPENCSGDIR
 #   OPENSCAD_LIBRARIES
 #
+# qmake Variables to define the installation:
+#
+#   PREFIX defines the base installation folder
+#
+#   LOCALE_PREFIX can overwrite the location of the gettext message catalogs
+#
+#   For linux packages that want to install the localization files into
+#   a folder shared by all packages, specify the LOCALE_PREFIX which will
+#   force usage of the given folder.
+#   The default layout is created by: LOCALE_PREFIX=<prefix>/share/locale
+#   where <prefix> is the base installation folder.   
+#
 # Please see the 'Building' sections of the OpenSCAD user manual 
 # for updated tips & workarounds.
 #
@@ -102,6 +114,8 @@ unix:!macx {
   QMAKE_LIBS_OPENGL *= -lX11
 }
 
+#QTPLUGIN += qtaccessiblewidgets
+
 netbsd* {
    QMAKE_LFLAGS += -L/usr/X11R7/lib
    QMAKE_LFLAGS += -Wl,-R/usr/X11R7/lib
@@ -139,6 +153,8 @@ netbsd* {
 	QMAKE_CXXFLAGS_WARN_ON += -Wno-unused-variable
 	QMAKE_CXXFLAGS_WARN_ON += -Wno-unused-function
 	QMAKE_CXXFLAGS_WARN_ON += -Wno-c++11-extensions
+	# gettext
+	QMAKE_CXXFLAGS_WARN_ON += -Wno-format-security
 	# might want to actually turn this on once in a while
 	QMAKE_CXXFLAGS_WARN_ON += -Wno-sign-compare
 }
@@ -155,6 +171,7 @@ CONFIG += opencsg
 CONFIG += boost
 CONFIG += eigen
 CONFIG += glib-2.0
+CONFIG += gettext
 
 #Uncomment the following line to enable QCodeEdit
 #CONFIG += qcodeedit
@@ -181,6 +198,8 @@ win* {
 }
 
 RESOURCES = openscad.qrc
+
+QMAKE_UIC += -tr _
 
 FORMS   += src/MainWindow.ui \
            src/Preferences.ui \
@@ -405,6 +424,27 @@ isEmpty(PREFIX):PREFIX = /usr/local
 
 target.path = $$PREFIX/bin/
 INSTALLS += target
+
+!isEmpty(LOCALE_PREFIX): DEFINES += LOCALE_PREFIX=\'\"$$LOCALE_PREFIX\"\'
+isEmpty(LOCALE_PREFIX): LOCALE_PREFIX = $$PREFIX/share/openscad/locale
+
+# Run translation update scripts as last step after linking the target
+QMAKE_POST_LINK += ./scripts/generate-potfiles.sh > po/POTFILES ; ./scripts/translation-update.sh
+
+# Create install targets for the languages defined in LINGUAS
+LINGUAS = $$cat(po/LINGUAS)
+for(language, LINGUAS) {
+  catalog = po/$$language/LC_MESSAGES/openscad.mo
+  exists($$catalog) {
+    translation_path = translation_$${language}.path
+    translation_files = translation_$${language}.files
+    translation_depends = translation_$${language}.depends
+    $$translation_path = $$LOCALE_PREFIX/$$language/LC_MESSAGES/
+    $$translation_files = $$catalog
+    $$translation_depends = po/$${language}.po
+    INSTALLS += translation_$$language
+  }
+}
 
 examples.path = $$PREFIX/share/openscad/examples/
 examples.files = examples/*

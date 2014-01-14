@@ -205,7 +205,7 @@ void includefile()
   }
   else {
     rootmodule->registerInclude(boosty::stringy(localpath), boosty::stringy(localpath));
-    PRINTB("WARNING: Can't open include file '%s'.", boosty::stringy(localpath));
+    PRINTB(_("WARNING: Can't open include file '%s'."), boosty::stringy(localpath));
     if (path_stack.size() > 0) path_stack.pop_back();
     return;
   };
@@ -219,7 +219,7 @@ void includefile()
 
   yyin = fopen(fullname.c_str(), "r");
   if (!yyin) {
-    PRINTB("WARNING: Can't open include file '%s'.", boosty::stringy(localpath));
+    PRINTB(_("WARNING: Can't open include file '%s'."), boosty::stringy(localpath));
     path_stack.pop_back();
     return;
   }
