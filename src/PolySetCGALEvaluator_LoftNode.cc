@@ -13,7 +13,8 @@
 
 #include "printutils.h"
 #include "openscad.h"
-#include "dxfdata.h" // get_fragments_from_r()
+#include "dxfdata.h"
+#include "context.h" // get_fragments_from_r()
 
 using namespace Eigen;
 
@@ -107,11 +108,22 @@ static loft_t create_slices(path_t shape, const LoftNode &node) {
 		// Rotate the shape around the Z axis so that the norm
 		// vector of the shape points into the same direction
 		// as the path tangent vector in the X/Y plane.
-		Vector3d normXY = Vector3d(normPath.x(), normPath.y(), 0).normalized();
-		double angle = acos(Vector3d(0, 1, 0).dot(normXY));
-		if (Vector3d(1, 0, 0).dot(normXY) >= 0) {
-			angle = 2 * M_PI - angle;
-		}
+		Vector3d normPathXY = Vector3d(normPath.x(), normPath.y(), 0);
+                
+                double angle;
+		Vector3d normXY;
+                if (normPathXY.norm() == 0) {
+                        normXY = Vector3d(0, 0, 0);
+                        angle = 0;
+                } else {
+                        normXY = normPathXY.normalized();
+                        angle = acos(Vector3d(0, 1, 0).dot(normXY));
+                        if (Vector3d(1, 0, 0).dot(normXY) >= 0) {
+                                angle = 2 * M_PI - angle;
+                        }
+                }
+                //std::cout << normPath.x() << ", " << normPath.y() << ", " << normPath.z() << std::endl;
+                //std::cout << "angle: " << angle << std::endl;
 		Transform3d rotate1(AngleAxisd(angle, Vector3d(0, 0, 1)));
 
 		// Rotate the shape around the axis in the X/Y plane. The
@@ -122,6 +134,8 @@ static loft_t create_slices(path_t shape, const LoftNode &node) {
 		if (Vector3d(0, 0, 1).dot(normPath) >= 0) {
 			angleZ = 2 * M_PI - angleZ;
 		}
+                //std::cout << normXYRot90.x() << ", " << normXYRot90.y() << ", " << normXYRot90.z() << std::endl;
+                //std::cout << "angleZ: " << angle << std::endl;
 		Transform3d rotate2(AngleAxisd(angleZ, normXYRot90));
 		
 		Transform3d translate(Translation3d(path[a]));
@@ -130,6 +144,14 @@ static loft_t create_slices(path_t shape, const LoftNode &node) {
 		tmp = apply_transform(tmp, rotate1);
 		tmp = apply_transform(tmp, rotate2);
 		tmp = apply_transform(tmp, translate);
+
+//		for (path_t::iterator it = tmp.begin();it != tmp.end();it++) {
+//			Vector3d v = *it;
+//                        std::cout << v.x() << ", " << v.y() << ", " << v.z() << " - ";
+//                }
+//                std::cout << std::endl;
+
+                
 		loft.push_back(tmp);
 	}
 	return loft;	
@@ -180,6 +202,23 @@ PolySet *PolySetCGALEvaluator::evaluatePolySet(const LoftNode &node)
 	if ((dxf == NULL) || dxf->paths.empty()) {
 		return NULL;
 	}
+	
+	bool connect = false;
+	if (!node.values_path.empty()) {
+		Value p0 = node.values_path[0];
+		Value p1 = node.values_path[node.values_path.size() - 1];
+		double x0, y0, z0;
+		p0.getVec3(x0, y0, z0);
+		double x1, y1, z1;
+		p1.getVec3(x1, y1, z1);
+		double x = x1 - x0;
+		double y = y1 - y0;
+		double z = z1 - z0;
+		double distance = std::sqrt(x * x + y * y + z * z);
+		if (distance < 1e-6) {
+			connect = true;
+		}
+	}
 
 	path_t shape;
 	DxfData::Path p = dxf->paths[0];
@@ -192,18 +231,22 @@ PolySet *PolySetCGALEvaluator::evaluatePolySet(const LoftNode &node)
 	loft_t loft = apply_transform(create_slices(shape, node), node);
 
 	path_t bottom = loft[0];
-	ps->append_poly();
-	int idx = 0;
-	for (path_t::iterator it = bottom.begin();it != bottom.end();it++) {
-		Vector3d v = *it;
-		ps->append_vertex(v.x(), v.y(), v.z());
+	if (!connect) {
+		ps->append_poly();
+		int idx = 0;
+		for (path_t::iterator it = bottom.begin();it != bottom.end();it++) {
+			Vector3d v = *it;
+			ps->append_vertex(v.x(), v.y(), v.z());
+		}
 	}
 
 	path_t top = loft[loft.size() - 1];
-	ps->append_poly();
-	for (path_t::reverse_iterator it = top.rbegin();it != top.rend();it++) {
-		Vector3d v = *it;
-		ps->append_vertex(v.x(), v.y(), v.z());
+	if (!connect) {
+		ps->append_poly();
+		for (path_t::reverse_iterator it = top.rbegin();it != top.rend();it++) {
+			Vector3d v = *it;
+			ps->append_vertex(v.x(), v.y(), v.z());
+		}
 	}
 
 	for (int a = 1;a < node.max_idx;a++) {
@@ -214,8 +257,10 @@ PolySet *PolySetCGALEvaluator::evaluatePolySet(const LoftNode &node)
 		ps->append_poly();
 		for (path_t::iterator it = p2.begin();it != p2.end();it++) {
 			Vector3d v = *it;
+                        //std::cout << v.x() << ", " << v.y() << ", " << v.z() << " - ";
 			ps->append_vertex(v.x(), v.y(), v.z());
 		}
+                //std::cout << std::endl;
 #else
 		for (int idx1 = 0;idx1 < p1.size();idx1++) {
 			int idx2 = (idx1 + p1.size() - 1) % p1.size();
@@ -225,7 +270,19 @@ PolySet *PolySetCGALEvaluator::evaluatePolySet(const LoftNode &node)
 				p2[idx2].x(), p2[idx2].y(), p2[idx2].z(),
 				p2[idx1].x(), p2[idx1].y(), p2[idx1].z());
 		}
+		
 #endif
+	}
+	
+	if (connect) {
+		for (int idx1 = 0;idx1 < top.size();idx1++) {
+			int idx2 = (idx1 + top.size() - 1) % top.size();
+			add_poly(ps,
+				top[idx1].x(), top[idx1].y(), top[idx1].z(),
+				top[idx2].x(), top[idx2].y(), top[idx2].z(),
+				bottom[idx2].x(), bottom[idx2].y(), bottom[idx2].z(),
+				bottom[idx1].x(), bottom[idx1].y(), bottom[idx1].z());
+		}
 	}
 	
 	return ps;
