@@ -225,7 +225,7 @@ HEADERS += src/typedefs.h \
            src/feature.h \
            src/node.h \
            src/csgnode.h \
-           src/loft.h \
+           src/loftnode.h \
            src/linearextrudenode.h \
            src/rotateextrudenode.h \
            src/projectionnode.h \
