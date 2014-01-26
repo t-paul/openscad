@@ -24,26 +24,6 @@ static void add_poly(PolySet *ps,
         double x3, double y3, double z3,
         double x4, double y4, double z4)
 {
-#if 0
-        std::cout
-                << std::right
-                << std::fixed
-                << std::setprecision(3)
-                << "[" << std::setw(8) << x1
-                << ", " << std::setw(8) << y1
-                << ", " << std::setw(8) << z1
-                << "], [" << std::setw(8) << x2
-                << ", " << std::setw(8) << y2
-                << ", " << std::setw(8) << z2
-                << "], [" << std::setw(8) << x3
-                << ", " << std::setw(8) << y3
-                << ", " << std::setw(8) << z3
-                << "], [" << std::setw(8) << x4
-                << ", " << std::setw(8) << y4
-                << ", " << std::setw(8) << z4
-                << "],"
-                << std::endl;
-#endif
 	ps->append_poly();
 	ps->append_vertex(x1, y1, z1);
 	ps->append_vertex(x2, y2, z2);
@@ -81,6 +61,11 @@ static path_t apply_transform(const path_t &path, const LoftNode &node, int idx)
 	return apply_transform(path, t);
 	
 }
+
+static Vector3d make_orthogonal(Vector3d u, Vector3d v) {
+	return (u - v.normalized().cross((v.normalized().cross(u)))).normalized();
+}
+
 static loft_t create_slices(path_t shape, const LoftNode &node) {
 	loft_t loft;
 
@@ -88,71 +73,67 @@ static loft_t create_slices(path_t shape, const LoftNode &node) {
 	double max_idx = node.max_idx;
 	
 	path_t path;
+	path_t tangents;
 	for (int a = 0;a <= max_idx;a++) {
 		if (node.values_path.empty()) {
 			path.push_back(Vector3d(0, 0, (a * height) / max_idx));
+			tangents.push_back(Vector3d(0, 0, 1));
 		} else {
 			double x, y, z;
+
 			Value v = node.values_path[a];
 			v.getVec3(x, y, z);
 			path.push_back(Vector3d(x, y, z));
+			
+			Value t = node.values_path_tangent[a];
+			t.getVec3(x, y, z);
+			tangents.push_back(Vector3d(x, y, z));
 		}
-	}	
+	}
 
-	for (int a = 0; a < max_idx; a++) {
-		Vector3d normPath = (path[a + 1] - path[a]).normalized();
-
-		// Rotate the shape from X/Y plane to X/Z
-		Transform3d rotate0(AngleAxisd(M_PI / 2.0, Vector3d(1, 0, 0)));
+	Matrix3d last_transform = Matrix3d::Identity();
+	for (int a = 0; a < max_idx; a++) {		
+		Vector3d tangent = tangents[a];
+		Vector3d col3 = last_transform.col(2);
+		Vector3d axis = col3.cross(tangent).normalized();
 		
-		// Rotate the shape around the Z axis so that the norm
-		// vector of the shape points into the same direction
-		// as the path tangent vector in the X/Y plane.
-		Vector3d normPathXY = Vector3d(normPath.x(), normPath.y(), 0);
-                
-                double angle;
-		Vector3d normXY;
-                if (normPathXY.norm() == 0) {
-                        normXY = Vector3d(0, 0, 0);
-                        angle = 0;
-                } else {
-                        normXY = normPathXY.normalized();
-                        angle = acos(Vector3d(0, 1, 0).dot(normXY));
-                        if (Vector3d(1, 0, 0).dot(normXY) >= 0) {
-                                angle = 2 * M_PI - angle;
-                        }
-                }
-                //std::cout << normPath.x() << ", " << normPath.y() << ", " << normPath.z() << std::endl;
-                //std::cout << "angle: " << angle << std::endl;
-		Transform3d rotate1(AngleAxisd(angle, Vector3d(0, 0, 1)));
-
-		// Rotate the shape around the axis in the X/Y plane. The
-		// axis is perpendicular to the tangent vector of the path
-		// projected to the X/Y plane.
-		Vector3d normXYRot90(Transform3d(AngleAxisd(M_PI / 2.0, Vector3d(0, 0, 1))) * normXY);
-		double angleZ = acos(normXY.dot(normPath));
-		if (Vector3d(0, 0, 1).dot(normPath) >= 0) {
-			angleZ = 2 * M_PI - angleZ;
+		Matrix3d rotate_from_to(Matrix3d::Identity());
+		if (axis.dot(axis) >= 0.99) {
+			Matrix3d rm1;
+			rm1 << tangent.normalized(), axis, axis.cross(tangent.normalized());
+			
+			Matrix3d rm2;
+			rm2 << col3.normalized(), axis, axis.cross(col3.normalized());
+			
+			rotate_from_to = rm1 * rm2.transpose();
 		}
-                //std::cout << normXYRot90.x() << ", " << normXYRot90.y() << ", " << normXYRot90.z() << std::endl;
-                //std::cout << "angleZ: " << angle << std::endl;
-		Transform3d rotate2(AngleAxisd(angleZ, normXYRot90));
 		
-		Transform3d translate(Translation3d(path[a]));
-		path_t tmp(shape);
-		tmp = apply_transform(tmp, rotate0);
-		tmp = apply_transform(tmp, rotate1);
-		tmp = apply_transform(tmp, rotate2);
-		tmp = apply_transform(tmp, translate);
+		Matrix3d rotation_matrix(Transform3d(last_transform).rotation());
+		Matrix3d rotation = rotate_from_to * rotation_matrix;
 
-//		for (path_t::iterator it = tmp.begin();it != tmp.end();it++) {
-//			Vector3d v = *it;
-//                        std::cout << v.x() << ", " << v.y() << ", " << v.z() << " - ";
-//                }
-//                std::cout << std::endl;
+		Vector3d c0 = rotation.col(0);
+		Vector3d c1 = rotation.col(1);
+		Vector3d c2 = rotation.col(2);
+		rotation << c0.normalized(), make_orthogonal(c1, c0), make_orthogonal(make_orthogonal(c2, c0), c1);
+		
+		last_transform = rotation;
 
-                
-		loft.push_back(tmp);
+		Matrix4d transform;
+		transform <<
+			rotation(0,0), rotation(0,1), rotation(0,2), path[a].x(),
+			rotation(1,0), rotation(1,1), rotation(1,2), path[a].y(),
+			rotation(2,0), rotation(2,1), rotation(2,2), path[a].z(),
+			0, 0, 0, 1;
+		
+		path_t result;
+		for (path_t::const_iterator it = shape.begin();it != shape.end();it++) {			
+			Vector3d v = *it;
+			Vector4d v4(v.x(), v.y(), v.z(), 1);
+			Vector4d r;
+			r = transform * v4;
+			result.push_back(Vector3d(r.x(), r.y(), r.z()));
+		}
+		loft.push_back(result);
 	}
 	return loft;	
 }
@@ -233,7 +214,6 @@ PolySet *PolySetCGALEvaluator::evaluatePolySet(const LoftNode &node)
 	path_t bottom = loft[0];
 	if (!connect) {
 		ps->append_poly();
-		int idx = 0;
 		for (path_t::iterator it = bottom.begin();it != bottom.end();it++) {
 			Vector3d v = *it;
 			ps->append_vertex(v.x(), v.y(), v.z());
@@ -262,8 +242,8 @@ PolySet *PolySetCGALEvaluator::evaluatePolySet(const LoftNode &node)
 		}
                 //std::cout << std::endl;
 #else
-		for (int idx1 = 0;idx1 < p1.size();idx1++) {
-			int idx2 = (idx1 + p1.size() - 1) % p1.size();
+		for (unsigned int idx1 = 0;idx1 < p1.size();idx1++) {
+			unsigned int idx2 = (idx1 + p1.size() - 1) % p1.size();
 			add_poly(ps,
 				p1[idx1].x(), p1[idx1].y(), p1[idx1].z(),
 				p1[idx2].x(), p1[idx2].y(), p1[idx2].z(),
@@ -275,8 +255,8 @@ PolySet *PolySetCGALEvaluator::evaluatePolySet(const LoftNode &node)
 	}
 	
 	if (connect) {
-		for (int idx1 = 0;idx1 < top.size();idx1++) {
-			int idx2 = (idx1 + top.size() - 1) % top.size();
+		for (unsigned int idx1 = 0;idx1 < top.size();idx1++) {
+			unsigned int idx2 = (idx1 + top.size() - 1) % top.size();
 			add_poly(ps,
 				top[idx1].x(), top[idx1].y(), top[idx1].z(),
 				top[idx2].x(), top[idx2].y(), top[idx2].z(),

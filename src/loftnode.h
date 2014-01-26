@@ -28,6 +28,7 @@ public:
         std::string offset_y;
         
         std::vector<Value> values_path;
+        std::vector<Value> values_path_tangent;
         std::vector<double> values_rotate;
         std::vector<double> values_scale_x;
         std::vector<double> values_scale_y;

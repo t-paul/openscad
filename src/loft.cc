@@ -95,6 +95,8 @@ public:
 private:
 	virtual void evaluate(Value &val, std::vector<double> &vec, EvalContext &ctx) const;
 	virtual void evaluate(Value &val, std::vector<Value> &vec, EvalContext &ctx) const;
+	virtual void calculate_tangent(const EvalContext *evalctx, Value &func, std::vector<Value> &vec, double t) const;
+	virtual Value evaluate(const EvalContext *evalctx, std::string func, double x) const;
 };
 
 AbstractNode *LoftModule::instantiate(const Context *ctx, const ModuleInstantiation *inst, const EvalContext *evalctx) const
@@ -128,6 +130,7 @@ AbstractNode *LoftModule::instantiate(const Context *ctx, const ModuleInstantiat
 	node->max_idx = floor(node->slices);
         for (int a = 0;a <= node->max_idx;a++) {
                 double v = (double)a / node->max_idx;
+		calculate_tangent(evalctx, path, node->values_path_tangent, v);
 		AssignmentList func_args;
 		std::string var("x");
 		func_args += Assignment(var, new Expression(Value(v)));
@@ -161,6 +164,47 @@ void LoftModule::evaluate(Value &func, std::vector<Value> &vec, EvalContext &ctx
 	
 	Value val = ctx.evaluate_function(func.toString(), &ctx);
 	vec.push_back(val);
+}
+
+void LoftModule::calculate_tangent(const EvalContext *evalctx, Value &func, std::vector<Value> &vec, double t) const
+{
+	if (func.type() != Value::STRING) {
+		return;
+	}
+	
+	std::string func_name = func.toString();
+	
+	double h = 1e-9;
+	while (true) {
+		double x0, y0, z0, x1, y1, z1;
+		Value v0 = evaluate(evalctx, func_name, t - h);
+		Value v1 = evaluate(evalctx, func_name, t + h);
+		v0.getVec3(x0, y0, z0);
+		v1.getVec3(x1, y1, z1);
+		double x = (x1 - x0) / (2 * h);
+		double y = (y1 - y0) / (2 * h);
+		double z = (z1 - z0) / (2 * h);
+		double l = x * x + y * y + z * z;
+		if ((l >= 1) || (h >= 1)) {
+			Value::VectorType v;
+			v.push_back(Value(x));
+			v.push_back(Value(y));
+			v.push_back(Value(z));
+			vec.push_back(Value(v));
+			break;
+		}
+		h *= 2;
+	}
+}
+
+Value LoftModule::evaluate(const EvalContext *evalctx, std::string func, double x) const
+{
+	AssignmentList func_args;
+	std::string var("x");
+	func_args += Assignment(var, new Expression(Value(x)));
+	EvalContext func_context(evalctx, func_args);
+	Value val = func_context.evaluate_function(func, &func_context);
+	return val;
 }
 
 void register_builtin_loft()
