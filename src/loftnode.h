@@ -22,18 +22,14 @@ public:
         double height;
         std::string path;
         std::string rotate;
-        std::string scale_x;
-        std::string scale_y;
-        std::string offset_x;
-        std::string offset_y;
+        std::string scale;
+        std::string offset;
         
         std::vector<Value> values_path;
         std::vector<Value> values_path_tangent;
         std::vector<double> values_rotate;
-        std::vector<double> values_scale_x;
-        std::vector<double> values_scale_y;
-        std::vector<double> values_offset_x;
-        std::vector<double> values_offset_y;
+        std::vector<Value> values_scale;
+        std::vector<Value> values_offset;
 };
 
 #endif

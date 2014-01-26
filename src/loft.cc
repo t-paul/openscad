@@ -76,10 +76,8 @@ std::string LoftNode::toString() const
 	stream << this->name() << "("
 		<< "path = " << path
 		<< ", rotate = " << rotate
-		<< ", scale_x = " << scale_x
-		<< ", scale_y = " << scale_y
-		<< ", offset_x = " << offset_x
-		<< ", offset_y = " << offset_y
+		<< ", scale = " << scale
+		<< ", offset = " << offset
                 << ", slices = " << slices
                 << ", height = " << height
 		<< ")";
@@ -112,17 +110,13 @@ AbstractNode *LoftModule::instantiate(const Context *ctx, const ModuleInstantiat
 	node->slices = c.lookup_variable("slices").toDouble();
 	Value path = c.lookup_variable("path");
 	Value rotate = c.lookup_variable("rotate");
-	Value scale_x = c.lookup_variable("scale_x");
-	Value scale_y = c.lookup_variable("scale_y");
-	Value offset_x = c.lookup_variable("offset_x");
-	Value offset_y = c.lookup_variable("offset_y");
+	Value scale = c.lookup_variable("scale");
+	Value offset = c.lookup_variable("offset");
 	
 	node->path = path.toString();
 	node->rotate = rotate.toString();
-	node->scale_x = scale_x.toString();
-	node->scale_y = scale_y.toString();
-	node->offset_x = offset_x.toString();
-	node->offset_y = offset_y.toString();
+	node->scale = scale.toString();
+	node->offset = offset.toString();
 
 	std::vector<AbstractNode *> instantiatednodes = inst->instantiateChildren(evalctx);
 	node->children.insert(node->children.end(), instantiatednodes.begin(), instantiatednodes.end());
@@ -137,10 +131,8 @@ AbstractNode *LoftModule::instantiate(const Context *ctx, const ModuleInstantiat
 		EvalContext func_context(evalctx, func_args);
 		evaluate(path, node->values_path, func_context);
 		evaluate(rotate, node->values_rotate, func_context);
-		evaluate(scale_x, node->values_scale_x, func_context);
-		evaluate(scale_y, node->values_scale_y, func_context);
-		evaluate(offset_x, node->values_offset_x, func_context);
-		evaluate(offset_y, node->values_offset_y, func_context);
+		evaluate(scale, node->values_scale, func_context);
+		evaluate(offset, node->values_offset, func_context);
 	}
 	
 	return node;

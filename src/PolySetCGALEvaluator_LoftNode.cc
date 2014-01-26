@@ -50,16 +50,21 @@ static path_t apply_transform(const path_t &path, const Transform3d &t)
 static path_t apply_transform(const path_t &path, const LoftNode &node, int idx)
 {
 	double r = node.values_rotate.empty() ? 0.0 : node.values_rotate[idx];
-	double sx = node.values_scale_x.empty() ? 1.0 : node.values_scale_x[idx];
-	double sy = node.values_scale_y.empty() ? 1.0 : node.values_scale_y[idx];
-	double ox = node.values_offset_x.empty() ? 0.0 : node.values_offset_x[idx];
-	double oy = node.values_offset_y.empty() ? 0.0 : node.values_offset_y[idx];
 	
-	Transform3d t(AngleAxisd(r, Vector3d(0, 0, 1)));
+	double sx = 1.0, sy = 1.0;
+	if (!node.values_scale.empty()) {
+		node.values_scale[idx].getVec2(sx, sy);
+	}
+	
+	double ox = 0.0, oy = 0.0;
+	if (!node.values_offset.empty()) {
+		node.values_offset[idx].getVec2(ox, oy);
+	}
+	
+	Transform3d t(AngleAxisd(M_PI * r / 360, Vector3d(0, 0, 1)));
 	t *= Scaling(sx, sy, 1.0);
 	t *= Translation3d(ox, oy, 0.0);
 	return apply_transform(path, t);
-	
 }
 
 static Vector3d make_orthogonal(Vector3d u, Vector3d v) {
@@ -126,7 +131,8 @@ static loft_t create_slices(path_t shape, const LoftNode &node) {
 			0, 0, 0, 1;
 		
 		path_t result;
-		for (path_t::const_iterator it = shape.begin();it != shape.end();it++) {			
+		path_t p = apply_transform(shape, node, a);
+		for (path_t::const_iterator it = p.begin();it != p.end();it++) {
 			Vector3d v = *it;
 			Vector4d v4(v.x(), v.y(), v.z(), 1);
 			Vector4d r;
