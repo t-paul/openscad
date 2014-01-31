@@ -35,6 +35,7 @@
 #include "printutils.h"
 #include "fileutils.h"
 #include "handle_dep.h" // handle_dep()
+#include "libsvg/libsvg.h"
 
 #ifdef ENABLE_CGAL
 #include "cgalutils.h"
@@ -105,6 +106,7 @@ AbstractNode *ImportModule::instantiate(const Context *ctx, const ModuleInstanti
 		std::string ext = boost::algorithm::to_lower_copy( extraw );
 		if (ext == ".stl") actualtype = TYPE_STL;
 		else if (ext == ".off") actualtype = TYPE_OFF;
+		else if (ext == ".svg") actualtype = TYPE_SVG;
 		else if (ext == ".dxf") actualtype = TYPE_DXF;
 	}
 
@@ -294,6 +296,58 @@ Geometry *ImportNode::createGeometry() const
 #else
   PRINT("WARNING: OFF import requires CGAL.");
 #endif
+	}
+		break;
+	case TYPE_SVG: {
+		libsvg::shapes_list_t *shapes = libsvg::libsvg_read_file(this->filename.c_str());
+		DxfData dd;
+		double x_min = 1.0/0.0;
+		double x_max = -1.0/0.0;
+		double y_min = 1.0/0.0;
+		double y_max = -1.0/0.0;
+		for (libsvg::shapes_list_t::iterator it = shapes->begin();it != shapes->end();it++) {
+			libsvg::shape *s = (*it);
+			for (libsvg::path_list_t::iterator it = s->get_path_list().begin();it != s->get_path_list().end();it++) {
+				libsvg::path_t& p = *it;
+				for (libsvg::path_t::iterator it2 = p.begin();it2 != p.end();it2++) {
+					Eigen::Vector3d& v = *it2;
+					if (v.x() < x_min) {
+						x_min = v.x();
+					}
+					if (v.x() > x_max) {
+						x_max = v.x();
+					}
+					if (v.y() < y_min) {
+						y_min = v.y();
+					}
+					if (v.y() > y_max) {
+						y_max = v.y();
+					}
+				}
+			}
+		}
+		
+		double cx = (x_min + x_max) / 2;
+		double cy = (y_min + y_max) / 2;
+		
+		for (libsvg::shapes_list_t::iterator it = shapes->begin();it != shapes->end();it++) {
+			libsvg::shape *s = (*it);
+			for (libsvg::path_list_t::iterator it = s->get_path_list().begin();it != s->get_path_list().end();it++) {
+				libsvg::path_t& p = *it;
+
+				dd.paths.push_back(DxfData::Path());
+				DxfData::Path *path = &dd.paths.back();
+				path->is_closed = true;
+				for (libsvg::path_t::iterator it2 = p.begin();it2 != p.end();it2++) {
+					Eigen::Vector3d& v = *it2;
+					double x = v.x() - cx;
+					double y = -v.y() + cy;
+					int p0 = dd.addPoint(x, y);
+					path->indices.push_back(p0);
+				}
+			}
+		}
+		g = dd.toPolygon2d();
 	}
 		break;
 	case TYPE_DXF: {

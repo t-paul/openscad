@@ -155,6 +155,7 @@ CONFIG += opencsg
 CONFIG += boost
 CONFIG += eigen
 CONFIG += glib-2.0
+CONFIG += libxml2
 
 #Uncomment the following line to enable QCodeEdit
 #CONFIG += qcodeedit
@@ -272,7 +273,21 @@ HEADERS += src/typedefs.h \
            \
            src/AutoUpdater.h
 
-SOURCES += src/version_check.cc \
+SOURCES += \
+           src/libsvg/libsvg.cc \
+           src/libsvg/circle.cc \
+           src/libsvg/ellipse.cc \
+           src/libsvg/line.cc \
+           src/libsvg/polygon.cc \
+           src/libsvg/polyline.cc \
+           src/libsvg/rect.cc \
+           src/libsvg/group.cc \
+           src/libsvg/svgpage.cc \
+           src/libsvg/path.cc \
+           src/libsvg/shape.cc \
+           src/libsvg/transformation.cc \
+           \
+           src/version_check.cc \
            src/ProgressWidget.cc \
            src/mathc99.cc \
            src/linalg.cc \
