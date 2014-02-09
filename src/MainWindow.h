@@ -88,6 +88,7 @@ private:
 	static void consoleOutput(const std::string &msg, void *userdata);
 	void loadViewSettings();
 	void loadDesignSettings();
+        QString get2dExportFilename(QString format, QString extension);
 
   class QMessageBox *openglbox;
 
@@ -145,6 +146,7 @@ private slots:
 	void actionExportSTL();
 	void actionExportOFF();
 	void actionExportDXF();
+	void actionExportSVG();
 	void actionExportCSG();
 	void actionExportImage();
 	void actionFlushCaches();
