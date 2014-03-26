@@ -225,6 +225,7 @@ HEADERS += src/typedefs.h \
            src/feature.h \
            src/node.h \
            src/csgnode.h \
+           src/loft.h \
            src/linearextrudenode.h \
            src/rotateextrudenode.h \
            src/projectionnode.h \
@@ -308,6 +309,7 @@ SOURCES += src/version_check.cc \
            src/render.cc \
            src/dxfdata.cc \
            src/dxfdim.cc \
+           src/loft.cc \
            src/linearextrude.cc \
            src/rotateextrude.cc \
            src/printutils.cc \
