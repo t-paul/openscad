@@ -1,20 +1,25 @@
-#include <math.h>
-#include <vector>
-#include <Eigen/Core>
-#include <Eigen/Geometry>
+#include "GeometryEvaluator.h"
+#include "traverser.h"
+#include "Tree.h"
+#include "GeometryCache.h"
+#include "CGALCache.h"
+#include "Polygon2d.h"
+#include "module.h"
+#include "state.h"
+#include "loftnode.h"
+#include "CGAL_Nef_polyhedron.h"
+#include "cgalutils.h"
+#include "clipper-utils.h"
+#include "polyset-utils.h"
+#include "polyset.h"
+#include "calc.h"
+#include "printutils.h"
+
+#include <algorithm>
 #include <boost/foreach.hpp>
 
-#include "module.h"
-#include "polyset.h"
-#include "dxfdata.h"
-#include "loftnode.h"
-#include "PolySetCGALEvaluator.h"
-#include "CGALEvaluator.h"
-
-#include "printutils.h"
-#include "openscad.h"
-#include "dxfdata.h"
-#include "context.h" // get_fragments_from_r()
+#include <CGAL/convex_hull_2.h>
+#include <CGAL/Point_2.h>
 
 using namespace Eigen;
 
@@ -157,37 +162,12 @@ static loft_t apply_transform(loft_t loft, const LoftNode &node)
 	return result;
 }
 
-static DxfData *evaluateChildNodes(CGALEvaluator *ev, const LoftNode &node)
+static Geometry * loftPolygon(const LoftNode &node, const Polygon2d &poly)
 {
-	// Union all (2D) children nodes to a single DxfData
-	CGAL_Nef_polyhedron sum;
-
-	BOOST_FOREACH(AbstractNode * v, node.getChildren())
-	{
-		if (v->modinst->isBackground()) continue;
-		CGAL_Nef_polyhedron N = ev->evaluateCGALMesh(*v);
-		if (!N.isNull()) {
-			if (N.dim != 2) {
-				PRINT("ERROR: linear_extrude() is not defined for 3D child objects!");
-			} else {
-				if (sum.isNull()) sum = N.copy();
-				else sum += N;
-			}
-		}
-	}
-
-	if (sum.isNull()) return NULL;
-	DxfData *dxf = sum.convertToDxfData();
-	return dxf;
-}
-
-PolySet *PolySetCGALEvaluator::evaluatePolySet(const LoftNode &node)
-{
-	PolySet *ps = new PolySet();
+	PolySet *ps = new PolySet(3);
 	
-	DxfData *dxf = evaluateChildNodes(&this->cgalevaluator, node);
-	if ((dxf == NULL) || dxf->paths.empty()) {
-		return NULL;
+	if (poly.outlines().size() != 1) {
+		return ps;
 	}
 	
 	bool connect = false;
@@ -208,10 +188,8 @@ PolySet *PolySetCGALEvaluator::evaluatePolySet(const LoftNode &node)
 	}
 
 	path_t shape;
-	DxfData::Path p = dxf->paths[0];
-	for (std::vector<int>::iterator it = p.indices.begin();it != p.indices.end();it++) {
-		int idx = *it;
-		Vector2d v = dxf->points[idx];
+	const Outline2d &o = poly.outlines()[0];
+	BOOST_FOREACH(const Vector2d &v, o.vertices) {
 		shape.push_back(Vector3d(v.x(), v.y(), 0));
 	}
 	
@@ -272,4 +250,27 @@ PolySet *PolySetCGALEvaluator::evaluatePolySet(const LoftNode &node)
 	}
 	
 	return ps;
+}
+
+Response GeometryEvaluator::visit(State &state, const LoftNode &node)
+{
+	if (state.isPrefix() && isSmartCached(node)) return PruneTraversal;
+	if (state.isPostfix()) {
+		shared_ptr<const Geometry> geom;
+		if (!isSmartCached(node)) {
+			const Geometry *geometry = applyToChildren2D(node, OPENSCAD_UNION);
+			if (geometry) {
+				const Polygon2d *polygons = dynamic_cast<const Polygon2d*>(geometry);
+				Geometry *extruded = loftPolygon(node, *polygons);
+				assert(extruded);
+				geom.reset(extruded);
+				delete geometry;
+			}
+		}
+		else {
+			geom = smartCacheGet(node);
+		}
+		addToParent(state, node, geom);
+	}
+	return ContinueTraversal;
 }

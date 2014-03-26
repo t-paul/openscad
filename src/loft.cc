@@ -53,22 +53,6 @@ std::string LoftNode::name() const
 	return "loft";
 }
 
-class PolySet *LoftNode::evaluate_polyset(PolySetEvaluator *evaluator) const
-{
-	if (!evaluator) {
-		PRINTB("WARNING: No suitable PolySetEvaluator found for %s module!", this->name());
-		return NULL;
-	}
-
-	print_messages_push();
-
-	PolySet *ps = evaluator->evaluatePolySet(*this);
-
-	print_messages_pop();
-
-	return ps;
-}
-
 std::string LoftNode::toString() const
 {
 	std::stringstream stream;

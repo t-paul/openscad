@@ -323,6 +323,7 @@ SOURCES += src/version_check.cc \
            src/nodedumper.cc \
            src/traverser.cc \
            src/GeometryEvaluator.cc \
+           src/GeometryEvaluator_LoftNode.cc \
            src/ModuleCache.cc \
            src/GeometryCache.cc \
            src/Tree.cc \
@@ -387,7 +388,8 @@ HEADERS += src/cgal.h \
            src/CGAL_Nef3_workaround.h \
            src/cgalworker.h \
            src/Polygon2d-CGAL.h
-           src/PolySetCGALEvaluator_LoftNode.cc \
+
+SOURCES += src/cgalutils.cc \
            src/CGALCache.cc \
            src/CGALRenderer.cc \
            src/CGAL_Nef_polyhedron.cc \

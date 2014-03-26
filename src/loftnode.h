@@ -14,9 +14,7 @@ public:
         virtual Response accept(class State &state, Visitor &visitor) const;
 	virtual std::string toString() const;
 	virtual std::string name() const;
-
-	virtual PolySet *evaluate_polyset(class PolySetEvaluator *) const;
-
+  
         int max_idx;
         double slices;
         double height;
