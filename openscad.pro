@@ -387,8 +387,7 @@ HEADERS += src/cgal.h \
            src/CGAL_Nef3_workaround.h \
            src/cgalworker.h \
            src/Polygon2d-CGAL.h
-
-SOURCES += src/cgalutils.cc \
+           src/PolySetCGALEvaluator_LoftNode.cc \
            src/CGALCache.cc \
            src/CGALRenderer.cc \
            src/CGAL_Nef_polyhedron.cc \

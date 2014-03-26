@@ -74,7 +74,8 @@ std::string LoftNode::toString() const
 	std::stringstream stream;
 
 	stream << this->name() << "("
-		<< "rotate = " << rotate
+		<< "path = " << path
+		<< ", rotate = " << rotate
 		<< ", scale_x = " << scale_x
 		<< ", scale_y = " << scale_y
 		<< ", offset_x = " << offset_x
@@ -93,6 +94,7 @@ public:
 	virtual AbstractNode *instantiate(const Context *ctx, const ModuleInstantiation *inst, const EvalContext *evalctx) const;
 private:
 	virtual void evaluate(Value &val, std::vector<double> &vec, EvalContext &ctx) const;
+	virtual void evaluate(Value &val, std::vector<Value> &vec, EvalContext &ctx) const;
 };
 
 AbstractNode *LoftModule::instantiate(const Context *ctx, const ModuleInstantiation *inst, const EvalContext *evalctx) const
@@ -106,12 +108,14 @@ AbstractNode *LoftModule::instantiate(const Context *ctx, const ModuleInstantiat
 
         node->height = c.lookup_variable("height").toDouble();
 	node->slices = c.lookup_variable("slices").toDouble();
+	Value path = c.lookup_variable("path");
 	Value rotate = c.lookup_variable("rotate");
 	Value scale_x = c.lookup_variable("scale_x");
 	Value scale_y = c.lookup_variable("scale_y");
 	Value offset_x = c.lookup_variable("offset_x");
 	Value offset_y = c.lookup_variable("offset_y");
 	
+	node->path = path.toString();
 	node->rotate = rotate.toString();
 	node->scale_x = scale_x.toString();
 	node->scale_y = scale_y.toString();
@@ -123,11 +127,12 @@ AbstractNode *LoftModule::instantiate(const Context *ctx, const ModuleInstantiat
 
 	node->max_idx = floor(node->slices);
         for (int a = 0;a <= node->max_idx;a++) {
-                double v = (double)a / node->slices;
+                double v = (double)a / node->max_idx;
 		AssignmentList func_args;
 		std::string var("x");
 		func_args += Assignment(var, new Expression(Value(v)));
 		EvalContext func_context(evalctx, func_args);
+		evaluate(path, node->values_path, func_context);
 		evaluate(rotate, node->values_rotate, func_context);
 		evaluate(scale_x, node->values_scale_x, func_context);
 		evaluate(scale_y, node->values_scale_y, func_context);
@@ -146,6 +151,16 @@ void LoftModule::evaluate(Value &func, std::vector<double> &vec, EvalContext &ct
 	
 	Value val = ctx.evaluate_function(func.toString(), &ctx);
 	vec.push_back(val.toDouble());
+}
+
+void LoftModule::evaluate(Value &func, std::vector<Value> &vec, EvalContext &ctx) const
+{
+	if (func.type() != Value::STRING) {
+		return;
+	}
+	
+	Value val = ctx.evaluate_function(func.toString(), &ctx);
+	vec.push_back(val);
 }
 
 void register_builtin_loft()

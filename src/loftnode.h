@@ -20,12 +20,14 @@ public:
         int max_idx;
         double slices;
         double height;
+        std::string path;
         std::string rotate;
         std::string scale_x;
         std::string scale_y;
         std::string offset_x;
         std::string offset_y;
         
+        std::vector<Value> values_path;
         std::vector<double> values_rotate;
         std::vector<double> values_scale_x;
         std::vector<double> values_scale_y;
