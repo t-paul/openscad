@@ -105,7 +105,7 @@ jobs:
             echo
             echo "Release files mirrored from https://files.openscad.org/rc/"
             echo
-            echo "For more information, see the [download](https://openscad.org/downloads.html) page.
+            echo "For more information, see the [download](https://openscad.org/downloads.html) page."
             echo
             for file in downloads/*; do
               case "$(basename "$file")" in *.asc|*.sha256|*.sha512) continue ;; esac
