@@ -74,9 +74,9 @@ jobs:
           mkdir -p downloads
           while IFS= read -r url ; do
             file="downloads/$(basename "$url")"
-            for ext in "" .sha256 .sha512 .asc ; do
+            for ext in "" .asc .sha256 .sha512 ; do
               echo "Downloading ${url}${ext}"
-              curl -fL --retry 3 --retry-delay 10 -o "${file}${ext}" "${url}${ext}"
+              curl -fL --no-progress-meter --retry 3 --retry-delay 10 -o "${file}${ext}" "${url}${ext}"
             done
           done < urls.txt
           ls -lh downloads/
@@ -84,7 +84,9 @@ jobs:
           (
             cd downloads
             for file in *; do
+              case "$file" in *.asc) continue ;; esac
               case "$file" in *.sha256) continue ;; esac
+              case "$file" in *.sha512) continue ;; esac
               expected=$(tr 'A-F' 'a-f' < "$file.sha256" | awk '{print $1; exit}')
               actual=$(sha256sum "$file" | awk '{print $1}')
               if [ -z "$expected" ] || [ "$expected" != "$actual" ]; then
