@@ -84,9 +84,7 @@ jobs:
           (
             cd downloads
             for file in *; do
-              case "$file" in *.asc) continue ;; esac
-              case "$file" in *.sha256) continue ;; esac
-              case "$file" in *.sha512) continue ;; esac
+              case "$file" in *.asc|*.sha256|*.sha512) continue ;; esac
               expected=$(tr 'A-F' 'a-f' < "$file.sha256" | awk '{print $1; exit}')
               actual=$(sha256sum "$file" | awk '{print $1}')
               if [ -z "$expected" ] || [ "$expected" != "$actual" ]; then
@@ -103,12 +101,14 @@ jobs:
           TAG="${{ steps.latest-tag.outputs.tag }}"
           VERSION="${TAG#openscad-}"
           {
-            echo "OpenSCAD $VERSION"
+            echo "## OpenSCAD $VERSION"
             echo
             echo "Release files mirrored from https://files.openscad.org/rc/"
             echo
+            echo "For more information, see the [download](https://openscad.org/downloads.html) page.
+            echo
             for file in downloads/*; do
-              case "$(basename "$file")" in *.sha256) continue ;; esac
+              case "$(basename "$file")" in *.asc|*.sha256|*.sha512) continue ;; esac
               echo "- $(basename "$file")"
             done
           } > release_notes.md
