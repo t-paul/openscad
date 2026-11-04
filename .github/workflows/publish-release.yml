@@ -16,6 +16,9 @@ jobs:
     env:
       RC_INDEX_URL: https://files.openscad.org/rc/.rc.js
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
       - name: Get latest tag
         id: latest-tag
         run: |
