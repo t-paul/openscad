@@ -72,12 +72,12 @@ jobs:
             exit 1
           fi
           mkdir -p downloads
-          while IFS= read -r url; do
+          while IFS= read -r url ; do
             file="downloads/$(basename "$url")"
-            echo "Downloading $url"
-            curl -fL --retry 3 --retry-delay 10 -o "$file" "$url"
-            echo "Downloading ${url}.sha256"
-            curl -fL --retry 3 --retry-delay 10 -o "${file}.sha256" "${url}.sha256"
+            for ext in "" .sha256 .sha512 .asc ; do
+              echo "Downloading ${url}${ext}"
+              curl -fL --retry 3 --retry-delay 10 -o "${file}${ext}" "${url}${ext}"
+            done
           done < urls.txt
           ls -lh downloads/
           # Verify every file against its sha256sum checksum
